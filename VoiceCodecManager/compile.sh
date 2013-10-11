@@ -38,3 +38,13 @@ voicecodecmanager.cpp VoiceEncoder_Silk.cpp VoiceEncoder_Speex.cpp \
 echo "leave this folder!"
 
 cd ..
+
+if [ -f Release/VoiceCodecMgr_i386.so ]; then
+	echo "Success!"
+
+	exit 0;
+fi
+
+echo "Error!"
+
+exit -1;

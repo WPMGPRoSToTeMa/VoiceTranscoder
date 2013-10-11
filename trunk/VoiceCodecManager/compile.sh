@@ -1,11 +1,13 @@
 #!/bin/sh
 #
 
+cd VoiceCodecManager
+
 echo "compile.sh got the control"
 mkdir ../Release 2>/dev/null
 rm -f ../Release/VoiceCodecMgr_i386.so 2>/dev/null
 
-g++	-mia32 -O3 -fasm-blocks \
+g++		-O3 \
 		-funroll-loops \
 		-fomit-frame-pointer \
 		-fno-rtti \
@@ -13,9 +15,8 @@ g++	-mia32 -O3 -fasm-blocks \
 		-fno-stack-protector \
 		-falign-functions=2 \
 		-Wno-unknown-pragmas \
-		-static-intel -shared  \
+		-shared  \
 		-static-libgcc \
-		-no-intel-extensions \
 		-fno-builtin \
 		-fno-exceptions \
 -I./hacker \
@@ -32,3 +33,7 @@ voicecodecmanager.cpp VoiceEncoder_Silk.cpp VoiceEncoder_Speex.cpp \
 -ldl -lm \
 -o ../Release/VoiceCodecMgr_i386.so \
 L./ -lSKP_SILK_SDK -lspeex
+
+echo "leave this folder!"
+
+cd ..

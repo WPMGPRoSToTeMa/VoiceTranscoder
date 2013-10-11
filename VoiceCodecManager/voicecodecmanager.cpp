@@ -34,7 +34,7 @@ FILE *g_pFile;
 #include <time.h>
 
 void StressTest1(void) {
-	for (int i = 0; i < 99999; i++)
+	for (int i = 0; i < 9999; i++)
 	{
 		char szTest[32];
 		snprintf(szTest, sizeof(szTest), "%d\n", i);
@@ -61,6 +61,29 @@ void StressTest1(void) {
 	}
 }
 
+void StressTest2(void) {
+	for (int i = 0; i < 9999; i++)
+	{
+		int nCompressedLength, nDecompressedSamples;
+		char chDecompressed[8192];
+		char chCompressed[4096];
+
+		size_t uiBuffSize = rand() % 4096 + 1;
+
+		byte *bBuff = new byte[uiBuffSize];
+
+		for (size_t ui = 0; ui < uiBuffSize; ui++) {
+			bBuff[ui] = rand() % 256;
+		}
+
+		nDecompressedSamples = g_pVoiceSilk[31]->Decompress((const char *)bBuff, (int)uiBuffSize, chDecompressed, sizeof(chDecompressed));
+
+		nCompressedLength = g_pVoiceSpeex[31]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed), false);
+
+		delete []bBuff;
+	}
+}
+
 qboolean VCM_Init( void ) {
 	g_pFile = fopen("cstrike/out.txt", "wt");
 
@@ -82,6 +105,7 @@ qboolean VCM_Init( void ) {
 	g_psvs = (server_static_t *)g_pdlEngine->FindAddr(SEARCH_SVS);
 
 	REG_SVR_COMMAND("stresstest1", StressTest1);
+	REG_SVR_COMMAND("stresstest2", StressTest2);
 
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);

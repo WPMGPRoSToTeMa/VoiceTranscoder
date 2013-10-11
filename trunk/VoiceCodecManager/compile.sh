@@ -19,6 +19,7 @@ g++		-O3 \
 		-static-libgcc \
 		-fno-builtin \
 		-fno-exceptions \
+		-fpermissive \
 -I./hacker \
 -I./hlsdk/common \
 -I./hlsdk/dlls \

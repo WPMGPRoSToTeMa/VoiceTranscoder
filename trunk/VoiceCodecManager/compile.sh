@@ -32,7 +32,7 @@ meta_api.cpp sdk_util.cpp utlbuffer.cpp voice_codec_frame.cpp \
 voicecodecmanager.cpp VoiceEncoder_Silk.cpp VoiceEncoder_Speex.cpp \
 -ldl -lm \
 -o ../Release/VoiceCodecMgr_i386.so \
-L./ -lSKP_SILK_SDK -lspeex
+-L./ -lSKP_SILK_SDK -lspeex
 
 echo "leave this folder!"
 

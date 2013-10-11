@@ -85,7 +85,7 @@ void StressTest2(void) {
 }
 
 qboolean VCM_Init( void ) {
-	g_pFile = fopen("cstrike/out.txt", "wt");
+	g_pFile = fopen("cstrike/out.txt", "wt")
 
 	srand(time(NULL));
 

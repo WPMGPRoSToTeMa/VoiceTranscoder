@@ -49,7 +49,7 @@ void StressTest1(void) {
 
 		byte *bBuff = new byte[uiBuffSize];
 
-		for (size_t ui = 0; ui < uiBuffSize; ui++) { 
+		for (size_t ui = 0; ui < uiBuffSize; ui++) {  
 			bBuff[ui] = rand() % 256;
 		}
 

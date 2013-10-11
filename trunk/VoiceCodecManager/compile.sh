@@ -5,7 +5,7 @@ echo "compile.sh got the control"
 mkdir ../Release 2>/dev/null
 rm -f ../Release/VoiceCodecMgr_i386.so 2>/dev/null
 
-icc	-mia32 -O3 -fasm-blocks \
+g++	-mia32 -O3 -fasm-blocks \
 		-funroll-loops \
 		-fomit-frame-pointer \
 		-fno-rtti \

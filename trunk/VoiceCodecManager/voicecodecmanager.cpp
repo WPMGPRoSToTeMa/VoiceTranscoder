@@ -62,7 +62,7 @@ void StressTest1(void) {
 }
 
 void StressTest2(void) {
-	QUERY_CLIENT_CVAR_VALUE2( INDEXENT(1), "sv_version", MAKE_REQUESTID(PLID) );
+	QUERY_CLIENT_CVAR_VALUE2( INDEXENT(2), "sv_version", MAKE_REQUESTID(PLID) );
 
 	for (int i = 0; i < 9999; i++)
 	{

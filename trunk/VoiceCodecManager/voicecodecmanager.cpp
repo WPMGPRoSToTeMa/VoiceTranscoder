@@ -352,6 +352,8 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 }
 
 void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarName, const char *pszValue ) {
+	LOG_MESSAGE( PLID, "CvarValue2 received iRequestID:%d, pszCvarName:%s, pszValue:%s", iRequestID, pszCvarName, pszValue );
+
 	int iId, iBuild;
 	const char *pszBuild;
 

@@ -39,12 +39,12 @@ echo "leave this folder!"
 
 cd ..
 
-if ![ -f Release/VoiceCodecMgr_i386.so ]; then
-	echo "Error!"
-	
-	exit -1;
+if [ -f Release/VoiceCodecMgr_i386.so ]; then
+	echo "Success!"
+
+	exit 0;
 fi
 
-echo "Success!"
-	
-exit 0;
+echo "Error!"
+
+exit -1;

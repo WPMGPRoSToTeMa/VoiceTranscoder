@@ -62,8 +62,6 @@ void StressTest1(void) {
 }
 
 void StressTest2(void) {
-	QUERY_CLIENT_CVAR_VALUE2( INDEXENT(2), "sv_version", MAKE_REQUESTID(PLID) );
-
 	for (int i = 0; i < 9999; i++)
 	{
 		int nCompressedLength, nDecompressedSamples;
@@ -341,13 +339,6 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 
 		QUERY_CLIENT_CVAR_VALUE2( pEntity, "sv_version", g_PlayerVCodec[ iId ].m_iRequestID );
 
-		MESSAGE_BEGIN(MSG_ONE, 58, NULL, pEntity);
-		WRITE_LONG(g_PlayerVCodec[ iId ].m_iRequestID);
-		WRITE_STRING("sv_version");
-		MESSAGE_END();
-
-		LOG_MESSAGE( PLID, "CvarValue2 sended iRequestID:%d", g_PlayerVCodec[ iId ].m_iRequestID );
-
 		break;
 	}
 
@@ -361,8 +352,6 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 }
 
 void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarName, const char *pszValue ) {
-	LOG_MESSAGE( PLID, "CvarValue2 received iRequestID:%d, pszCvarName:%s, pszValue:%s", iRequestID, pszCvarName, pszValue );
-
 	int iId, iBuild;
 	const char *pszBuild;
 

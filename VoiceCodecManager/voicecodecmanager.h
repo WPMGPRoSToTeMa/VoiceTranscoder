@@ -10,8 +10,9 @@
 #include <dynamiclibrary.h>
 #include <hooker.h>
 
-#include "interface.h"
 #include "ivoicecodec.h"
+#include "VoiceEncoder_Silk.h"
+#include "VoiceEncoder_Speex.h"
 
 #define MAX_CLIENTS	32
 

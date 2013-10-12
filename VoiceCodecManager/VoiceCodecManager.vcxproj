@@ -68,6 +68,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VOICECODECMANAGER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>.\hlsdk\common;.\hlsdk\dlls;.\hlsdk\engine;.\hlsdk\pm_shared;.\metamod;.\hacker;.\speex;.\silk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -86,7 +87,6 @@
     <ClCompile Include="CRC32.cpp" />
     <ClCompile Include="dllapi.cpp" />
     <ClCompile Include="h_export.cpp" />
-    <ClCompile Include="interface.cpp" />
     <ClCompile Include="meta_api.cpp" />
     <ClCompile Include="sdk_util.cpp" />
     <ClCompile Include="utlbuffer.cpp" />
@@ -102,7 +102,6 @@
     <ClInclude Include="build.h" />
     <ClInclude Include="CRC32.h" />
     <ClInclude Include="iframeencoder.h" />
-    <ClInclude Include="interface.h" />
     <ClInclude Include="ivoicecodec.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="utiltypes.h" />

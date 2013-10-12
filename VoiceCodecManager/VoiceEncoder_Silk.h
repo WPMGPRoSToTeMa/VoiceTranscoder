@@ -10,15 +10,15 @@
 
 #include <SKP_Silk_SDK_API.h>
 
-#define MAX_BYTES_PER_FRAME     250 // Equals peak bitrate of 100 kbps 
-#define MAX_INPUT_FRAMES        5
-#define FRAME_LENGTH_MS         20
-#define MAX_API_FS_KHZ          8
-#define MAX_FRAMEBUFFER_SAMPLES	16383
+extern IVoiceCodec *CreateSilkVoiceCodec();
 
 class VoiceEncoder_Silk : public IVoiceCodec
 {
 public:
+	static const int s_iMaxInputFrames = 5;
+	static const int s_iFrameLengthMs = 20;
+	static const int s_iMaxApiFsKhz = 8;
+
 	VoiceEncoder_Silk();
 	virtual ~VoiceEncoder_Silk();
 

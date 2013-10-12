@@ -7,11 +7,9 @@
 
 #define NOSTEAM_TEST
 
-IBaseInterface *CreateSilkVoiceCodec() {
-	return (IBaseInterface *)new VoiceEncoder_Silk;
+IVoiceCodec *CreateSilkVoiceCodec() {
+	return new VoiceEncoder_Silk;
 }
-
-EXPOSE_INTERFACE_FN(CreateSilkVoiceCodec, IVoiceCodec, "voice_silk")
 
 VoiceEncoder_Silk::VoiceEncoder_Silk() {
 	m_pEncState = NULL;
@@ -48,15 +46,13 @@ void VoiceEncoder_Silk::Release() {
 	delete this;
 }
 
-#include <stdio.h>
-
 int VoiceEncoder_Silk::Compress(const char *psUncompressed, int nSamples, char *pbCompressed, int nMaxCompressedBytes, bool fFinal) {
 	// Standard size of header
 	pbCompressed += 14;
 
 	m_iSampleRate = 8000;
 
-	int nMinSamples = MAX_INPUT_FRAMES * m_iSampleRate * FRAME_LENGTH_MS / 1000;
+	int nMinSamples = s_iMaxInputFrames * m_iSampleRate * s_iFrameLengthMs / 1000;
 
 	m_buffEncode.Put(psUncompressed, nSamples * BYTES_PER_SAMPLE);
 
@@ -68,7 +64,7 @@ int VoiceEncoder_Silk::Compress(const char *psUncompressed, int nSamples, char *
 	int nSamplesRemain;
 	CUtlBuffer buffCompressed(pbCompressed, nMaxCompressedBytes);
 
-	nMinSamples = m_iSampleRate * FRAME_LENGTH_MS / 1000;
+	nMinSamples = m_iSampleRate * s_iFrameLengthMs / 1000;
 
 	nSamplesRemain = (m_buffEncode.TellPut() - m_buffEncode.TellGet()) / BYTES_PER_SAMPLE;
 
@@ -151,7 +147,7 @@ int VoiceEncoder_Silk::Decompress(const char *pCompressed, int compressedBytes, 
 
 	m_decStatus.API_sampleRate = m_iSampleRate;
 
-	int nMinSamples = m_iSampleRate * FRAME_LENGTH_MS / 1000;
+	int nMinSamples = m_iSampleRate * s_iFrameLengthMs / 1000;
 
 	while (buffCompressed.TellGet() + 2 <= buffCompressed.Size()) {
 		iLen = buffCompressed.GetUnsignedShort();
@@ -191,39 +187,6 @@ int VoiceEncoder_Silk::Decompress(const char *pCompressed, int compressedBytes, 
 	}
 
 	return buffDecompressed.TellPut() / BYTES_PER_SAMPLE;
-
-	/*m_nEncodedBytes = *(short *)&pCompressed[curCompressedByte];
-	curCompressedByte += sizeof(short);
-
-	if (m_nEncodedBytes == -1)
-	{
-		ResetState();
-
-		return nDecompressedBytes / BYTES_PER_SAMPLE;
-	}
-
-	while ((compressedBytes - curCompressedByte) >= m_nEncodedBytes)
-	{
-		iLen = maxUncompressedBytes - nDecompressedBytes;
-		SKP_Silk_SDK_Decode(m_pDecState, &m_decStatus, NULL, (const unsigned char *)&pCompressed[curCompressedByte], m_nEncodedBytes, (short *)&pUncompressed[nDecompressedBytes], (short *)&iLen);
-		curCompressedByte += m_nEncodedBytes;
-		nDecompressedBytes += iLen * BYTES_PER_SAMPLE;
-
-		if (curCompressedByte >= compressedBytes)
-			break;
-
-		m_nEncodedBytes = *(short *)&pCompressed[curCompressedByte];
-		curCompressedByte += sizeof(short);
-
-		if (m_nEncodedBytes == -1)
-		{
-			ResetState();
-
-			return nDecompressedBytes / BYTES_PER_SAMPLE;
-		}
-	}
-
-	return nDecompressedBytes / BYTES_PER_SAMPLE;*/
 }
 
 bool VoiceEncoder_Silk::ResetState() {

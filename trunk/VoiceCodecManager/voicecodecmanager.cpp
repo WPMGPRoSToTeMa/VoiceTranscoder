@@ -29,68 +29,7 @@ cvar_t *g_pcvarVoiceVolumeSilk;
 
 bool g_bIsMiles;
 
-FILE *g_pFile;
-
-#include <time.h>
-
-void StressTest1(void) {
-	for (int i = 0; i < 9999; i++)
-	{
-		char szTest[32];
-		snprintf(szTest, sizeof(szTest), "%d\n", i);
-		fputs(szTest, g_pFile);
-		fflush(g_pFile);
-
-		int nCompressedLength, nDecompressedSamples;
-		char chDecompressed[8192];
-		char chCompressed[4096];
-
-		size_t uiBuffSize = rand() % 4096 + 1;
-
-		byte *bBuff = new byte[uiBuffSize];
-
-		for (size_t ui = 0; ui < uiBuffSize; ui++) {
-			bBuff[ui] = rand() % 256;
-		}
-
-		nDecompressedSamples = g_pVoiceSpeex[31]->Decompress((const char *)bBuff, (int)uiBuffSize, chDecompressed, sizeof(chDecompressed));
-
-		nCompressedLength = g_pVoiceSilk[31]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed), false);
-
-		delete []bBuff;
-	}
-}
-
-void StressTest2(void) {
-	for (int i = 0; i < 9999; i++)
-	{
-		int nCompressedLength, nDecompressedSamples;
-		char chDecompressed[8192];
-		char chCompressed[4096];
-
-		size_t uiBuffSize = rand() % 4096 + 1;
-
-		byte *bBuff = new byte[uiBuffSize];
-
-		for (size_t ui = 0; ui < uiBuffSize; ui++) {
-			bBuff[ui] = rand() % 256;
-		}
-
-		nDecompressedSamples = g_pVoiceSilk[31]->Decompress((const char *)bBuff, (int)uiBuffSize, chDecompressed, sizeof(chDecompressed));
-
-		nCompressedLength = g_pVoiceSpeex[31]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed), false);
-
-		delete []bBuff;
-	}
-}
-
 qboolean VCM_Init( void ) {
-	g_pFile = fopen("cstrike/out.txt", "wt");
-
-	srand(time(NULL));
-
-	CreateInterfaceFn pfnCreateInterface;
-
 	g_pdlEngine = new DYNLIB( (void *)g_engfuncs.pfnPrecacheModel );
 
 	g_phookParseVoiceData = new HOOKER<SV_PARSEVOICEDATA>(g_pdlEngine->FindAddr(SEARCH_SV_PARSEVOICEDATA), SV_ParseVoiceData);
@@ -104,9 +43,6 @@ qboolean VCM_Init( void ) {
 
 	g_psvs = (server_static_t *)g_pdlEngine->FindAddr(SEARCH_SVS);
 
-	REG_SVR_COMMAND("stresstest1", StressTest1);
-	REG_SVR_COMMAND("stresstest2", StressTest2);
-
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
 
@@ -116,16 +52,8 @@ qboolean VCM_Init( void ) {
 	g_pcvarVoiceVolumeSpeex = CVAR_GET_POINTER("sv_voicevolume_speex");
 	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
 
-	pfnCreateInterface = Sys_GetFactoryThis();
-
-	if ( !pfnCreateInterface ) {
-		LOG_ERROR( PLID, "Couldn't find CreateIntefrace function (Speex)" );
-
-		return FALSE;
-	}
-
 	for (int i = 0; i < MAX_CLIENTS; i++) {
-		g_pVoiceSpeex[i] = (IVoiceCodec *)pfnCreateInterface("voice_speex", 0);
+		g_pVoiceSpeex[i] = CreateSpeexVoiceCodec();
 
 		if ( !g_pVoiceSpeex[i] ) {
 			LOG_ERROR( PLID, "Couldn't get speex interface" );
@@ -140,17 +68,9 @@ qboolean VCM_Init( void ) {
 		}
 	}
 
-	pfnCreateInterface = Sys_GetFactoryThis( );
-
-	if ( !pfnCreateInterface ) {
-		LOG_ERROR( PLID, "Couldn't find CreateIntefrace function (Silk)" );
-
-		return FALSE;
-	}
-
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		g_pVoiceSilk[i] = (IVoiceCodec *)pfnCreateInterface("voice_silk", 0);
+		g_pVoiceSilk[i] = CreateSilkVoiceCodec();
 
 		if ( !g_pVoiceSilk[i] ) {
 			LOG_ERROR( PLID, "Couldn't get silk interface" );
@@ -177,6 +97,11 @@ qboolean VCM_Init( void ) {
 }
 
 qboolean VCM_End( void ) {
+	delete g_phookParseVoiceData;
+	delete g_phookWriteVoiceCodec;
+
+	delete g_pdlEngine;
+
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		g_pVoiceSpeex[i]->Release();
 		g_pVoiceSilk[i]->Release();

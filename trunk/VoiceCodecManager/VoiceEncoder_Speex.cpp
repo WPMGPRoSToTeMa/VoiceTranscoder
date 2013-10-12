@@ -1,72 +1,19 @@
-//========= Copyright © 1996-2005, Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//
-//=============================================================================//
-
-/* This product contains Speex software.  The license terms of the Speex
-software, distributed with this product, are as follows:
-
-© 2002-2003, Jean-Marc Valin/Xiph.Org Foundation
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-- Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-- Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or
-other materials provided with the distribution.
-
-Neither the name of the Xiph.org Foundation nor the names of its
-contributors may be used to endorse or promote products derived from this
-software without specific prior written permission.
-
-This software is provided by the copyright holders and contributors "as is"
-and any express or implied warranties, including, but not limited to, the
-implied warranties of merchantability and fitness for a particular purpose
-are disclaimed. In no event shall the foundation or contributors be liable
-for any direct, indirect, incidental, special, exemplary, or consequential
-damages (including, but not limited to, procurement of substitute goods or
-services; loss of use, data, or profits; or business interruption) however
-caused and on any theory of liability, whether in contract, strict
-liability, or tort (including negligence or otherwise) arising in any way
-out of the use of this software, even if advised of the possibility of such
-damage. */
-
 #include "ivoicecodec.h"
 #include "VoiceEncoder_Speex.h"
 #include <stdio.h>
 
-#define SAMPLERATE			8000	// get 8000 samples/sec
-#define RAW_FRAME_SIZE		160		// in 160 samples per frame
+#define SAMPLERATE			8000
+#define RAW_FRAME_SIZE		160
 
-// each quality has a differnt farme size
 const int ENCODED_FRAME_SIZE [11] = {6,6,15,15,20,20,28,28,38,38,38};	
-
-/* useful Speex voice qualities are 0,2,4,6 and 8. each quality level
-   has a diffrent encoded frame size and needed bitrate:
-
-	Quality 0 :  6 bytes/frame,  2400bps
-	Quality 2 : 15 bytes/frame,  6000bps
-	Quality 4 : 20 bytes/frame,  8000bps
-	Quality 6 : 28 bytes/frame, 11200bps
-	Quality 8 : 38 bytes/frame, 15200bps */
-
 
 extern IVoiceCodec* CreateVoiceCodec_Frame(IFrameEncoder *pEncoder);
 
-IBaseInterface* CreateSpeexVoiceCodec()
+IVoiceCodec* CreateSpeexVoiceCodec()
 {
 	IFrameEncoder *pEncoder = new VoiceEncoder_Speex;
-	return (IBaseInterface*)CreateVoiceCodec_Frame( pEncoder );
+	return CreateVoiceCodec_Frame( pEncoder );
 }
-
-EXPOSE_INTERFACE_FN(CreateSpeexVoiceCodec, IVoiceCodec, "voice_speex")
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

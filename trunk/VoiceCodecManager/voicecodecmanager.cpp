@@ -178,7 +178,7 @@ void MSG_WriteByte(sizebuf_t *pDatagram, byte bVal) {
 	*pbData = bVal;
 }
 
-void MSG_WriteShort(sizebuf_t *pDatagram, short sVal) {
+void MSG_WriteShort(sizebuf_t *pDatagram, int sVal) {
 	short *psData = (short *)SZ_GetSpace(pDatagram, sizeof(short));
 
 	*psData = sVal;
@@ -201,6 +201,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 	iClient = ((size_t)pClient - (size_t)g_psvs->m_pClients) / g_sizeClientStruct;
 
 	nDataLength = MSG_ReadShort( );
+
+	LOG_MESSAGE(PLID, "MSG_ReadShort: %d", nDataLength);
 
 	if ( nDataLength > sizeof( chReceived ) ) {
 		return;

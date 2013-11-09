@@ -129,10 +129,14 @@ int VoiceEncoder_Silk::Compress(const char *psUncompressed, int nSamples, char *
 	return buffCompressed.TellPut();
 }
 
+#include "meta_api.h"
+
 int VoiceEncoder_Silk::Decompress(const char *pCompressed, int compressedBytes, char *pUncompressed, int maxUncompressedBytes)
 {
 	pCompressed += 14;
 	compressedBytes -= 18;
+
+	LOG_MESSAGE(PLID, "SILK: %d", *(short *)(pCompressed - 2));
 
 	m_iSampleRate = 8000;
 

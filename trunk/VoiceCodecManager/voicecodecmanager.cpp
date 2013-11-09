@@ -135,7 +135,7 @@ qboolean VCM_End( void ) {
 int MSG_ReadShort(void) {
 	short iResult;
 
-	if ( *pmsg_readcount + sizeof(short) > pnet_message->cursize )
+	if ( *pmsg_readcount + 2 > pnet_message->cursize )
 	{
 		*pmsg_badread = 1;
 
@@ -145,7 +145,7 @@ int MSG_ReadShort(void) {
 	{
 		iResult = *(short *)&(pnet_message->data[*pmsg_readcount]);
 
-		*pmsg_readcount += sizeof(short);
+		*pmsg_readcount += 2;
 	}
 
 	return iResult;
@@ -162,7 +162,7 @@ int MSG_ReadBuf(size_t size, void *pDest) {
 	}
 	else
 	{
-		memcpy(pDest, pnet_message->data, size);
+		memcpy(pDest, &pnet_message->data[*pmsg_readcount], size);
 
 		*pmsg_readcount += size;
 
@@ -178,7 +178,7 @@ void MSG_WriteByte(sizebuf_t *pDatagram, byte bVal) {
 	*pbData = bVal;
 }
 
-void MSG_WriteShort(sizebuf_t *pDatagram, int sVal) {
+void MSG_WriteShort(sizebuf_t *pDatagram, short sVal) {
 	short *psData = (short *)SZ_GetSpace(pDatagram, sizeof(short));
 
 	*psData = sVal;

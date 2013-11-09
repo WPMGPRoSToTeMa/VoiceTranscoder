@@ -38,6 +38,7 @@ struct playervcodec_t {
 #define SEARCH_MSG_WRITEBUF			0x35CD0
 #define SEARCH_SVS					0x4362C0
 #else
+#define SEARCH_SV_CHECKTIMEOUTS		"SV_CheckTimeouts"
 #define SEARCH_SV_PARSEVOICEDATA	"SV_ParseVoiceData"
 #define SEARCH_SV_WRITEVOICECODEC	"SV_WriteVoiceCodec"
 #define SEARCH_MSG_READSHORT		"MSG_ReadShort"
@@ -70,6 +71,8 @@ extern MSG_WRITEBYTE *g_pfnWriteByte;
 extern MSG_WRITESHORT *g_pfnWriteShort;
 extern MSG_WRITEBUF *g_pfnWriteBuf;
 
+extern size_t g_sizeClientStruct;
+
 extern server_static_t *g_psvs;
 
 extern playervcodec_t g_PlayerVCodec[ MAX_CLIENTS+1 ];
@@ -83,6 +86,8 @@ extern cvar_t *g_pcvarVoiceQuality;
 
 extern qboolean VCM_Init( void );
 extern qboolean VCM_End( void );
+
+extern void ParseSizeClientStruct(void);
 
 extern qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ] );
 extern void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarName, const char *pszValue );

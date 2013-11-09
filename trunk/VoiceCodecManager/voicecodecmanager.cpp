@@ -11,6 +11,8 @@ MSG_WRITEBYTE *g_pfnWriteByte;
 MSG_WRITESHORT *g_pfnWriteShort;
 MSG_WRITEBUF *g_pfnWriteBuf;
 
+size_t g_sizeClientStruct;
+
 server_static_t *g_psvs;
 
 playervcodec_t g_PlayerVCodec[ MAX_CLIENTS+1 ];
@@ -31,6 +33,8 @@ bool g_bIsMiles;
 
 qboolean VCM_Init( void ) {
 	g_pdlEngine = new DYNLIB( (void *)g_engfuncs.pfnPrecacheModel );
+
+	ParseSizeClientStruct();
 
 	g_phookParseVoiceData = new HOOKER<SV_PARSEVOICEDATA>(g_pdlEngine->FindAddr(SEARCH_SV_PARSEVOICEDATA), SV_ParseVoiceData);
 	g_phookWriteVoiceCodec = new HOOKER<SV_WRITEVOICECODEC>(g_pdlEngine->FindAddr(SEARCH_SV_WRITEVOICECODEC), SV_WriteVoiceCodec);
@@ -110,6 +114,20 @@ qboolean VCM_End( void ) {
 	return TRUE;
 }
 
+void ParseSizeClientStruct(void) {
+#ifdef _WIN32
+	g_sizeClientStruct = sizeof(client_t);
+#else
+	void *pAddr = g_pdlEngine->FindAddr(SV_CHECKTIMEOUTS);
+
+	pAddr = g_pdlEngine->FindAddr(pAddr, "\x81\x00\x00\x00\x00\x00", "\xFF\x00\x00\x00\xFF\xFF", 6);
+
+	g_sizeClientStruct = *(size_t *)((size_t)pAddr + 2);
+
+	LOG_MESSAGE( PLID, "Size of client_t structure is %d", g_sizeClientStruct );
+#endif
+}
+
 void SV_WriteVoiceCodec( sizebuf_t *pDatagram ) {
 	g_phookWriteVoiceCodec->Unhook( );
 	g_phookWriteVoiceCodec->m_pfnOrig( pDatagram );
@@ -136,7 +154,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 	char chCompressed[4096];
 	client_t *pDestClient;
 
-	iClient = pClient - g_psvs->m_pClients;
+	iClient = ((size_t)pClient - (size_t)g_psvs->m_pClients) / g_sizeClientStruct;
 
 	nDataLength = g_pfnReadShort( );
 
@@ -201,7 +219,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 			continue;
 		}
 
-		pDestClient = &g_psvs->m_pClients[i];
+		pDestClient = (client_t *)((size_t)g_psvs->m_pClients + g_sizeClientStruct * i);
 		bLocal = (pDestClient == pClient);
 
 		// Does the game code want cl sending to this client?

@@ -65,9 +65,9 @@ struct sizebuf_t
 {
 	char *descr;
 	qboolean OverflowFlags;
-	char *data;
-	int maxsize;
-	int cursize;
+	byte *data;
+	size_t maxsize;
+	size_t cursize;
 };
 
 enum netsrc_t

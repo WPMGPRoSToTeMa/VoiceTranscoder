@@ -7,9 +7,6 @@
 
 #include "util.h"
 
-#include <dynamiclibrary.h>
-#include <hooker.h>
-
 #include "ivoicecodec.h"
 #include "VoiceEncoder_Silk.h"
 #include "VoiceEncoder_Speex.h"
@@ -28,48 +25,17 @@ struct playervcodec_t {
 	int				m_iRequestID;
 };
 
-#ifdef _WIN32
-#define SEARCH_SV_PARSEVOICEDATA	0xAB33F
-#define SEARCH_SV_WRITEVOICECODEC	0x9D200
-#define SEARCH_MSG_READSHORT		0x36830
-#define SEARCH_MSG_READBUF			0x36980
-#define SEARCH_MSG_WRITEBYTE		0x35BD0
-#define SEARCH_MSG_WRITESHORT		0x35BF0
-#define SEARCH_MSG_WRITEBUF			0x35CD0
-#define SEARCH_SVS					0x4362C0
-#else
-#define SEARCH_SV_CHECKTIMEOUTS		"SV_CheckTimeouts"
-#define SEARCH_SV_PARSEVOICEDATA	"SV_ParseVoiceData"
-#define SEARCH_SV_WRITEVOICECODEC	"SV_WriteVoiceCodec"
-#define SEARCH_MSG_READSHORT		"MSG_ReadShort"
-#define SEARCH_MSG_READBUF			"MSG_ReadBuf"
-#define SEARCH_MSG_WRITEBYTE		"MSG_WriteByte"
-#define SEARCH_MSG_WRITESHORT		"MSG_WriteShort"
-#define SEARCH_MSG_WRITEBUF			"MSG_WriteBuf"
-#define SEARCH_SVS					"svs"
-#endif
+struct sv_clcfuncs_t {
+	unsigned int iMsgId;
+	const char *pszMsgName;
+	void (* pfnCallback)(client_t *pClient);
+};
 
-typedef void ( SV_PARSEVOICEDATA )( client_t *pClient );
-typedef void ( SV_WRITEVOICECODEC )( sizebuf_t *pDatagram );
-typedef int ( MSG_READSHORT )( void );
-typedef void ( MSG_READBUF )( size_t, char * );
-typedef void ( MSG_WRITEBYTE )( sizebuf_t *pDatagram, int );
-typedef void ( MSG_WRITESHORT )( sizebuf_t *pDatagram, int );
-typedef void ( MSG_WRITEBUF )( sizebuf_t *pDatagram, size_t, char * );
+#define CLC_VOICEDATA	8
+
+#define SVC_VOICEDATA	53
 
 extern void SV_ParseVoiceData( client_t *pClient );
-extern void SV_WriteVoiceCodec( sizebuf_t *pDatagram );
-
-extern DYNLIB *g_pdlEngine;
-
-extern HOOKER< SV_PARSEVOICEDATA > *g_phookParseVoiceData;
-extern HOOKER< SV_WRITEVOICECODEC > *g_phookWriteVoiceCodec;
-
-extern MSG_READSHORT *g_pfnReadShort;
-extern MSG_READBUF *g_pfnReadBuf;
-extern MSG_WRITEBYTE *g_pfnWriteByte;
-extern MSG_WRITESHORT *g_pfnWriteShort;
-extern MSG_WRITEBUF *g_pfnWriteBuf;
 
 extern size_t g_sizeClientStruct;
 

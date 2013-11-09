@@ -135,7 +135,7 @@ qboolean VCM_End( void ) {
 int MSG_ReadShort(void) {
 	short iResult;
 
-	if ( *pmsg_readcount + 2 > pnet_message->cursize )
+	if ( *pmsg_readcount + sizeof(short) > pnet_message->cursize )
 	{
 		*pmsg_badread = 1;
 
@@ -145,7 +145,7 @@ int MSG_ReadShort(void) {
 	{
 		iResult = *(short *)&(pnet_message->data[*pmsg_readcount]);
 
-		*pmsg_readcount += 2;
+		*pmsg_readcount += sizeof(short);
 	}
 
 	return iResult;
@@ -201,8 +201,6 @@ void SV_ParseVoiceData(client_t *pClient) {
 	iClient = ((size_t)pClient - (size_t)g_psvs->m_pClients) / g_sizeClientStruct;
 
 	nDataLength = MSG_ReadShort( );
-
-	LOG_MESSAGE(PLID, "MSG_ReadShort: %d", nDataLength);
 
 	if ( nDataLength > sizeof( chReceived ) ) {
 		return;

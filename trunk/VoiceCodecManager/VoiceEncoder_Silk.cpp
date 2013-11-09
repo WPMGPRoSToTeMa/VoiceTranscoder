@@ -134,8 +134,6 @@ int VoiceEncoder_Silk::Decompress(const char *pCompressed, int compressedBytes, 
 	pCompressed += 14;
 	compressedBytes -= 18;
 
-	LOG_MESSAGE(PLID, "SILK: %d", *(short *)(pCompressed - 2));
-
 	m_iSampleRate = 8000;
 
 	if (compressedBytes <= 0) {

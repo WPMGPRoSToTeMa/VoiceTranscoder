@@ -19,6 +19,7 @@ struct DYNLIB
 #endif
 	// Поиск адреса функции по сигнатуре и маске
 	inline void *FindAddr(const char *ccpSig, const char *ccpMask, size_t uiLen); // Сигнатура, маска (какие байты сравнивать, FF сравнивать, 00 нет), длина, например "\x1C\x44\xDA", "\xFF\x00\xFF", 3
+	inline void *FindAddr(void *pBase, const char *ccpSig, const char *ccpMask, size_t uiLen);
 	// Поиск по названию функции
 	inline void *FindAddr(const char *ccpName)
 	{
@@ -176,4 +177,33 @@ void *DYNLIB::FindAddr(const char *ccpSig, const char *ccpMask, size_t uiLen)
     return NULL;
 }
 
+void *DYNLIB::FindAddr(void *pBase, const char *ccpSig, const char *ccpMask, size_t uiLen)
+{
+	unsigned char *ucpBuff = (unsigned char *)pBase;						// Получаем стартовый адрес
+	unsigned char *ucpEnd = (unsigned char *)m_pBase + m_uiSize - uiLen;	// Получаем конечный	
+
+	unsigned long ul;	// Текущая позиция в сигнатуре
+
+	// Цикл по всей библиотеке
+	while (ucpBuff <= ucpEnd)
+	{
+		// Проверяем сигнатуру и маску
+		for (ul = 0; ul < uiLen; ul++)
+		{
+			// ADDRESS & MASK != SIGNATURE & MASK => break;
+			if ((ucpBuff[ul] & ((unsigned char *)ccpMask)[ul]) != (((unsigned char *)ccpSig)[ul] & ((unsigned char *)ccpMask)[ul]))
+				break;
+		}
+
+		// Если последний проверенный байт равен длине возвращаем адрес
+		if (ul == uiLen)
+			return (void *)ucpBuff;
+
+		// Переходим к следующему байту
+		ucpBuff++;
+	}
+
+	// Ничего не нашли, возвращаем нуль
+	return NULL;
+}
 #endif

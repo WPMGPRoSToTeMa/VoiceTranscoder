@@ -129,11 +129,6 @@ int VoiceEncoder_Silk::Compress(const char *psUncompressed, int nSamples, char *
 	return buffCompressed.TellPut();
 }
 
-#include <extdll.h>
-
-#include <dllapi.h>
-#include <meta_api.h>
-
 int VoiceEncoder_Silk::Decompress(const char *pCompressed, int compressedBytes, char *pUncompressed, int maxUncompressedBytes)
 {
 	pCompressed += 14;

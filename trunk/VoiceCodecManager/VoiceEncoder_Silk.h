@@ -3,6 +3,11 @@
 
 #pragma once
 
+#include <extdll.h>
+
+#include <dllapi.h>
+#include <meta_api.h>
+
 #include "ivoicecodec.h"
 #include "utlbuffer.h"
 

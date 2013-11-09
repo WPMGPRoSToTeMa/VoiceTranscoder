@@ -59,6 +59,12 @@ qboolean VCM_Init( void ) {
 	// Get svs
 	g_psvs = (server_static_t *)g_pDpApi->p_svs;
 
+	// ...
+	pmsg_readcount = (size_t *)g_pDpApi->p_msg_readcount;
+	pmsg_badread = g_pDpApi->p_msg_badread;
+	pnet_message = (sizebuf_t *)g_pDpApi->p_net_message_addr;
+	SZ_GetSpace = (void *(*)(sizebuf_t *, size_t))g_pDpApi->p_SZ_GetSpace;
+
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
 

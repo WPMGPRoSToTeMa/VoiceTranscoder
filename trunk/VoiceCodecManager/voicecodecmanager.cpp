@@ -118,7 +118,7 @@ void ParseSizeClientStruct(void) {
 #ifdef _WIN32
 	g_sizeClientStruct = sizeof(client_t);
 #else
-	void *pAddr = g_pdlEngine->FindAddr(SV_CHECKTIMEOUTS);
+	void *pAddr = g_pdlEngine->FindAddr(SEARCH_SV_CHECKTIMEOUTS);
 
 	pAddr = g_pdlEngine->FindAddr(pAddr, "\x81\x00\x00\x00\x00\x00", "\xFF\x00\x00\x00\xFF\xFF", 6);
 

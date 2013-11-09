@@ -103,6 +103,7 @@
   <ItemGroup>
     <ClInclude Include="build.h" />
     <ClInclude Include="CRC32.h" />
+    <ClInclude Include="dproto_api.h" />
     <ClInclude Include="iframeencoder.h" />
     <ClInclude Include="ivoicecodec.h" />
     <ClInclude Include="util.h" />

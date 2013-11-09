@@ -20,6 +20,7 @@ g++		-O3 \
 		-fno-builtin \
 		-fno-exceptions \
 		-fpermissive \
+		-fvisibility=hidden \
 -I./hacker \
 -I./hlsdk/common \
 -I./hlsdk/dlls \

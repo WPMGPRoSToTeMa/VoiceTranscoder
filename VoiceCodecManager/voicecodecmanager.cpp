@@ -30,6 +30,9 @@ bool g_bIsntSpeex;
 
 dp_enginfo_api_t *g_pDpApi;
 
+char g_szOldVoiceCodec[12];
+int g_iOldVoiceQuality;
+
 qboolean VCM_Init( void ) {
 	// Get dproto API
 	sscanf(CVAR_GET_STRING(DPROTO_API_CVAR_NAME), "%u", &g_pDpApi);
@@ -106,6 +109,9 @@ qboolean VCM_Init( void ) {
 			return FALSE;
 		}
 	}
+
+	strncpy(g_szOldVoiceCodec, g_pcvarVoiceCodec->string, sizeof(g_szOldVoiceCodec));
+	g_iOldVoiceQuality = g_pcvarVoiceQuality->value;
 
 	if (strcmp(g_pcvarVoiceCodec->string, "voice_speex") != 0) {
 		LOG_MESSAGE( PLID, "Warning vcodec isn't speex. Voice disabled." );
@@ -334,6 +340,29 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 	}
 
 	RETURN_META_VALUE( MRES_IGNORED, TRUE );
+}
+
+void StartFrame ( void ) {
+	if (g_iOldVoiceQuality == g_pcvarVoiceQuality->value && stricmp(g_szOldVoiceCodec, g_pcvarVoiceCodec->string) == 0) {
+		RETURN_META( MRES_IGNORED );
+	}
+
+	for (int i = 0; i < MAX_CLIENTS; i++) {
+		g_pVoiceSpeex[i]->Init(g_pcvarVoiceQuality->value);
+	}
+
+	strncpy(g_szOldVoiceCodec, g_pcvarVoiceCodec->string, sizeof(g_szOldVoiceCodec));
+	g_iOldVoiceQuality = g_pcvarVoiceQuality->value;
+
+	if (strcmp(g_pcvarVoiceCodec->string, "voice_speex") != 0) {
+		LOG_MESSAGE( PLID, "Warning vcodec isn't speex. Voice disabled." );
+
+		g_bIsntSpeex = true;
+	} else {
+		g_bIsntSpeex = false;
+	}
+
+	RETURN_META( MRES_IGNORED );
 }
 
 void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarName, const char *pszValue ) {

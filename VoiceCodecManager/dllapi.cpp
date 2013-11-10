@@ -19,7 +19,8 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersi
 		return FALSE;
 	}
 
-	pFunctionTable->pfnClientConnect = ClientConnect_Pre;
+	pFunctionTable->pfnClientConnect = &ClientConnect_Pre;
+	pFunctionTable->pfnStartFrame = &StartFrame;
 
 	return TRUE;
 }
@@ -32,7 +33,7 @@ C_DLLEXPORT int GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pNewFunctionTable, int *i
 		return FALSE;
 	}
 
-	pNewFunctionTable->pfnCvarValue2 = CvarValue2_Pre;
+	pNewFunctionTable->pfnCvarValue2 = &CvarValue2_Pre;
 
 	return TRUE;
 }

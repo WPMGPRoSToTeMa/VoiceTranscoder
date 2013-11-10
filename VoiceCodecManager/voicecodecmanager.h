@@ -56,4 +56,5 @@ extern qboolean VCM_End( void );
 extern void ParseSizeClientStruct(void);
 
 extern qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ] );
+extern void StartFrame ( void );
 extern void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarName, const char *pszValue );

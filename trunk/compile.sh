@@ -1,8 +1,6 @@
 #!/bin/sh
 #
 
-cd VoiceCodecManager
-
 echo "compile.sh got the control"
 mkdir Release 2>/dev/null
 rm -f Release/vcm.so 2>/dev/null

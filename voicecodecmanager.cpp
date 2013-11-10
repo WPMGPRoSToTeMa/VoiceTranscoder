@@ -343,7 +343,7 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 }
 
 void StartFrame ( void ) {
-	if (g_iOldVoiceQuality == g_pcvarVoiceQuality->value && stricmp(g_szOldVoiceCodec, g_pcvarVoiceCodec->string) == 0) {
+	if (g_iOldVoiceQuality == g_pcvarVoiceQuality->value && strcmp(g_szOldVoiceCodec, g_pcvarVoiceCodec->string) == 0) {
 		RETURN_META( MRES_IGNORED );
 	}
 

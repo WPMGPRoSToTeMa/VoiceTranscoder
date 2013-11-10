@@ -1,11 +1,9 @@
 #!/bin/sh
 #
 
-cd VoiceCodecManager
-
 echo "compile.sh got the control"
-mkdir ../Release 2>/dev/null
-rm -f ../Release/VoiceCodecMgr_i386.so 2>/dev/null
+mkdir Release 2>/dev/null
+rm -f Release/vcm.so 2>/dev/null
 
 g++		-O3 \
 		-funroll-loops \
@@ -29,18 +27,14 @@ g++		-O3 \
 -I./metamod \
 -I./silk \
 -I./speex \
-build.cpp CRC32.cpp dllapi.cpp h_export.cpp interface.cpp \
+build.cpp CRC32.cpp dllapi.cpp h_export.cpp \
 meta_api.cpp sdk_util.cpp utlbuffer.cpp voice_codec_frame.cpp \
 voicecodecmanager.cpp VoiceEncoder_Silk.cpp VoiceEncoder_Speex.cpp \
 -ldl -lm \
--o ../Release/VoiceCodecMgr_i386.so \
+-o Release/vcm.so \
 -L./ -lSKP_SILK_SDK -lspeex
 
-echo "leave this folder!"
-
-cd ..
-
-if [ -f Release/VoiceCodecMgr_i386.so ]; then
+if [ -f Release/vcm.so ]; then
 	echo "Success!"
 
 	exit 0;

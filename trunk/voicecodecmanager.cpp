@@ -35,7 +35,17 @@ int g_iOldVoiceQuality;
 
 qboolean VCM_Init( void ) {
 	// Get dproto API
-	sscanf(CVAR_GET_STRING(DPROTO_API_CVAR_NAME), "%u", &g_pDpApi);
+	const char *pszDpApi = CVAR_GET_STRING(DPROTO_API_CVAR_NAME);
+
+	// Check for dpapi
+	if (pszDpApi[0] == '\0') {
+		LOG_ERROR(PLID, "Can't get DPAPI");
+
+		return false;
+	}
+
+	// Scan for addr
+	sscanf(pszDpApi, "%u", &g_pDpApi);
 
 	// Check major ver
 	if (g_pDpApi->version_major != DPROTO_ENGINFO_API_VERSION_MAJOR) {

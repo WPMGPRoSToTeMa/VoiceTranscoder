@@ -27,7 +27,7 @@ g++		-O3 \
 -I./metamod \
 -I./silk \
 -I./speex \
-build.cpp CRC32.cpp dllapi.cpp h_export.cpp interface.cpp \
+build.cpp CRC32.cpp dllapi.cpp h_export.cpp \
 meta_api.cpp sdk_util.cpp utlbuffer.cpp voice_codec_frame.cpp \
 voicecodecmanager.cpp VoiceEncoder_Silk.cpp VoiceEncoder_Speex.cpp \
 -ldl -lm \

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utiltypes.h"
+#include "UtilTypes.h"
 
 const ulong CrcTableOffset32[256] =
 {

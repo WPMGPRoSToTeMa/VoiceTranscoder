@@ -3,7 +3,7 @@
 
 echo "compile.sh got the control"
 mkdir Release 2>/dev/null
-rm -f Release/vcm.so 2>/dev/null
+rm -f Release/vtc.so 2>/dev/null
 
 g++		-O3 \
 		-funroll-loops \
@@ -27,14 +27,15 @@ g++		-O3 \
 -I./metamod \
 -I./silk \
 -I./speex \
-build.cpp CRC32.cpp dllapi.cpp h_export.cpp \
-meta_api.cpp sdk_util.cpp utlbuffer.cpp voice_codec_frame.cpp \
-voicecodecmanager.cpp VoiceEncoder_Silk.cpp VoiceEncoder_Speex.cpp \
+-I./DprotoAPI \
+Build.cpp CRC32.cpp DllAPI.cpp DProtoAPI.cpp EngineFuncs.cpp HExport.cpp \
+MetaAPI.cpp Player.cpp SdkUTIL.cpp UtlBuffer.cpp \
+VoiceTranscoder.cpp VoiceCodec_Silk.cpp VoiceCodec_Speex.cpp \
 -ldl -lm \
--o Release/vcm.so \
+-o Release/vtc.so \
 -L./ -lSKP_SILK_SDK -lspeex
 
-if [ -f Release/vcm.so ]; then
+if [ -f Release/vtc.so ]; then
 	echo "Success!"
 
 	exit 0;

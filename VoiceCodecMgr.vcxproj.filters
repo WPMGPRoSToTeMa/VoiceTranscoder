@@ -21,75 +21,84 @@
     <None Include="compile.sh" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="VoiceEncoder_Silk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VoiceEncoder_Speex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="build.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CRC32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllapi.cpp">
+    <ClCompile Include="EngineFuncs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="h_export.cpp">
+    <ClCompile Include="DProtoAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="meta_api.cpp">
+    <ClCompile Include="VoiceCodec_Silk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sdk_util.cpp">
+    <ClCompile Include="VoiceCodec_Speex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utlbuffer.cpp">
+    <ClCompile Include="Build.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="voice_codec_frame.cpp">
+    <ClCompile Include="UtlBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="voicecodecmanager.cpp">
+    <ClCompile Include="VoiceTranscoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DllAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HExport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaAPI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SdkUTIL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="build.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CRC32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dproto_api.h">
+    <ClInclude Include="EngineFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="iframeencoder.h">
+    <ClInclude Include="DProtoAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ivoicecodec.h">
+    <ClInclude Include="Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util.h">
+    <ClInclude Include="VoiceCodec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utiltypes.h">
+    <ClInclude Include="VoiceCodec_Silk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utlbuffer.h">
+    <ClInclude Include="VoiceCodec_Speex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="utlmemory.h">
+    <ClInclude Include="Build.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="voicecodecmanager.h">
+    <ClInclude Include="Util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VoiceEncoder_Silk.h">
+    <ClInclude Include="UtilTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VoiceEncoder_Speex.h">
+    <ClInclude Include="UtlBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UtlMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceTranscoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

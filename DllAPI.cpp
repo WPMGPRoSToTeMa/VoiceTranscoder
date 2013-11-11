@@ -3,7 +3,7 @@
 #include <dllapi.h>
 #include <meta_api.h>
 
-#include "voicecodecmanager.h"
+#include "VoiceTranscoder.h"
 
 C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion)
 {

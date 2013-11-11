@@ -1,4 +1,4 @@
-#include "VoiceEncoder_Silk.h"
+#include "VoiceCodec_Silk.h"
 #include "CRC32.h"
 
 #ifndef min
@@ -7,11 +7,7 @@
 
 #define NOSTEAM_TEST
 
-IVoiceCodec *CreateSilkVoiceCodec() {
-	return new VoiceEncoder_Silk;
-}
-
-VoiceEncoder_Silk::VoiceEncoder_Silk() {
+CSilk::CSilk() {
 	m_pEncState = NULL;
 	m_pDecState = NULL;
 	m_iSampleRate = 0;
@@ -19,12 +15,12 @@ VoiceEncoder_Silk::VoiceEncoder_Silk() {
 	m_iPacketLossPercentage = 0;
 }
 
-VoiceEncoder_Silk::~VoiceEncoder_Silk() {
+CSilk::~CSilk() {
 	free(m_pEncState);
 	free(m_pDecState);
 }
 
-bool VoiceEncoder_Silk::Init(int iQuality) {
+bool CSilk::Init(int iQuality) {
 	int iSize;
 
 	m_iSampleRate = 16000;
@@ -42,31 +38,31 @@ bool VoiceEncoder_Silk::Init(int iQuality) {
 	return true;
 }
 
-void VoiceEncoder_Silk::Release() {
+void CSilk::Release() {
 	delete this;
 }
 
-int VoiceEncoder_Silk::Compress(const char *psUncompressed, int nSamples, char *pbCompressed, int nMaxCompressedBytes, bool fFinal) {
+int CSilk::Compress(const short *psDecompressed, int nDecompressedSamples, byte *pbCompressed, int nMaxCompressedBytes) {
 	// Standard size of header
 	pbCompressed += 14;
 
 	m_iSampleRate = 8000;
 
-	int nMinSamples = s_iMaxInputFrames * m_iSampleRate * s_iFrameLengthMs / 1000;
+	int nMinSamples = c_iMaxInputFrames * m_iSampleRate * c_iFrameLengthMs / 1000;
 
-	m_buffEncode.Put(psUncompressed, nSamples * BYTES_PER_SAMPLE);
+	m_buffEncode.Put(psDecompressed, nDecompressedSamples * c_iBytesPerSample);
 
-	if ((m_buffEncode.TellPut() / BYTES_PER_SAMPLE) < nMinSamples && !fFinal) {
-		return NULL;
+	if ((m_buffEncode.TellPut() / c_iBytesPerSample) < nMinSamples) {
+		return 0;
 	}
 
 	short nBytesOut;
 	int nSamplesRemain;
 	CUtlBuffer buffCompressed(pbCompressed, nMaxCompressedBytes);
 
-	nMinSamples = m_iSampleRate * s_iFrameLengthMs / 1000;
+	nMinSamples = m_iSampleRate * c_iFrameLengthMs / 1000;
 
-	nSamplesRemain = (m_buffEncode.TellPut() - m_buffEncode.TellGet()) / BYTES_PER_SAMPLE;
+	nSamplesRemain = (m_buffEncode.TellPut() - m_buffEncode.TellGet()) / c_iBytesPerSample;
 
 	while (nSamplesRemain >= nMinSamples) {
 		nBytesOut = min(buffCompressed.Size() - buffCompressed.TellPut() - sizeof(short), 0x7FFF);
@@ -82,26 +78,18 @@ int VoiceEncoder_Silk::Compress(const char *psUncompressed, int nSamples, char *
 
 		SKP_Silk_SDK_Encode(m_pEncState, &m_encStatus, (const short *)m_buffEncode.PeekGet(), nMinSamples, (unsigned char *)buffCompressed.PeekPut(sizeof(short)), (short *)&nBytesOut);
 
-		m_buffEncode.SeekGet(CUtlBuffer::SEEK_CURRENT, nMinSamples * BYTES_PER_SAMPLE);
+		m_buffEncode.SeekGet(CUtlBuffer::SEEK_CURRENT, nMinSamples * c_iBytesPerSample);
 
 		buffCompressed.PutShort(nBytesOut);
 		buffCompressed.SeekPut(CUtlBuffer::SEEK_CURRENT, nBytesOut);
 
-		nSamplesRemain = (m_buffEncode.TellPut() - m_buffEncode.TellGet()) / BYTES_PER_SAMPLE;
+		nSamplesRemain = (m_buffEncode.TellPut() - m_buffEncode.TellGet()) / c_iBytesPerSample;
 	}
 
 	m_buffEncode.Clear();
 
-	if (nSamplesRemain && nSamplesRemain <= nSamples) {
-		m_buffEncode.Put(&psUncompressed[nSamples - nSamplesRemain], nSamplesRemain << 1);
-	}
-
-	if (fFinal) {
-		ResetState();
-
-		if (buffCompressed.Size() - buffCompressed.TellPut() - sizeof(short)) {
-			buffCompressed.PutUnsignedShort(0xFFFF);
-		}
+	if (nSamplesRemain && nSamplesRemain <= nDecompressedSamples) {
+		m_buffEncode.Put(&psDecompressed[nDecompressedSamples - nSamplesRemain], nSamplesRemain << 1);
 	}
 
 	int iSize = buffCompressed.TellPut();
@@ -129,25 +117,25 @@ int VoiceEncoder_Silk::Compress(const char *psUncompressed, int nSamples, char *
 	return buffCompressed.TellPut();
 }
 
-int VoiceEncoder_Silk::Decompress(const char *pCompressed, int compressedBytes, char *pUncompressed, int maxUncompressedBytes)
+int CSilk::Decompress(const byte *pbCompressed, int nCompressedBytes, short *psDecompressed, int nMaxUncompressedBytes)
 {
-	pCompressed += 14;
-	compressedBytes -= 18;
+	pbCompressed += 14;
+	nCompressedBytes -= 18;
 
 	m_iSampleRate = 8000;
 
-	if (compressedBytes <= 0) {
+	if (nCompressedBytes <= 0) {
 		return 0;
 	}
 
 	int iLen;
 	short nSamples;
-	CUtlBuffer buffCompressed(pCompressed, compressedBytes);
-	CUtlBuffer buffDecompressed(pUncompressed, maxUncompressedBytes);
+	CUtlBuffer buffCompressed(pbCompressed, nCompressedBytes);
+	CUtlBuffer buffDecompressed(psDecompressed, nMaxUncompressedBytes);
 
 	m_decStatus.API_sampleRate = m_iSampleRate;
 
-	int nMinSamples = m_iSampleRate * s_iFrameLengthMs / 1000;
+	int nMinSamples = m_iSampleRate * c_iFrameLengthMs / 1000;
 
 	while (buffCompressed.TellGet() + 2 <= buffCompressed.Size()) {
 		iLen = buffCompressed.GetUnsignedShort();
@@ -155,41 +143,41 @@ int VoiceEncoder_Silk::Decompress(const char *pCompressed, int compressedBytes, 
 		if (iLen == 65535) {
 			ResetState();
 
-			return buffDecompressed.TellPut() / BYTES_PER_SAMPLE;
+			return buffDecompressed.TellPut() / c_iBytesPerSample;
 		}
 
 		if (buffCompressed.TellGet() + iLen > buffCompressed.Size()) {
-			return buffDecompressed.TellPut() / BYTES_PER_SAMPLE;
+			return buffDecompressed.TellPut() / c_iBytesPerSample;
 		}
 
-		if (buffDecompressed.TellPut() + nMinSamples * BYTES_PER_SAMPLE > buffDecompressed.Size()) {
-			return buffDecompressed.TellPut() / BYTES_PER_SAMPLE;
+		if (buffDecompressed.TellPut() + nMinSamples * c_iBytesPerSample > buffDecompressed.Size()) {
+			return buffDecompressed.TellPut() / c_iBytesPerSample;
 		}
 
-		memset(buffDecompressed.PeekPut(), 0, nMinSamples * BYTES_PER_SAMPLE);
+		memset(buffDecompressed.PeekPut(), 0, nMinSamples * c_iBytesPerSample);
 
 		if (iLen) {
-			nSamples = (buffDecompressed.Size() - buffDecompressed.TellPut()) / BYTES_PER_SAMPLE;
+			nSamples = (buffDecompressed.Size() - buffDecompressed.TellPut()) / c_iBytesPerSample;
 
 			if (SKP_Silk_SDK_Decode(m_pDecState, &m_decStatus, 0, (const unsigned char *)buffCompressed.PeekGet(), iLen, (short *)buffDecompressed.PeekPut(), &nSamples)) {
-				return buffDecompressed.TellPut() / BYTES_PER_SAMPLE;
+				return buffDecompressed.TellPut() / c_iBytesPerSample;
 			}
 
 			buffCompressed.SeekGet(CUtlBuffer::SEEK_CURRENT, iLen);
-			buffDecompressed.SeekPut(CUtlBuffer::SEEK_CURRENT, nSamples * BYTES_PER_SAMPLE);
+			buffDecompressed.SeekPut(CUtlBuffer::SEEK_CURRENT, nSamples * c_iBytesPerSample);
 
 			if (m_decStatus.moreInternalDecoderFrames) {
-				return buffDecompressed.TellPut() / BYTES_PER_SAMPLE;
+				return buffDecompressed.TellPut() / c_iBytesPerSample;
 			}
 		} else {
-			buffDecompressed.SeekPut(CUtlBuffer::SEEK_CURRENT, nMinSamples * BYTES_PER_SAMPLE);
+			buffDecompressed.SeekPut(CUtlBuffer::SEEK_CURRENT, nMinSamples * c_iBytesPerSample);
 		}
 	}
 
-	return buffDecompressed.TellPut() / BYTES_PER_SAMPLE;
+	return buffDecompressed.TellPut() / c_iBytesPerSample;
 }
 
-bool VoiceEncoder_Silk::ResetState() {
+bool CSilk::ResetState() {
 	if (m_pEncState) {
 		SKP_Silk_SDK_InitEncoder(m_pEncState, &m_encStatus);
 	}

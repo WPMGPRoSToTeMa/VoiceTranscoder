@@ -44,6 +44,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>vtc</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -67,15 +68,20 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VOICECODECMGR_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\hlsdk\common;.\hlsdk\dlls;.\hlsdk\engine;.\hlsdk\pm_shared;.\metamod;.\hacker;.\speex;.\silk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\hlsdk\common;.\hlsdk\dlls;.\hlsdk\engine;.\hlsdk\pm_shared;.\metamod;.\hacker;.\speex;.\silk;.\DprotoAPI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>VoiceCodecMgr.def</ModuleDefinitionFile>
     </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST "$(ProjectDir)PostBuildEvent.bat" (CALL "$(ProjectDir)PostBuildEvent.bat" "$(OutDir)" "$(TargetName)" "$(TargetExt)")</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="compile.sh" />
@@ -84,31 +90,34 @@
     <None Include="VoiceCodecMgr.def" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="build.cpp" />
+    <ClCompile Include="Build.cpp" />
     <ClCompile Include="CRC32.cpp" />
-    <ClCompile Include="dllapi.cpp" />
-    <ClCompile Include="h_export.cpp" />
-    <ClCompile Include="meta_api.cpp" />
-    <ClCompile Include="sdk_util.cpp" />
-    <ClCompile Include="utlbuffer.cpp" />
-    <ClCompile Include="voicecodecmanager.cpp" />
-    <ClCompile Include="VoiceEncoder_Silk.cpp" />
-    <ClCompile Include="VoiceEncoder_Speex.cpp" />
-    <ClCompile Include="voice_codec_frame.cpp" />
+    <ClCompile Include="DllAPI.cpp" />
+    <ClCompile Include="DProtoAPI.cpp" />
+    <ClCompile Include="EngineFuncs.cpp" />
+    <ClCompile Include="HExport.cpp" />
+    <ClCompile Include="MetaAPI.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SdkUTIL.cpp" />
+    <ClCompile Include="UtlBuffer.cpp" />
+    <ClCompile Include="VoiceTranscoder.cpp" />
+    <ClCompile Include="VoiceCodec_Silk.cpp" />
+    <ClCompile Include="VoiceCodec_Speex.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="build.h" />
+    <ClInclude Include="Build.h" />
     <ClInclude Include="CRC32.h" />
-    <ClInclude Include="dproto_api.h" />
-    <ClInclude Include="iframeencoder.h" />
-    <ClInclude Include="ivoicecodec.h" />
-    <ClInclude Include="util.h" />
-    <ClInclude Include="utiltypes.h" />
-    <ClInclude Include="utlbuffer.h" />
-    <ClInclude Include="utlmemory.h" />
-    <ClInclude Include="voicecodecmanager.h" />
-    <ClInclude Include="VoiceEncoder_Silk.h" />
-    <ClInclude Include="VoiceEncoder_Speex.h" />
+    <ClInclude Include="DProtoAPI.h" />
+    <ClInclude Include="EngineFuncs.h" />
+    <ClInclude Include="VoiceCodec.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="UtilTypes.h" />
+    <ClInclude Include="UtlBuffer.h" />
+    <ClInclude Include="UtlMemory.h" />
+    <ClInclude Include="VoiceTranscoder.h" />
+    <ClInclude Include="VoiceCodec_Silk.h" />
+    <ClInclude Include="VoiceCodec_Speex.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libspeex.lib" />

@@ -13,7 +13,7 @@
 
 #pragma warning (disable : 4514)
 
-#include "utlbuffer.h"
+#include "UtlBuffer.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>

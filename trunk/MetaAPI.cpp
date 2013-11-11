@@ -4,9 +4,9 @@
 
 #include "sdk_util.h"
 
-#include "build.h"
+#include "Build.h"
 
-#include "voicecodecmanager.h"
+#include "VoiceTranscoder.h"
 
 // Must provide at least one of these..
 static META_FUNCTIONS gMetaFunctionTable = {
@@ -23,12 +23,12 @@ static META_FUNCTIONS gMetaFunctionTable = {
 // Description of plugin
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,							// ifvers
-	"VoiceCodecManager",							// name
+	"VoiceTranscoder",								// name
 	GetBuildNumberAsString(),						// version
 	GetCompileTime(),								// date
 	"[WPMG]PRoSToTeM@ <wpmgprostotema@live.ru>",	// author
 	"http://www.wpmg.ru/",							// url
-	"VCM",											// logtag, all caps please
+	"VTC",											// logtag, all caps please
 	PT_ANYTIME,										// (when) loadable
 	PT_ANYPAUSE,									// (when) unloadable
 };
@@ -64,7 +64,7 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME , META_FUNCTIONS *pFunctionTable, meta
 
 	gpGamedllFuncs = pGamedllFuncs;
 
-	if ( !VCM_Init( ) ) {
+	if ( !VTC_Init( ) ) {
 		LOG_ERROR( PLID, "Could not initialize a plugin" );
 		
 		return FALSE;
@@ -74,7 +74,7 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME , META_FUNCTIONS *pFunctionTable, meta
 }
 
 C_DLLEXPORT int Meta_Detach( PLUG_LOADTIME , PL_UNLOAD_REASON ) {
-	if ( !VCM_End() ) {
+	if ( !VTC_End() ) {
 		LOG_ERROR( PLID, "Could not end a plugin" );
 
 		return FALSE;

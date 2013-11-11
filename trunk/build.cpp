@@ -1,10 +1,10 @@
-#include "build.h"
+#include "Build.h"
 
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "utiltypes.h"
+#include "UtilTypes.h"
 
 //////////////////////////////////////////////////////////////////////////
 // DateString2Days

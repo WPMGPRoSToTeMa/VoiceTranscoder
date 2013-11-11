@@ -1,4 +1,4 @@
-#include "ivoicecodec.h"
+#include "VoiceCodec.h"
 #include "VoiceEncoder_Speex.h"
 #include <stdio.h>
 

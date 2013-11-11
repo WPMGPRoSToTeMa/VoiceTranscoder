@@ -1,7 +1,7 @@
-#include "voicecodecmanager.h"
-#include "dproto_api.h"
+#include "VoiceTranscoder.h"
+#include "EngineFuncs.h"
 
-void (* g_pfnDefCallback)(client_t *);
+PCLCFUNCS_CALLBACK g_pfnSVParseVoiceData;
 
 size_t g_sizeClientStruct;
 
@@ -9,8 +9,8 @@ server_static_t *g_psvs;
 
 playervcodec_t g_PlayerVCodec[ MAX_CLIENTS+1 ];
 
-IVoiceCodec *g_pVoiceSpeex[ MAX_CLIENTS ];
-IVoiceCodec *g_pVoiceSilk[ MAX_CLIENTS ];
+CSpeex *g_pVoiceSpeex[ MAX_CLIENTS ];
+CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 
 cvar_t g_cvarVoiceVolumeSpeex = {"sv_voicevolume_speex", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceVolumeSilk = {"sv_voicevolume_silk", "1.0", FCVAR_EXTDLL};
@@ -21,62 +21,33 @@ cvar_t *g_pcvarVoiceQuality;
 cvar_t *g_pcvarVoiceVolumeSpeex;
 cvar_t *g_pcvarVoiceVolumeSilk;
 
-size_t *pmsg_readcount;
-int *pmsg_badread;
-sizebuf_t *pnet_message;
-void * (* SZ_GetSpace)(sizebuf_t *, size_t);
-
 bool g_bIsntSpeex;
-
-dp_enginfo_api_t *g_pDpApi;
 
 char g_szOldVoiceCodec[12];
 int g_iOldVoiceQuality;
 
-qboolean VCM_Init( void ) {
-	// Get dproto API
-	const char *pszDpApi = CVAR_GET_STRING(DPROTO_API_CVAR_NAME);
-
-	// Check for dpapi
-	if (pszDpApi[0] == '\0') {
-		LOG_ERROR(PLID, "Can't get DPAPI");
-
-		return false;
-	}
-
-	// Scan for addr
-	sscanf(pszDpApi, "%u", &g_pDpApi);
-
-	// Check major ver
-	if (g_pDpApi->version_major != DPROTO_ENGINFO_API_VERSION_MAJOR) {
-		LOG_ERROR(PLID, "DPAPI major version checking failed: current %d (needed %d)", g_pDpApi->version_major, DPROTO_ENGINFO_API_VERSION_MAJOR);
-
-		return false;
-	}
-	// Check minor ver
-	if (g_pDpApi->version_minor < DPROTO_ENGINFO_API_VERSION_MINOR) {
-		LOG_ERROR(PLID, "DPAPI minor version checking failed: current %d (needed minimal %d)", g_pDpApi->version_minor, DPROTO_ENGINFO_API_VERSION_MINOR);
-
+qboolean VTC_Init( void ) {
+	if (!DProtoAPI_Init()) {
 		return false;
 	}
 
 	// Change clc_voicedata callback
-	sv_clcfuncs_t *pCLC = (sv_clcfuncs_t *)g_pDpApi->p_clc_funcs;
+	sv_clcfuncs_t *pCLC = (sv_clcfuncs_t *)g_pDprotoAPI->p_clc_funcs;
 
-	g_pfnDefCallback = pCLC[CLC_VOICEDATA].pfnCallback;
+	g_pfnSVParseVoiceData = pCLC[CLC_VOICEDATA].pfnCallback;
 	pCLC[CLC_VOICEDATA].pfnCallback = &SV_ParseVoiceData;
 
 	// Get size client_t
-	g_sizeClientStruct = g_pDpApi->client_t_size;
+	g_sizeClientStruct = g_pDprotoAPI->client_t_size;
 
 	// Get svs
-	g_psvs = (server_static_t *)g_pDpApi->p_svs;
+	g_psvs = (server_static_t *)g_pDprotoAPI->p_svs;
 
-	// ...
-	pmsg_readcount = (size_t *)g_pDpApi->p_msg_readcount;
-	pmsg_badread = g_pDpApi->p_msg_badread;
-	pnet_message = (sizebuf_t *)g_pDpApi->p_net_message_addr;
-	SZ_GetSpace = (void *(*)(sizebuf_t *, size_t))g_pDpApi->p_SZ_GetSpace;
+	// Get MSG_** specified vars and funcs
+	g_pMsgReadcount = (size_t *)g_pDprotoAPI->p_msg_readcount;
+	g_pMsgBadread = (bool *)g_pDprotoAPI->p_msg_badread;
+	g_pNetMessage = (sizebuf_t *)g_pDprotoAPI->p_net_message_addr;
+	g_pfnSZGetSpace = (PSZ_GETSPACE)g_pDprotoAPI->p_SZ_GetSpace;
 
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
@@ -88,7 +59,7 @@ qboolean VCM_Init( void ) {
 	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
-		g_pVoiceSpeex[i] = CreateSpeexVoiceCodec();
+		g_pVoiceSpeex[i] = new CSpeex;
 
 		if ( !g_pVoiceSpeex[i] ) {
 			LOG_ERROR( PLID, "Couldn't get speex interface" );
@@ -105,7 +76,7 @@ qboolean VCM_Init( void ) {
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		g_pVoiceSilk[i] = CreateSilkVoiceCodec();
+		g_pVoiceSilk[i] = new CSilk;
 
 		if ( !g_pVoiceSilk[i] ) {
 			LOG_ERROR( PLID, "Couldn't get silk interface" );
@@ -134,11 +105,13 @@ qboolean VCM_Init( void ) {
 	return TRUE;
 }
 
-qboolean VCM_End( void ) {
-	// Change clc_voicedata callback
-	sv_clcfuncs_t *pCLC = (sv_clcfuncs_t *)g_pDpApi->p_clc_funcs;
+qboolean VTC_End( void ) {
+	DProtoAPI_Deinit();
 
-	pCLC[CLC_VOICEDATA].pfnCallback = g_pfnDefCallback;
+	// Change clc_voicedata callback
+	sv_clcfuncs_t *pCLC = (sv_clcfuncs_t *)g_pDprotoAPI->p_clc_funcs;
+
+	pCLC[CLC_VOICEDATA].pfnCallback = g_pfnSVParseVoiceData;
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		g_pVoiceSpeex[i]->Release();
@@ -148,81 +121,39 @@ qboolean VCM_End( void ) {
 	return TRUE;
 }
 
-int MSG_ReadShort(void) {
-	short iResult;
+const int c_iCheckMsMin = 30;
 
-	if ( *pmsg_readcount + sizeof(short) > pnet_message->cursize )
-	{
-		*pmsg_badread = 1;
-
-		iResult = -1;
-	}
-	else
-	{
-		iResult = *(short *)&(pnet_message->data[*pmsg_readcount]);
-
-		*pmsg_readcount += sizeof(short);
-	}
-
-	return iResult;
-}
-
-int MSG_ReadBuf(size_t size, void *pDest) {
-	int iResult;
-
-	if ( *pmsg_readcount + size > pnet_message->cursize )
-	{
-		*pmsg_badread = 1;
-
-		iResult = -1;
-	}
-	else
-	{
-		memcpy(pDest, &pnet_message->data[*pmsg_readcount], size);
-
-		*pmsg_readcount += size;
-
-		iResult = 1;
-	}
-
-	return iResult;
-}
-
-void MSG_WriteByte(sizebuf_t *pDatagram, byte bVal) {
-	byte *pbData = (byte *)SZ_GetSpace(pDatagram, sizeof(byte));
-
-	*pbData = bVal;
-}
-
-void MSG_WriteShort(sizebuf_t *pDatagram, short sVal) {
-	short *psData = (short *)SZ_GetSpace(pDatagram, sizeof(short));
-
-	*psData = sVal;
-}
-
-void MSG_WriteBuf(sizebuf_t *pDatagram, size_t size, void *pBuf) {
-	void *pData = SZ_GetSpace(pDatagram, size);
-
-	memcpy(pData, pBuf, size);
-}
+float g_flLastReceivedVoice[32];
 
 void SV_ParseVoiceData(client_t *pClient) {
 	int i, iClient;
 	int nDataLength, nCompressedLength, nDecompressedSamples;
-	char chReceived[4096];
-	char chDecompressed[8192];
-	char chCompressed[4096];
+	byte chReceived[4096];
+	short chDecompressed[4096];
+	byte chCompressed[4096];
 	client_t *pDestClient;
 
 	iClient = ((size_t)pClient - (size_t)g_psvs->m_pClients) / g_sizeClientStruct;
 
 	nDataLength = MSG_ReadShort( );
 
+	//LOG_MESSAGE( PLID, "%d:%f", iClient, gpGlobals->time );
+
 	if ( nDataLength > sizeof( chReceived ) ) {
 		return;
 	}
 
 	MSG_ReadBuf( nDataLength, chReceived );
+
+	if ((gpGlobals->time - g_flLastReceivedVoice[iClient]) < (c_iCheckMsMin * 0.001)) {
+		LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
+
+		return;
+	}
+
+	LOG_MESSAGE(PLID, "Accept %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
+
+	g_flLastReceivedVoice[iClient] = gpGlobals->time;
 
 	if ( g_PlayerVCodec[ iClient + 1 ].m_voiceCodec == VOICECODEC_NONE) {
 		return;
@@ -248,7 +179,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 			}
 		}
 
-		nCompressedLength = g_pVoiceSilk[iClient]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed), false);
+		nCompressedLength = g_pVoiceSilk[iClient]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed));
 	} else {
 		nDecompressedSamples = g_pVoiceSilk[iClient]->Decompress(chReceived, nDataLength, chDecompressed, sizeof(chDecompressed));
 
@@ -263,7 +194,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 			}
 		}
 
-		nCompressedLength = g_pVoiceSpeex[iClient]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed), false);
+		nCompressedLength = g_pVoiceSpeex[iClient]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed));
 	}
 
 	for (i = 0; i < MAX_CLIENTS; i++)
@@ -271,7 +202,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 		qboolean bLocal;
 		int nSendLength;
 		int nSend;
-		char *chSend;
+		byte *chSend;
 
 		if (g_PlayerVCodec[i + 1].m_voiceCodec == VOICECODEC_NONE) {
 			continue;
@@ -344,9 +275,9 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 	}
 
 	if ( g_PlayerVCodec[ iId ].m_voiceCodec != VOICECODEC_NONE ) {
-		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Miles/Speex)", iId, pszName, pszAddress, iProtocol );
+		//LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Miles/Speex)", iId, pszName, pszAddress, iProtocol );
 	} else {
-		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Check...)", iId, pszName, pszAddress, iProtocol );
+		//LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Check...)", iId, pszName, pszAddress, iProtocol );
 	}
 
 	RETURN_META_VALUE( MRES_IGNORED, TRUE );
@@ -413,9 +344,9 @@ void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarNa
 	}
 
 	if (g_PlayerVCodec[ iId ].m_voiceCodec == VOICECODEC_MILES_SPEEX) {
-		LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Miles/Speex)", iId, iBuild );
+		//LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Miles/Speex)", iId, iBuild );
 	} else {
-		LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Silk)", iId, iBuild );
+		//LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Silk)", iId, iBuild );
 	}
 
 	RETURN_META( MRES_IGNORED );

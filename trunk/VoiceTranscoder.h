@@ -5,11 +5,14 @@
 #include <dllapi.h>
 #include <meta_api.h>
 
-#include "util.h"
+#include "Util.h"
 
-#include "ivoicecodec.h"
-#include "VoiceEncoder_Silk.h"
-#include "VoiceEncoder_Speex.h"
+#include "VoiceCodec.h"
+#include "VoiceCodec_Speex.h"
+#include "VoiceCodec_Silk.h"
+
+#include "DProtoAPI.h"
+#include "EngineFuncs.h"
 
 #define MAX_CLIENTS	32
 
@@ -25,16 +28,6 @@ struct playervcodec_t {
 	int				m_iRequestID;
 };
 
-struct sv_clcfuncs_t {
-	unsigned int iMsgId;
-	const char *pszMsgName;
-	void (* pfnCallback)(client_t *pClient);
-};
-
-#define CLC_VOICEDATA	8
-
-#define SVC_VOICEDATA	53
-
 extern void SV_ParseVoiceData( client_t *pClient );
 
 extern size_t g_sizeClientStruct;
@@ -43,15 +36,15 @@ extern server_static_t *g_psvs;
 
 extern playervcodec_t g_PlayerVCodec[ MAX_CLIENTS+1 ];
 
-extern IVoiceCodec *g_pVoiceSpeex[ MAX_CLIENTS ];
-extern IVoiceCodec *g_pVoiceSilk[ MAX_CLIENTS ];
+extern CSpeex *g_pVoiceSpeex[ MAX_CLIENTS ];
+extern CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 
 extern cvar_t *g_pcvarVoiceEnable;
 extern cvar_t *g_pcvarVoiceCodec;
 extern cvar_t *g_pcvarVoiceQuality;
 
-extern qboolean VCM_Init( void );
-extern qboolean VCM_End( void );
+extern qboolean VTC_Init( void );
+extern qboolean VTC_End( void );
 
 extern void ParseSizeClientStruct(void);
 

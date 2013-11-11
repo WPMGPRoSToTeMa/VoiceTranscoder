@@ -2,6 +2,7 @@
 
 #include "Util.h"
 #include "DProtoAPI.h"
+#include <string.h>
 
 #define CLC_VOICEDATA	8
 

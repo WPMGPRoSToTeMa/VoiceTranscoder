@@ -54,6 +54,10 @@ void CSpeex::Release() {
 }
 
 int	CSpeex::Compress(const short *psDecompressed, int nDecompressedSamples, byte *pbCompressed, int nMaxCompressedBytes) {
+	if (nDecompressedSamples <= 0) {
+		return 0;
+	}
+
 	m_buffEncode.Put(psDecompressed, nDecompressedSamples * c_iBytesPerSample);
 
 	if (m_buffEncode.TellPut() < c_nRawBytes) {

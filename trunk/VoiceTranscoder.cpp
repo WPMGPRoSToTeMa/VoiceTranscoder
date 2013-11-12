@@ -17,7 +17,7 @@ CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 cvar_t g_cvarVoiceVolumeSpeex = {"sv_voicevolume_speex", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceVolumeSilk = {"sv_voicevolume_silk", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceFloodMs = {"sv_voicefloodms", "30", FCVAR_EXTDLL};
-cvar_t g_cvarVTCVersion = {"vtc_version", GetBuildNumberAsString(), FCVAR_EXTDLL};
+cvar_t g_cvarVTCVersion = {"vtc_version", GetBuildNumberAsString(), FCVAR_EXTDLL | FCVAR_SERVER};
 
 cvar_t *g_pcvarVoiceEnable;
 cvar_t *g_pcvarVoiceCodec;

@@ -1,6 +1,7 @@
 #include "VoiceTranscoder.h"
 #include "EngineFuncs.h"
 #include "CRC32.h"
+#include "Build.h"
 
 PCLCFUNCS_CALLBACK g_pfnSVParseVoiceData;
 
@@ -16,6 +17,7 @@ CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 cvar_t g_cvarVoiceVolumeSpeex = {"sv_voicevolume_speex", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceVolumeSilk = {"sv_voicevolume_silk", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceFloodMs = {"sv_voicefloodms", "30", FCVAR_EXTDLL};
+cvar_t g_cvarVTCVersion = {"vtc_version", GetBuildNumberAsString(), FCVAR_EXTDLL};
 
 cvar_t *g_pcvarVoiceEnable;
 cvar_t *g_pcvarVoiceCodec;
@@ -23,6 +25,7 @@ cvar_t *g_pcvarVoiceQuality;
 cvar_t *g_pcvarVoiceVolumeSpeex;
 cvar_t *g_pcvarVoiceVolumeSilk;
 cvar_t *g_pcvarVoiceFloodMs;
+cvar_t *g_pcvarVTCVersion;
 
 bool g_bIsntSpeex;
 
@@ -55,6 +58,7 @@ qboolean VTC_Init( void ) {
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
 	CVAR_REGISTER(&g_cvarVoiceFloodMs);
+	CVAR_REGISTER(&g_cvarVTCVersion);
 
 	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
 	g_pcvarVoiceCodec = CVAR_GET_POINTER("sv_voicecodec");
@@ -62,6 +66,7 @@ qboolean VTC_Init( void ) {
 	g_pcvarVoiceVolumeSpeex = CVAR_GET_POINTER("sv_voicevolume_speex");
 	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
 	g_pcvarVoiceFloodMs = CVAR_GET_POINTER("sv_voicefloodms");
+	g_pcvarVTCVersion = CVAR_GET_POINTER("vtc_version");
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		g_pVoiceSpeex[i] = new CSpeex;

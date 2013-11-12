@@ -72,13 +72,13 @@ qboolean VTC_Init( void ) {
 		g_pVoiceSpeex[i] = new CSpeex;
 
 		if ( !g_pVoiceSpeex[i] ) {
-			LOG_ERROR( PLID, "Couldn't get speex interface" );
+			LOG_ERROR( PLID, "Couldn't get speex codec" );
 
 			return FALSE;
 		}
 
 		if ( !g_pVoiceSpeex[i]->Init(g_pcvarVoiceQuality->value) ) {
-			LOG_ERROR( PLID, "Couldn't initialize speex interface" );
+			LOG_ERROR( PLID, "Couldn't initialize speex codec" );
 
 			return FALSE;
 		}
@@ -89,13 +89,13 @@ qboolean VTC_Init( void ) {
 		g_pVoiceSilk[i] = new CSilk;
 
 		if ( !g_pVoiceSilk[i] ) {
-			LOG_ERROR( PLID, "Couldn't get silk interface" );
+			LOG_ERROR( PLID, "Couldn't get silk codec" );
 
 			return FALSE;
 		}
 
 		if ( !g_pVoiceSilk[i]->Init(0) ) {
-			LOG_ERROR( PLID, "Couldn't initialize silk interface" );
+			LOG_ERROR( PLID, "Couldn't initialize silk codec" );
 
 			return FALSE;
 		}
@@ -146,6 +146,10 @@ void SV_ParseVoiceData(client_t *pClient) {
 	nDataLength = MSG_ReadShort( );
 
 	if ( nDataLength > sizeof( chReceived ) ) {
+		LOG_MESSAGE(PLID, "SV_ParseVoiceData: invalid incoming packet.\n");
+
+		((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Invalid voice data\n");
+
 		return;
 	}
 
@@ -156,9 +160,9 @@ void SV_ParseVoiceData(client_t *pClient) {
 			ulong ulOurCRC = ~ComputeCRC(0xFFFFFFFF, chReceived, nDataLength - sizeof(ulong));
 
 			if (ulOurCRC != *(ulong *)&chReceived[nDataLength - sizeof(ulong)]) {
-				LOG_MESSAGE(PLID, "Couldn't validate voice packet CRC");
+				LOG_MESSAGE(PLID, "SV_ParseVoiceData: invalid incoming packet.\n");
 
-				((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Couldn't validate voice packet CRC");
+				((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Invalid voice data\n");
 
 				return;
 			}

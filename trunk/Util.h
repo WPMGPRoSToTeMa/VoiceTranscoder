@@ -303,7 +303,7 @@ struct client_t
 	qboolean		m_fSkipMessage;
 	void *			frames;
 	event_info_t	events[64];
-	void *			edict;
+	edict_t *		m_pEdict;
 	const void *	target_edict;
 	int				m_iUserID;
 	clientid_t		m_clientID;

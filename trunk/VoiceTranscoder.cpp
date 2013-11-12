@@ -1,5 +1,6 @@
 #include "VoiceTranscoder.h"
 #include "EngineFuncs.h"
+#include "CRC32.h"
 
 PCLCFUNCS_CALLBACK g_pfnSVParseVoiceData;
 
@@ -14,12 +15,14 @@ CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 
 cvar_t g_cvarVoiceVolumeSpeex = {"sv_voicevolume_speex", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceVolumeSilk = {"sv_voicevolume_silk", "1.0", FCVAR_EXTDLL};
+cvar_t g_cvarVoiceFloodMs = {"sv_voicefloodms", "30", FCVAR_EXTDLL};
 
 cvar_t *g_pcvarVoiceEnable;
 cvar_t *g_pcvarVoiceCodec;
 cvar_t *g_pcvarVoiceQuality;
 cvar_t *g_pcvarVoiceVolumeSpeex;
 cvar_t *g_pcvarVoiceVolumeSilk;
+cvar_t *g_pcvarVoiceFloodMs;
 
 bool g_bIsntSpeex;
 
@@ -51,12 +54,14 @@ qboolean VTC_Init( void ) {
 
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
+	CVAR_REGISTER(&g_cvarVoiceFloodMs);
 
 	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
 	g_pcvarVoiceCodec = CVAR_GET_POINTER("sv_voicecodec");
 	g_pcvarVoiceQuality = CVAR_GET_POINTER("sv_voicequality");
 	g_pcvarVoiceVolumeSpeex = CVAR_GET_POINTER("sv_voicevolume_speex");
 	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
+	g_pcvarVoiceFloodMs = CVAR_GET_POINTER("sv_voicefloodms");
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		g_pVoiceSpeex[i] = new CSpeex;
@@ -121,9 +126,9 @@ qboolean VTC_End( void ) {
 	return TRUE;
 }
 
-const int c_iCheckMsMin = 30;
-
 float g_flLastReceivedVoice[32];
+
+int g_iCounter;
 
 void SV_ParseVoiceData(client_t *pClient) {
 	int i, iClient;
@@ -137,21 +142,42 @@ void SV_ParseVoiceData(client_t *pClient) {
 
 	nDataLength = MSG_ReadShort( );
 
-	//LOG_MESSAGE( PLID, "%d:%f", iClient, gpGlobals->time );
-
 	if ( nDataLength > sizeof( chReceived ) ) {
 		return;
 	}
 
 	MSG_ReadBuf( nDataLength, chReceived );
 
-	if ((gpGlobals->time - g_flLastReceivedVoice[iClient]) < (c_iCheckMsMin * 0.001)) {
+	if (g_PlayerVCodec[iClient + 1].m_voiceCodec == VOICECODEC_SILK) {
+		if (nDataLength > sizeof(ulong)) {
+			ulong ulOurCRC = ~ComputeCRC(0xFFFFFFFF, chReceived, nDataLength - sizeof(ulong));
+
+			if (ulOurCRC != *(ulong *)&chReceived[nDataLength - sizeof(ulong)]) {
+				LOG_MESSAGE(PLID, "Couldn't validate voice packet CRC");
+
+				((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Couldn't validate voice packet CRC");
+
+				return;
+			}
+		}
+	}
+
+	char szFile[32];
+	snprintf(szFile, sizeof(szFile), "cstrike/voicedumps/%s%d.bin", (nDataLength == 15) ? "_" : "", g_iCounter++);
+
+	FILE *pFile = fopen(szFile, "wb");
+	fwrite(chReceived, nDataLength, 1, pFile);
+	fclose(pFile);
+
+	if ((gpGlobals->time - g_flLastReceivedVoice[iClient]) < (g_pcvarVoiceFloodMs->value * 0.001)) {
 		LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
+
+		((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Stop voice flooding!");
 
 		return;
 	}
 
-	LOG_MESSAGE(PLID, "Accept %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
+	//LOG_MESSAGE(PLID, "Accept %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
 
 	g_flLastReceivedVoice[iClient] = gpGlobals->time;
 

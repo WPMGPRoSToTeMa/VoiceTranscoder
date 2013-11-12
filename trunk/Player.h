@@ -2,6 +2,8 @@
 
 #include "VoiceCodec.h"
 
+#include "Util.h"
+
 enum vcodec_t {
 	VCODEC_NONE = 0,
 	VCODEC_SPEEX,
@@ -10,14 +12,15 @@ enum vcodec_t {
 
 class CPlayer {
 public:
+	client_t *		m_pClient;
 	vcodec_t		m_vcodec;
 	bool			m_fRequested;
 	int				m_iRequestID;
 	CVoiceCodec	*	m_pEncoder;
 	CVoiceCodec *	m_pDecoder;
-	double			m_dbLastReceivedVoice;
+	float			m_flLastReceivedVoice;
 
 	void Connect();
-	void CvarValue();
+	void CvarValue(int iRequestID, const char *pszCvar, const char *pszValue);
 	void ReceivedVoice();
 };

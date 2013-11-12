@@ -50,6 +50,10 @@ int CSilk::Compress(const short *psDecompressed, int nDecompressedSamples, byte 
 
 	int nMinSamples = c_iMaxInputFrames * m_iSampleRate * c_iFrameLengthMs / 1000;
 
+	if (nDecompressedSamples <= 0) {
+		return 0;
+	}
+
 	m_buffEncode.Put(psDecompressed, nDecompressedSamples * c_iBytesPerSample);
 
 	if ((m_buffEncode.TellPut() / c_iBytesPerSample) < nMinSamples) {

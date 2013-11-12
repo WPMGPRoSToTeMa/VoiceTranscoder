@@ -128,8 +128,6 @@ qboolean VTC_End( void ) {
 
 float g_flLastReceivedVoice[32];
 
-int g_iCounter;
-
 void SV_ParseVoiceData(client_t *pClient) {
 	int i, iClient;
 	int nDataLength, nCompressedLength, nDecompressedSamples;
@@ -162,17 +160,10 @@ void SV_ParseVoiceData(client_t *pClient) {
 		}
 	}
 
-	char szFile[32];
-	snprintf(szFile, sizeof(szFile), "cstrike/voicedumps/%s%d.bin", (nDataLength == 15) ? "_" : "", g_iCounter++);
-
-	FILE *pFile = fopen(szFile, "wb");
-	fwrite(chReceived, nDataLength, 1, pFile);
-	fclose(pFile);
-
 	if ((gpGlobals->time - g_flLastReceivedVoice[iClient]) < (g_pcvarVoiceFloodMs->value * 0.001)) {
-		LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
+		//LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
 
-		((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Stop voice flooding!");
+		//((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Stop voice flooding!");
 
 		return;
 	}

@@ -19,6 +19,7 @@
     <None Include="libSKP_SILK_SDK.a" />
     <None Include="libspeex.a" />
     <None Include="compile.sh" />
+    <None Include="compile_debug.sh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CRC32.cpp">

@@ -85,6 +85,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="compile.sh" />
+    <None Include="compile_debug.sh" />
     <None Include="libSKP_SILK_SDK.a" />
     <None Include="libspeex.a" />
     <None Include="VoiceCodecMgr.def" />

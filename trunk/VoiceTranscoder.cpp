@@ -279,6 +279,7 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 
 	g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_NONE;
 	g_PlayerVCodec[ iId ].m_fIsRequested = false;
+	g_flLastReceivedVoice[iId-1] = 0;
 
 	sprintf( szCommand, "dp_clientinfo %d\n", iId );
 	SERVER_COMMAND( szCommand );
@@ -301,9 +302,13 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 	}
 
 	if ( g_PlayerVCodec[ iId ].m_voiceCodec != VOICECODEC_NONE ) {
-		//LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Miles/Speex)", iId, pszName, pszAddress, iProtocol );
+#ifdef VTC_DEBUG
+		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Miles/Speex)", iId, pszName, pszAddress, iProtocol );
+#endif
 	} else {
-		//LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Check...)", iId, pszName, pszAddress, iProtocol );
+#ifdef VTC_DEBUG
+		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Check...)", iId, pszName, pszAddress, iProtocol );
+#endif
 	}
 
 	RETURN_META_VALUE( MRES_IGNORED, TRUE );
@@ -370,9 +375,13 @@ void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarNa
 	}
 
 	if (g_PlayerVCodec[ iId ].m_voiceCodec == VOICECODEC_MILES_SPEEX) {
-		//LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Miles/Speex)", iId, iBuild );
+#ifdef VTC_DEBUG
+		LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Miles/Speex)", iId, iBuild );
+#endif
 	} else {
-		//LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Silk)", iId, iBuild );
+#ifdef VTC_DEBUG
+		LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Silk)", iId, iBuild );
+#endif
 	}
 
 	RETURN_META( MRES_IGNORED );

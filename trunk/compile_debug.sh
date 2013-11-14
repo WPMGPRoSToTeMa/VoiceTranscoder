@@ -30,7 +30,7 @@ g++		-O3 \
 -I./DprotoAPI \
 Build.cpp CRC32.cpp DllAPI.cpp DProtoAPI.cpp EngineFuncs.cpp HExport.cpp \
 MetaAPI.cpp Player.cpp SdkUTIL.cpp UtlBuffer.cpp \
-VoiceTranscoder.cpp VoiceCodec_Silk.cpp VoiceCodec_Speex.cpp \
+VoiceTranscoder.cpp VoiceCodec_Silk.cpp VoiceCodec_Speex.cpp Logger.cpp Logging.cpp \
 -DVTC_DEBUG \
 -ldl -lm \
 -o Release/vtc_dbg.so \

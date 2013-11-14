@@ -97,6 +97,8 @@
     <ClCompile Include="DProtoAPI.cpp" />
     <ClCompile Include="EngineFuncs.cpp" />
     <ClCompile Include="HExport.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Logging.cpp" />
     <ClCompile Include="MetaAPI.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SdkUTIL.cpp" />
@@ -110,6 +112,9 @@
     <ClInclude Include="CRC32.h" />
     <ClInclude Include="DProtoAPI.h" />
     <ClInclude Include="EngineFuncs.h" />
+    <ClInclude Include="ErrorCode.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="Logging.h" />
     <ClInclude Include="VoiceCodec.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Util.h" />

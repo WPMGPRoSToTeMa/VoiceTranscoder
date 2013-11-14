@@ -4,6 +4,7 @@
 #include <extdll.h>
 #include <dllapi.h>
 #include <meta_api.h>
+#include "Logging.h"
 
 dp_enginfo_api_t *g_pDprotoAPI;
 
@@ -20,6 +21,7 @@ bool DProtoAPI_Init(void) {
 #ifdef VTC_DEBUG
 		LOG_ERROR(PLID, "Can't get DPAPI");
 #endif
+		g_pLog->Printf("ERROR: %d\n", ERRORCODE_CANT_GET_DPAPI);
 
 		return false;
 	}
@@ -36,6 +38,7 @@ bool DProtoAPI_Init(void) {
 #ifdef VTC_DEBUG
 		LOG_ERROR(PLID, "DPAPI major version checking failed: current %d (need %d)", g_pDprotoAPI->version_major, DPROTO_ENGINFO_API_VERSION_MAJOR);
 #endif
+		g_pLog->Printf("ERROR: %d\n", ERRORCODE_MAJOR_VERSION_MISMATCH);
 
 		return false;
 	}
@@ -44,6 +47,7 @@ bool DProtoAPI_Init(void) {
 #ifdef VTC_DEBUG
 		LOG_ERROR(PLID, "DPAPI minor version checking failed: current %d (need minimal %d)", g_pDprotoAPI->version_minor, DPROTO_ENGINFO_API_VERSION_MINOR);
 #endif
+		g_pLog->Printf("ERROR: %d\n", ERRORCODE_MINOR_VERSION_MISMATCH);
 
 		return false;
 	}

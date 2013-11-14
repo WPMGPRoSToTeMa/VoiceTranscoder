@@ -2,6 +2,7 @@
 #include "EngineFuncs.h"
 #include "CRC32.h"
 #include "Build.h"
+#include "Logging.h"
 
 PCLCFUNCS_CALLBACK g_pfnSVParseVoiceData;
 
@@ -16,7 +17,7 @@ CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 
 cvar_t g_cvarVoiceVolumeSpeex = {"sv_voicevolume_speex", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceVolumeSilk = {"sv_voicevolume_silk", "1.0", FCVAR_EXTDLL};
-cvar_t g_cvarVoiceFloodMs = {"sv_voicefloodms", "30", FCVAR_EXTDLL};
+cvar_t g_cvarVoiceFloodMs = {"sv_voicefloodms", "0", FCVAR_EXTDLL};
 cvar_t g_cvarVTCVersion = {"vtc_version", GetBuildNumberAsString(), FCVAR_EXTDLL | FCVAR_SERVER};
 
 cvar_t *g_pcvarVoiceEnable;
@@ -73,12 +74,14 @@ qboolean VTC_Init( void ) {
 
 		if ( !g_pVoiceSpeex[i] ) {
 			LOG_ERROR( PLID, "Couldn't get speex codec" );
+			g_pLog->Printf("ERROR: Couldn't get speex codec\n");
 
 			return FALSE;
 		}
 
 		if ( !g_pVoiceSpeex[i]->Init(g_pcvarVoiceQuality->value) ) {
 			LOG_ERROR( PLID, "Couldn't initialize speex codec" );
+			g_pLog->Printf("ERROR: Couldn't initialize speex codec\n");
 
 			return FALSE;
 		}
@@ -90,12 +93,14 @@ qboolean VTC_Init( void ) {
 
 		if ( !g_pVoiceSilk[i] ) {
 			LOG_ERROR( PLID, "Couldn't get silk codec" );
+			g_pLog->Printf("ERROR: Couldn't get silk codec\n");
 
 			return FALSE;
 		}
 
 		if ( !g_pVoiceSilk[i]->Init(0) ) {
 			LOG_ERROR( PLID, "Couldn't initialize silk codec" );
+			g_pLog->Printf("ERROR: Couldn't initialize silk codec\n");
 
 			return FALSE;
 		}
@@ -105,11 +110,10 @@ qboolean VTC_Init( void ) {
 	g_iOldVoiceQuality = g_pcvarVoiceQuality->value;
 
 	if (strcmp(g_pcvarVoiceCodec->string, "voice_speex") != 0) {
-		LOG_MESSAGE( PLID, "Warning vcodec isn't speex. Voice disabled." );
+		LOG_MESSAGE( PLID, "Warning voicecodec isn't speex. sv_voicecodec directly set to voice_speex." );
+		g_pLog->Printf("WARNING: voicecodec isn't speex. sv_voicecodec directly set to voice_speex.\n");
 
-		g_bIsntSpeex = true;
-	} else {
-		g_bIsntSpeex = false;
+		g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceCodec, "voice_speex");
 	}
 
 	return TRUE;
@@ -169,7 +173,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 		}
 	}
 
-	if ((gpGlobals->time - g_flLastReceivedVoice[iClient]) < (g_pcvarVoiceFloodMs->value * 0.001)) {
+	if (g_pcvarVoiceFloodMs->value != 0 && (gpGlobals->time - g_flLastReceivedVoice[iClient]) < (g_pcvarVoiceFloodMs->value * 0.001)) {
 		//LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
 
 		//((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Stop voice flooding!");
@@ -182,9 +186,6 @@ void SV_ParseVoiceData(client_t *pClient) {
 	g_flLastReceivedVoice[iClient] = gpGlobals->time;
 
 	if ( g_PlayerVCodec[ iClient + 1 ].m_voiceCodec == VOICECODEC_NONE) {
-		return;
-	}
-	if (g_bIsntSpeex) {
 		return;
 	}
 	if (g_pcvarVoiceEnable->value == 0.0f) {
@@ -305,6 +306,8 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 #ifdef VTC_DEBUG
 		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Miles/Speex)", iId, pszName, pszAddress, iProtocol );
 #endif
+		LOG_MESSAGE( PLID, "Player %d %s", iId, "speex");
+		g_pLog->Printf("Player %d %s\n", iId, "speex");
 	} else {
 #ifdef VTC_DEBUG
 		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Check...)", iId, pszName, pszAddress, iProtocol );
@@ -315,23 +318,45 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 }
 
 void StartFrame ( void ) {
-	if (g_iOldVoiceQuality == g_pcvarVoiceQuality->value && strcmp(g_szOldVoiceCodec, g_pcvarVoiceCodec->string) == 0) {
-		RETURN_META( MRES_IGNORED );
-	}
-
-	for (int i = 0; i < MAX_CLIENTS; i++) {
-		g_pVoiceSpeex[i]->Init(g_pcvarVoiceQuality->value);
-	}
-
-	strncpy(g_szOldVoiceCodec, g_pcvarVoiceCodec->string, sizeof(g_szOldVoiceCodec));
-	g_iOldVoiceQuality = g_pcvarVoiceQuality->value;
-
 	if (strcmp(g_pcvarVoiceCodec->string, "voice_speex") != 0) {
-		LOG_MESSAGE( PLID, "Warning vcodec isn't speex. Voice disabled." );
+		LOG_MESSAGE( PLID, "Warning voicecodec isn't speex. sv_voicecodec directly set to voice_speex." );
+		g_pLog->Printf("WARNING: voicecodec isn't speex. sv_voicecodec directly set to voice_speex.\n");
 
-		g_bIsntSpeex = true;
-	} else {
-		g_bIsntSpeex = false;
+		g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceCodec, "voice_speex");
+	} else if (g_pcvarVoiceQuality->value != g_iOldVoiceQuality) {
+		if (g_pcvarVoiceQuality->value < 1) {
+			LOG_MESSAGE( PLID, "Warning voicequality < 1. sv_voicequality directly set to 1." );
+			g_pLog->Printf("WARNING: voicequality < 1. sv_voicequality directly set to 1.\n");
+
+			g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceQuality, "1");
+		} else if (g_pcvarVoiceQuality->value > 5) {
+			LOG_MESSAGE( PLID, "Warning voicequality > 5. sv_voicequality directly set to 5." );
+			g_pLog->Printf("WARNING: voicequality > 5. sv_voicequality directly set to 5.\n");
+
+			g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceQuality, "5");
+		}
+
+		g_iOldVoiceQuality = g_pcvarVoiceQuality->value;
+		
+		for (int i = 0; i < MAX_CLIENTS; i++) {
+			delete g_pVoiceSpeex[i];
+
+			g_pVoiceSpeex[i] = new CSpeex;
+
+			if ( !g_pVoiceSpeex[i] ) {
+				LOG_ERROR( PLID, "Couldn't get speex codec" );
+				g_pLog->Printf("ERROR: Couldn't get speex codec\n");
+
+				RETURN_META( MRES_IGNORED );
+			}
+
+			if ( !g_pVoiceSpeex[i]->Init(g_pcvarVoiceQuality->value) ) {
+				LOG_ERROR( PLID, "Couldn't initialize speex codec" );
+				g_pLog->Printf("ERROR: Couldn't initialize speex codec\n");
+
+				RETURN_META( MRES_IGNORED );
+			}
+		}
 	}
 
 	RETURN_META( MRES_IGNORED );
@@ -378,10 +403,14 @@ void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarNa
 #ifdef VTC_DEBUG
 		LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Miles/Speex)", iId, iBuild );
 #endif
+		LOG_MESSAGE( PLID, "Player %d %s", iId, "speex");
+		g_pLog->Printf("Player %d %s\n", iId, "speex");
 	} else {
 #ifdef VTC_DEBUG
 		LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Silk)", iId, iBuild );
 #endif
+		LOG_MESSAGE( PLID, "Player %d %s", iId, "silk");
+		g_pLog->Printf("Player %d %s\n", iId, "silk");
 	}
 
 	RETURN_META( MRES_IGNORED );

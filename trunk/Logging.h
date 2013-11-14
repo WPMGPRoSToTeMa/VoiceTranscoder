@@ -9,3 +9,4 @@
 extern CLogger * g_pLog;
 
 extern bool LoggingInitialize(void);
+extern bool LoggingDeinitialize(void);

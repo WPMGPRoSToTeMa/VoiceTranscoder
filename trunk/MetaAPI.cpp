@@ -102,5 +102,7 @@ C_DLLEXPORT int Meta_Detach( PLUG_LOADTIME , PL_UNLOAD_REASON ) {
 	
 	g_pLog->Printf("End Meta_Detach\n");
 
+	LoggingDeinitialize();
+
 	return TRUE;
 }

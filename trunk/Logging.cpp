@@ -21,3 +21,9 @@ bool LoggingInitialize(void) {
 
 	return true;
 }
+
+bool LoggingDeinitialize(void) {
+	delete g_pLog;
+
+	return true;
+}

@@ -42,6 +42,8 @@ extern CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 extern cvar_t *g_pcvarVoiceEnable;
 extern cvar_t *g_pcvarVoiceCodec;
 extern cvar_t *g_pcvarVoiceQuality;
+extern cvar_t *g_pcvarVTCLogDir;
+extern cvar_t *g_pcvarVTCLog;
 
 extern qboolean VTC_Init( void );
 extern qboolean VTC_End( void );

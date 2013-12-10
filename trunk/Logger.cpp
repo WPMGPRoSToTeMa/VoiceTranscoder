@@ -44,7 +44,11 @@ void CLogger::Printf(const char * pszFmt, ...) {
 			szFileName[sizeToCopy] = '\0';
 			strcat(szFileName, "vtc.log");
 		} else {
-			sprintf(szFileName, "%s/vtc.log", g_pcvarVTCLogDir->string);
+			char szGamedir[32];
+
+			GET_GAME_DIR(szGamedir);
+
+			sprintf(szFileName, "%s/%s/vtc.log", szGamedir, g_pcvarVTCLogDir->string);
 		}
 
 		m_pfile = fopen(szFileName, "at");

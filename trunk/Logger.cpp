@@ -20,8 +20,6 @@ CLogger::~CLogger() {
 	}
 }
 
-#include <WINdows.h>
-
 void CLogger::Printf(const char * pszFmt, ...) {
 	char szTemp[32];
 	time_t rawtime;
@@ -48,8 +46,6 @@ void CLogger::Printf(const char * pszFmt, ...) {
 		} else {
 			sprintf(szFileName, "%s/vtc.log", g_pcvarVTCLogDir->string);
 		}
-
-		MessageBox(NULL, szFileName, "", NULL);
 
 		m_pfile = fopen(szFileName, "at");
 

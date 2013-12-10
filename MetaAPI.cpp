@@ -50,17 +50,17 @@ C_DLLEXPORT int Meta_Query(char *, plugin_info_t **pPlugInfo, mutil_funcs_t *pMe
 		return FALSE;
 	}
 
-	g_pLog->Printf("Logging started (Meta_Query)\n");
+	//g_pLog->Printf("Logging started (Meta_Query)\n");
 
 	return TRUE;
 }
 
 C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME , META_FUNCTIONS *pFunctionTable, meta_globals_t *pMGlobals, gamedll_funcs_t *pGamedllFuncs) {
-	g_pLog->Printf("Start Meta_Attach\n");
+	//g_pLog->Printf("Start Meta_Attach\n");
 
 	if ( !pMGlobals ) {
 		LOG_ERROR( PLID, "Meta_Attach called with null pMGlobals" );
-		g_pLog->Printf("ERROR: Meta_Attach called with null pMGlobals\n");
+		//g_pLog->Printf("ERROR: Meta_Attach called with null pMGlobals\n");
 
 		return FALSE;
 	}
@@ -69,7 +69,7 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME , META_FUNCTIONS *pFunctionTable, meta
 
 	if ( !pFunctionTable ) {
 		LOG_ERROR( PLID, "Meta_Attach called with null pFunctionTable" );
-		g_pLog->Printf("ERROR: Meta_Attach called with null pFunctionTable\n");
+		//g_pLog->Printf("ERROR: Meta_Attach called with null pFunctionTable\n");
 
 		return FALSE;
 	}
@@ -80,27 +80,27 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME , META_FUNCTIONS *pFunctionTable, meta
 
 	if ( !VTC_Init( ) ) {
 		LOG_ERROR( PLID, "Could not initialize a plugin" );
-		g_pLog->Printf("ERROR: Could not initialize a plugin\n");
+		//g_pLog->Printf("ERROR: Could not initialize a plugin\n");
 		
 		return FALSE;
 	}
 
-	g_pLog->Printf("End Meta_Attach\n");
+	//g_pLog->Printf("End Meta_Attach\n");
 
 	return TRUE;
 }
 
 C_DLLEXPORT int Meta_Detach( PLUG_LOADTIME , PL_UNLOAD_REASON ) {
-	g_pLog->Printf("Start Meta_Detach\n");
+	//g_pLog->Printf("Start Meta_Detach\n");
 
 	if ( !VTC_End() ) {
 		LOG_ERROR( PLID, "Could not end a plugin" );
-		g_pLog->Printf("ERROR: Could not end a plugin\n");
+		//g_pLog->Printf("ERROR: Could not end a plugin\n");
 
 		return FALSE;
 	}
 	
-	g_pLog->Printf("End Meta_Detach\n");
+	//g_pLog->Printf("End Meta_Detach\n");
 
 	LoggingDeinitialize();
 

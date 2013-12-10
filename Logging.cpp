@@ -3,7 +3,7 @@
 CLogger * g_pLog;
 
 bool LoggingInitialize(void) {
-	char szLogPath[260], szGamedir[32];
+	/*char szLogPath[260], szGamedir[32];
 
 	GET_GAME_DIR(szGamedir);
 	snprintf(szLogPath, sizeof(szLogPath), "%s/logs/", szGamedir);
@@ -12,10 +12,10 @@ bool LoggingInitialize(void) {
 #else
 	mkdir(szLogPath);
 #endif
-	strncat(szLogPath, "vtc.log", sizeof(szLogPath));
+	strncat(szLogPath, "vtc.log", sizeof(szLogPath));*/
 
 	g_pLog = new CLogger;
-	if (!g_pLog->Init(szLogPath)) {
+	if (!g_pLog->Init("")) {
 		return false;
 	}
 

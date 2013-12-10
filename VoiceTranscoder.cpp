@@ -19,6 +19,8 @@ cvar_t g_cvarVoiceVolumeSpeex = {"sv_voicevolume_speex", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceVolumeSilk = {"sv_voicevolume_silk", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceFloodMs = {"sv_voicefloodms", "0", FCVAR_EXTDLL};
 cvar_t g_cvarVTCVersion = {"vtc_version", GetBuildNumberAsString(), FCVAR_EXTDLL | FCVAR_SERVER};
+cvar_t g_cvarVTCLogDir = {"vtc_logdir", "", FCVAR_EXTDLL};
+cvar_t g_cvarVTCLog = {"vtc_log", "0", FCVAR_EXTDLL};
 
 cvar_t *g_pcvarVoiceEnable;
 cvar_t *g_pcvarVoiceCodec;
@@ -27,6 +29,8 @@ cvar_t *g_pcvarVoiceVolumeSpeex;
 cvar_t *g_pcvarVoiceVolumeSilk;
 cvar_t *g_pcvarVoiceFloodMs;
 cvar_t *g_pcvarVTCVersion;
+cvar_t *g_pcvarVTCLogDir;
+cvar_t *g_pcvarVTCLog;
 
 bool g_bIsntSpeex;
 
@@ -60,6 +64,8 @@ qboolean VTC_Init( void ) {
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
 	CVAR_REGISTER(&g_cvarVoiceFloodMs);
 	CVAR_REGISTER(&g_cvarVTCVersion);
+	CVAR_REGISTER(&g_cvarVTCLogDir);
+	CVAR_REGISTER(&g_cvarVTCLog);
 
 	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
 	g_pcvarVoiceCodec = CVAR_GET_POINTER("sv_voicecodec");
@@ -68,6 +74,8 @@ qboolean VTC_Init( void ) {
 	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
 	g_pcvarVoiceFloodMs = CVAR_GET_POINTER("sv_voicefloodms");
 	g_pcvarVTCVersion = CVAR_GET_POINTER("vtc_version");
+	g_pcvarVTCLogDir = CVAR_GET_POINTER("vtc_logdir");
+	g_pcvarVTCLog = CVAR_GET_POINTER("vtc_log");
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		g_pVoiceSpeex[i] = new CSpeex;

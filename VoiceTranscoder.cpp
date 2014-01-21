@@ -395,11 +395,13 @@ void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarNa
 	// 1.1.2.7/Stdio,48,6027
 	//////////////////////////////////////////////////////////////////////////
 	pszBuild = strrchr( pszValue, ',' );
+	g_pLog->Printf("[%d %s %s]\n", iId, pszValue, (pszBuild == NULL) ? "ERROR" : pszBuild);
 	if ( pszBuild == NULL ) {
 		RETURN_META( MRES_IGNORED );
 	}
 	pszBuild++;
 	iBuild = atoi( pszBuild );
+	g_pLog->Printf("[%d %s %d]\n", iId, pszBuild, iBuild);
 
 	if ( iBuild >= 6027 ) {
 		g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_SILK;

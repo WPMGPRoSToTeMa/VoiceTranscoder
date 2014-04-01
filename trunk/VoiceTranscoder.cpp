@@ -37,6 +37,14 @@ bool g_bIsntSpeex;
 char g_szOldVoiceCodec[12];
 int g_iOldVoiceQuality;
 
+PCLCFUNCS_CALLBACK g_pfnSVParseCvarValue2;
+
+void SV_ParseCvarValue2(client_t *pClient) {
+	g_pLog->Printf("CvarValue2 received\n");
+
+	g_pfnSVParseCvarValue2(pClient);
+}
+
 qboolean VTC_Init( void ) {
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
@@ -68,6 +76,8 @@ qboolean VTC_Init( void ) {
 
 	g_pfnSVParseVoiceData = pCLC[CLC_VOICEDATA].pfnCallback;
 	pCLC[CLC_VOICEDATA].pfnCallback = &SV_ParseVoiceData;
+	g_pfnSVParseCvarValue2 = pCLC[0xB].pfnCallback;
+	pCLC[0xB].pfnCallback = &SV_ParseCvarValue2;
 
 	g_pLog->Printf("New address %.8X\n", pCLC[CLC_VOICEDATA].pfnCallback);
 
@@ -306,6 +316,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ] ) {
 	char szCommand[ 256 ];
 	int iId, iProtocol;
+
+	g_pLog->Printf("Client connect\n");
 
 	iId = ENTINDEX(pEntity);
 

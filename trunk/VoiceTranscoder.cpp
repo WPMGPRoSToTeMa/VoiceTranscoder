@@ -397,6 +397,8 @@ void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarNa
 	int iId, iBuild;
 	const char *pszBuild;
 
+	g_pLog->Printf("Hm??\n");
+
 	iId = ENTINDEX( pEnt );
 
 	if ( !g_PlayerVCodec[ iId ].m_fIsRequested ) {

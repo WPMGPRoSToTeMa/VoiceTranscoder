@@ -403,7 +403,7 @@ void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarNa
 	iBuild = atoi( pszBuild );
 	g_pLog->Printf("[%d %s %d]\n", iId, pszBuild, iBuild);
 
-	if ( iBuild >= 6027 ) {
+	if ( iBuild > 4554 ) {
 		g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_SILK;
 	} else {
 		g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_MILES_SPEEX;

@@ -38,6 +38,23 @@ char g_szOldVoiceCodec[12];
 int g_iOldVoiceQuality;
 
 qboolean VTC_Init( void ) {
+	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
+	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
+	CVAR_REGISTER(&g_cvarVoiceFloodMs);
+	CVAR_REGISTER(&g_cvarVTCVersion);
+	CVAR_REGISTER(&g_cvarVTCLogDir);
+	CVAR_REGISTER(&g_cvarVTCLog);
+
+	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
+	g_pcvarVoiceCodec = CVAR_GET_POINTER("sv_voicecodec");
+	g_pcvarVoiceQuality = CVAR_GET_POINTER("sv_voicequality");
+	g_pcvarVoiceVolumeSpeex = CVAR_GET_POINTER("sv_voicevolume_speex");
+	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
+	g_pcvarVoiceFloodMs = CVAR_GET_POINTER("sv_voicefloodms");
+	g_pcvarVTCVersion = CVAR_GET_POINTER("vtc_version");
+	g_pcvarVTCLogDir = CVAR_GET_POINTER("vtc_logdir");
+	g_pcvarVTCLog = CVAR_GET_POINTER("vtc_log");
+
 	if (!DProtoAPI_Init()) {
 		return false;
 	}
@@ -65,23 +82,6 @@ qboolean VTC_Init( void ) {
 	g_pMsgBadread = (bool *)g_pDprotoAPI->p_msg_badread;
 	g_pNetMessage = (sizebuf_t *)g_pDprotoAPI->p_net_message_addr;
 	g_pfnSZGetSpace = (PSZ_GETSPACE)g_pDprotoAPI->p_SZ_GetSpace;
-
-	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
-	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
-	CVAR_REGISTER(&g_cvarVoiceFloodMs);
-	CVAR_REGISTER(&g_cvarVTCVersion);
-	CVAR_REGISTER(&g_cvarVTCLogDir);
-	CVAR_REGISTER(&g_cvarVTCLog);
-
-	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
-	g_pcvarVoiceCodec = CVAR_GET_POINTER("sv_voicecodec");
-	g_pcvarVoiceQuality = CVAR_GET_POINTER("sv_voicequality");
-	g_pcvarVoiceVolumeSpeex = CVAR_GET_POINTER("sv_voicevolume_speex");
-	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
-	g_pcvarVoiceFloodMs = CVAR_GET_POINTER("sv_voicefloodms");
-	g_pcvarVTCVersion = CVAR_GET_POINTER("vtc_version");
-	g_pcvarVTCLogDir = CVAR_GET_POINTER("vtc_logdir");
-	g_pcvarVTCLog = CVAR_GET_POINTER("vtc_log");
 
 	for (int i = 0; i < MAX_CLIENTS; i++) {
 		g_pVoiceSpeex[i] = new CSpeex;

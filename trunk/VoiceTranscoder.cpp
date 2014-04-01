@@ -163,6 +163,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 
 	nDataLength = MSG_ReadShort( );
 
+	g_pLog->Printf("Received %d bytes\n", nDataLength);
+
 	if ( nDataLength > sizeof( chReceived ) ) {
 		LOG_MESSAGE(PLID, "SV_ParseVoiceData: invalid incoming packet.\n");
 
@@ -172,6 +174,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 	}
 
 	MSG_ReadBuf( nDataLength, chReceived );
+
+	g_pLog->Printf("Check 1\n", nDataLength);
 
 	if (g_PlayerVCodec[iClient + 1].m_voiceCodec == VOICECODEC_SILK) {
 		if (nDataLength > sizeof(ulong)) {
@@ -187,6 +191,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 		}
 	}
 
+	g_pLog->Printf("Check 2\n", nDataLength);
+
 	if (g_pcvarVoiceFloodMs->value != 0 && (gpGlobals->time - g_flLastReceivedVoice[iClient]) < (g_pcvarVoiceFloodMs->value * 0.001)) {
 		//LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
 
@@ -195,6 +201,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 		return;
 	}
 
+	g_pLog->Printf("Check 3\n", nDataLength);
+
 	//LOG_MESSAGE(PLID, "Accept %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
 
 	g_flLastReceivedVoice[iClient] = gpGlobals->time;
@@ -202,9 +210,14 @@ void SV_ParseVoiceData(client_t *pClient) {
 	if ( g_PlayerVCodec[ iClient + 1 ].m_voiceCodec == VOICECODEC_NONE) {
 		return;
 	}
+
+	g_pLog->Printf("Check 4\n", nDataLength);
+
 	if (g_pcvarVoiceEnable->value == 0.0f) {
 		return;
 	}
+
+	g_pLog->Printf("Check 5\n", nDataLength);
 
 	if (g_PlayerVCodec[iClient + 1].m_voiceCodec == VOICECODEC_MILES_SPEEX) {
 		nDecompressedSamples = g_pVoiceSpeex[iClient]->Decompress(chReceived, nDataLength, chDecompressed, sizeof(chDecompressed));
@@ -237,6 +250,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 
 		nCompressedLength = g_pVoiceSpeex[iClient]->Compress(chDecompressed, nDecompressedSamples, chCompressed, sizeof(chCompressed));
 	}
+
+	g_pLog->Printf("Check 6\n", nDataLength);
 
 	for (i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -278,6 +293,8 @@ void SV_ParseVoiceData(client_t *pClient) {
 		// Is there room to write this data in?
 		if( (6 + nSend + pDestClient->m_Datagram.cursize) < pDestClient->m_Datagram.maxsize )
 		{
+			g_pLog->Printf("Check 7\n", nDataLength);
+
 			MSG_WriteByte( &pDestClient->m_Datagram, SVC_VOICEDATA );
 			MSG_WriteByte( &pDestClient->m_Datagram, iClient );
 			MSG_WriteShort( &pDestClient->m_Datagram, nSendLength );

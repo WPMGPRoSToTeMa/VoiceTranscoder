@@ -45,8 +45,14 @@ qboolean VTC_Init( void ) {
 	// Change clc_voicedata callback
 	sv_clcfuncs_t *pCLC = (sv_clcfuncs_t *)g_pDprotoAPI->p_clc_funcs;
 
+	CVAR_SET_FLOAT("vtc_log", 1.0);
+
+	g_pLog->Printf("Old address %.8X\n", pCLC[CLC_VOICEDATA].pfnCallback);
+
 	g_pfnSVParseVoiceData = pCLC[CLC_VOICEDATA].pfnCallback;
 	pCLC[CLC_VOICEDATA].pfnCallback = &SV_ParseVoiceData;
+
+	g_pLog->Printf("New address %.8X\n", pCLC[CLC_VOICEDATA].pfnCallback);
 
 	// Get size client_t
 	g_sizeClientStruct = g_pDprotoAPI->client_t_size;

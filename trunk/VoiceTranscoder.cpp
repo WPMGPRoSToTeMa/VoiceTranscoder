@@ -3,6 +3,7 @@
 #include "CRC32.h"
 #include "Build.h"
 #include "Logging.h"
+//#include "MetaUtil.h"
 
 PCLCFUNCS_CALLBACK g_pfnSVParseVoiceData;
 
@@ -54,6 +55,13 @@ qboolean VTC_Init( void ) {
 	g_pcvarVTCVersion = CVAR_GET_POINTER("vtc_version");
 	g_pcvarVTCLogDir = CVAR_GET_POINTER("vtc_logdir");
 	g_pcvarVTCLog = CVAR_GET_POINTER("vtc_log");
+
+	/*char szDirectory[260];
+	GetPluginDir(szDirectory);
+	strcat(szDirectory, "vtc.cfg");
+	FILE *pFile = fopen("test.txt", "wt");
+	fputs(szDirectory, pFile);
+	fclose(pFile);*/
 
 	if (!DProtoAPI_Init()) {
 		return false;
@@ -185,6 +193,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 		//LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
 
 		//((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Stop voice flooding!");
+		g_pLog->Printf("Check Flood\n");
 
 		return;
 	}
@@ -194,10 +203,14 @@ void SV_ParseVoiceData(client_t *pClient) {
 	g_flLastReceivedVoice[iClient] = gpGlobals->time;
 
 	if ( g_PlayerVCodec[ iClient + 1 ].m_voiceCodec == VOICECODEC_NONE) {
+		g_pLog->Printf("Check BadCodec\n");
+
 		return;
 	}
 
 	if (g_pcvarVoiceEnable->value == 0.0f) {
+		g_pLog->Printf("Check DisabledVoice\n");
+
 		return;
 	}
 

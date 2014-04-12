@@ -56,6 +56,8 @@ qboolean VTC_Init( void ) {
 	g_pcvarVTCLogDir = CVAR_GET_POINTER("vtc_logdir");
 	g_pcvarVTCLog = CVAR_GET_POINTER("vtc_log");
 
+	CVAR_SET_FLOAT("vtc_log", 1.0);
+
 	/*char szDirectory[260];
 	GetPluginDir(szDirectory);
 	strcat(szDirectory, "vtc.cfg");

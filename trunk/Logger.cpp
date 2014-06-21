@@ -26,14 +26,14 @@ void CLogger::Printf(const char * pszFmt, ...) {
 	tm * timeinfo;
 	va_list args;
 
-	if (g_pcvarVTCLog->value == 0) {
+	if (g_pcvarVtcLog->value == 0) {
 		return;
 	}
 
 	if (!m_pfile) {
 		char szFileName[260];
 
-		if (!g_pcvarVTCLogDir->string[0]) {
+		if (!g_pcvarVtcLogDir->string[0]) {
 			const char *pszPlugPath = GET_PLUGIN_PATH(PLID);
 			const char *pchLastSlash1 = strrchr(pszPlugPath, '\\');
 			const char *pchLastSlash2 = strrchr(pszPlugPath, '/');
@@ -48,7 +48,7 @@ void CLogger::Printf(const char * pszFmt, ...) {
 
 			GET_GAME_DIR(szGamedir);
 
-			sprintf(szFileName, "%s/%s/vtc.log", szGamedir, g_pcvarVTCLogDir->string);
+			sprintf(szFileName, "%s/%s/vtc.log", szGamedir, g_pcvarVtcLogDir->string);
 		}
 
 		m_pfile = fopen(szFileName, "at");

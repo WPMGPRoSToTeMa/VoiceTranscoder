@@ -20,6 +20,7 @@
     <None Include="libspeex.a" />
     <None Include="compile.sh" />
     <None Include="compile_debug.sh" />
+    <None Include="vtc.cfg" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CRC32.cpp">
@@ -65,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Logging.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -115,6 +119,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

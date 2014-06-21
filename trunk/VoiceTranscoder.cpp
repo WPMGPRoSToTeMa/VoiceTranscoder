@@ -3,7 +3,7 @@
 #include "CRC32.h"
 #include "Build.h"
 #include "Logging.h"
-//#include "MetaUtil.h"
+#include "MetaUtil.h"
 
 PCLCFUNCS_CALLBACK g_pfnSVParseVoiceData;
 
@@ -19,51 +19,59 @@ CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 cvar_t g_cvarVoiceVolumeSpeex = {"sv_voicevolume_speex", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceVolumeSilk = {"sv_voicevolume_silk", "1.0", FCVAR_EXTDLL};
 cvar_t g_cvarVoiceFloodMs = {"sv_voicefloodms", "0", FCVAR_EXTDLL};
-cvar_t g_cvarVTCVersion = {"vtc_version", GetBuildNumberAsString(), FCVAR_EXTDLL | FCVAR_SERVER};
-cvar_t g_cvarVTCLogDir = {"vtc_logdir", "", FCVAR_EXTDLL};
-cvar_t g_cvarVTCLog = {"vtc_log", "0", FCVAR_EXTDLL};
+cvar_t g_cvarVtcVersion = {"vtc_version", GetBuildNumberAsString(), FCVAR_EXTDLL | FCVAR_SERVER};
+cvar_t g_cvarVtcLogDir = {"vtc_logdir", "", FCVAR_EXTDLL};
+cvar_t g_cvarVtcLog = {"vtc_log", "0", FCVAR_EXTDLL};
+cvar_t g_cvarVtcDefaultCodec = {"vtc_defaultcodec", "speex", FCVAR_EXTDLL};
 
-cvar_t *g_pcvarVoiceEnable;
-cvar_t *g_pcvarVoiceCodec;
-cvar_t *g_pcvarVoiceQuality;
-cvar_t *g_pcvarVoiceVolumeSpeex;
-cvar_t *g_pcvarVoiceVolumeSilk;
-cvar_t *g_pcvarVoiceFloodMs;
-cvar_t *g_pcvarVTCVersion;
-cvar_t *g_pcvarVTCLogDir;
-cvar_t *g_pcvarVTCLog;
+cvar_t *g_pcvarSvVoiceEnable;
+cvar_t *g_pcvarSvVoiceCodec;
+cvar_t *g_pcvarSvVoiceQuality;
+cvar_t *g_pcvarSvVoiceVolumeSpeex;
+cvar_t *g_pcvarSvVoiceVolumeSilk;
+cvar_t *g_pcvarSvVoiceFloodMs;
+cvar_t *g_pcvarVtcVersion;
+cvar_t *g_pcvarVtcLogDir;
+cvar_t *g_pcvarVtcLog;
+cvar_t *g_pcvarVtcDefaultCodec;
 
 bool g_bIsntSpeex;
 
 char g_szOldVoiceCodec[12];
 int g_iOldVoiceQuality;
 
+voicecodec_t g_vcodecDefault;
+
 qboolean VTC_Init( void ) {
 	CVAR_REGISTER(&g_cvarVoiceVolumeSpeex);
 	CVAR_REGISTER(&g_cvarVoiceVolumeSilk);
 	CVAR_REGISTER(&g_cvarVoiceFloodMs);
-	CVAR_REGISTER(&g_cvarVTCVersion);
-	CVAR_REGISTER(&g_cvarVTCLogDir);
-	CVAR_REGISTER(&g_cvarVTCLog);
+	CVAR_REGISTER(&g_cvarVtcVersion);
+	CVAR_REGISTER(&g_cvarVtcLogDir);
+	CVAR_REGISTER(&g_cvarVtcLog);
+	CVAR_REGISTER(&g_cvarVtcDefaultCodec);
 
-	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
-	g_pcvarVoiceCodec = CVAR_GET_POINTER("sv_voicecodec");
-	g_pcvarVoiceQuality = CVAR_GET_POINTER("sv_voicequality");
-	g_pcvarVoiceVolumeSpeex = CVAR_GET_POINTER("sv_voicevolume_speex");
-	g_pcvarVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
-	g_pcvarVoiceFloodMs = CVAR_GET_POINTER("sv_voicefloodms");
-	g_pcvarVTCVersion = CVAR_GET_POINTER("vtc_version");
-	g_pcvarVTCLogDir = CVAR_GET_POINTER("vtc_logdir");
-	g_pcvarVTCLog = CVAR_GET_POINTER("vtc_log");
+	g_pcvarSvVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
+	g_pcvarSvVoiceCodec = CVAR_GET_POINTER("sv_voicecodec");
+	g_pcvarSvVoiceQuality = CVAR_GET_POINTER("sv_voicequality");
+	g_pcvarSvVoiceVolumeSpeex = CVAR_GET_POINTER("sv_voicevolume_speex");
+	g_pcvarSvVoiceVolumeSilk = CVAR_GET_POINTER("sv_voicevolume_silk");
+	g_pcvarSvVoiceFloodMs = CVAR_GET_POINTER("sv_voicefloodms");
+	g_pcvarVtcVersion = CVAR_GET_POINTER("vtc_version");
+	g_pcvarVtcLogDir = CVAR_GET_POINTER("vtc_logdir");
+	g_pcvarVtcLog = CVAR_GET_POINTER("vtc_log");
+	g_pcvarVtcDefaultCodec = CVAR_GET_POINTER("vtc_defaultcodec");
 
-	CVAR_SET_FLOAT("vtc_log", 1.0);
-
-	/*char szDirectory[260];
+	char szDirectory[260];
 	GetPluginDir(szDirectory);
 	strcat(szDirectory, "vtc.cfg");
-	FILE *pFile = fopen("test.txt", "wt");
-	fputs(szDirectory, pFile);
-	fclose(pFile);*/
+
+	char szCommand[256];
+	strcpy(szCommand, "exec \"");
+	strcat(szCommand, &szDirectory[strlen(GET_GAME_INFO(PLID, GINFO_GAMEDIR))]);
+	strcat(szCommand, "\"\n");
+	SERVER_COMMAND(szCommand);
+	SERVER_EXECUTE();
 
 	if (!DProtoAPI_Init()) {
 		return false;
@@ -97,7 +105,7 @@ qboolean VTC_Init( void ) {
 			return FALSE;
 		}
 
-		if ( !g_pVoiceSpeex[i]->Init(g_pcvarVoiceQuality->value) ) {
+		if ( !g_pVoiceSpeex[i]->Init(g_pcvarSvVoiceQuality->value) ) {
 			LOG_ERROR( PLID, "Couldn't initialize speex codec" );
 			g_pLog->Printf("ERROR: Couldn't initialize speex codec\n");
 
@@ -124,14 +132,14 @@ qboolean VTC_Init( void ) {
 		}
 	}
 
-	strncpy(g_szOldVoiceCodec, g_pcvarVoiceCodec->string, sizeof(g_szOldVoiceCodec));
-	g_iOldVoiceQuality = g_pcvarVoiceQuality->value;
+	strncpy(g_szOldVoiceCodec, g_pcvarSvVoiceCodec->string, sizeof(g_szOldVoiceCodec));
+	g_iOldVoiceQuality = g_pcvarSvVoiceQuality->value;
 
-	if (strcmp(g_pcvarVoiceCodec->string, "voice_speex") != 0) {
+	if (strcmp(g_pcvarSvVoiceCodec->string, "voice_speex") != 0) {
 		LOG_MESSAGE( PLID, "Warning voicecodec isn't speex. sv_voicecodec directly set to voice_speex." );
 		g_pLog->Printf("WARNING: voicecodec isn't speex. sv_voicecodec directly set to voice_speex.\n");
 
-		g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceCodec, "voice_speex");
+		g_engfuncs.pfnCvar_DirectSet(g_pcvarSvVoiceCodec, "voice_speex");
 	}
 
 	return TRUE;
@@ -177,7 +185,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 
 	MSG_ReadBuf( nDataLength, chReceived );
 
-	if (g_PlayerVCodec[iClient + 1].m_voiceCodec == VOICECODEC_SILK) {
+	if (g_PlayerVCodec[iClient + 1].m_vcodec == VOICECODEC_SILK) {
 		if (nDataLength > sizeof(ulong)) {
 			ulong ulOurCRC = ~ComputeCRC(0xFFFFFFFF, chReceived, nDataLength - sizeof(ulong));
 
@@ -191,7 +199,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 		}
 	}
 
-	if (g_pcvarVoiceFloodMs->value != 0 && (gpGlobals->time - g_flLastReceivedVoice[iClient]) < (g_pcvarVoiceFloodMs->value * 0.001)) {
+	if (g_pcvarSvVoiceFloodMs->value != 0 && (gpGlobals->time - g_flLastReceivedVoice[iClient]) < (g_pcvarSvVoiceFloodMs->value * 0.001)) {
 		//LOG_MESSAGE(PLID, "Block %f %f %f", gpGlobals->time, g_flLastReceivedVoice[iClient], gpGlobals->time - g_flLastReceivedVoice[iClient]);
 
 		//((void (*)(client_t *, bool, const char *, ...))g_pDprotoAPI->p_SV_DropClient)(pClient, false, "Stop voice flooding!");
@@ -204,27 +212,27 @@ void SV_ParseVoiceData(client_t *pClient) {
 
 	g_flLastReceivedVoice[iClient] = gpGlobals->time;
 
-	if ( g_PlayerVCodec[ iClient + 1 ].m_voiceCodec == VOICECODEC_NONE) {
+	if ( g_PlayerVCodec[ iClient + 1 ].m_vcodec == VOICECODEC_NONE) {
 		g_pLog->Printf("Check BadCodec\n");
 
 		return;
 	}
 
-	if (g_pcvarVoiceEnable->value == 0.0f) {
+	if (g_pcvarSvVoiceEnable->value == 0.0f) {
 		g_pLog->Printf("Check DisabledVoice\n");
 
 		return;
 	}
 
-	if (g_PlayerVCodec[iClient + 1].m_voiceCodec == VOICECODEC_MILES_SPEEX) {
+	if (g_PlayerVCodec[iClient + 1].m_vcodec == VOICECODEC_MILES_SPEEX) {
 		nDecompressedSamples = g_pVoiceSpeex[iClient]->Decompress(chReceived, nDataLength, chDecompressed, sizeof(chDecompressed));
 
-		if (g_pcvarVoiceVolumeSpeex->value != 1.0) {
+		if (g_pcvarSvVoiceVolumeSpeex->value != 1.0) {
 			short *sSample = (short *)chDecompressed;
 
 			for (int iSample = 0; iSample < nDecompressedSamples; iSample++)
 			{
-				*sSample = min(max(*sSample * g_pcvarVoiceVolumeSpeex->value, -32768), 32767);
+				*sSample = min(max(*sSample * g_pcvarSvVoiceVolumeSpeex->value, -32768), 32767);
 
 				sSample++;
 			}
@@ -234,12 +242,12 @@ void SV_ParseVoiceData(client_t *pClient) {
 	} else {
 		nDecompressedSamples = g_pVoiceSilk[iClient]->Decompress(chReceived, nDataLength, chDecompressed, sizeof(chDecompressed));
 
-		if (g_pcvarVoiceVolumeSilk->value != 1.0) {
+		if (g_pcvarSvVoiceVolumeSilk->value != 1.0) {
 			short *sSample = (short *)chDecompressed;
 
 			for (int iSample = 0; iSample < nDecompressedSamples; iSample++)
 			{
-				*sSample = min(max(*sSample * g_pcvarVoiceVolumeSilk->value, -32768), 32767);
+				*sSample = min(max(*sSample * g_pcvarSvVoiceVolumeSilk->value, -32768), 32767);
 
 				sSample++;
 			}
@@ -255,7 +263,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 		int nSend;
 		byte *chSend;
 
-		if (g_PlayerVCodec[i + 1].m_voiceCodec == VOICECODEC_NONE) {
+		if (g_PlayerVCodec[i + 1].m_vcodec == VOICECODEC_NONE) {
 			continue;
 		}
 
@@ -271,7 +279,7 @@ void SV_ParseVoiceData(client_t *pClient) {
 			continue;
 
 		// Is loopback enabled?
-		if (g_PlayerVCodec[iClient + 1].m_voiceCodec == g_PlayerVCodec[i + 1].m_voiceCodec) {
+		if (g_PlayerVCodec[iClient + 1].m_vcodec == g_PlayerVCodec[i + 1].m_vcodec) {
 			nSend = nDataLength;
 			chSend = chReceived;
 		} else {
@@ -302,7 +310,7 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 
 	iId = ENTINDEX(pEntity);
 
-	g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_NONE;
+	g_PlayerVCodec[ iId ].m_vcodec = VOICECODEC_NONE;
 	g_PlayerVCodec[ iId ].m_fIsRequested = false;
 	g_flLastReceivedVoice[iId-1] = 0;
 
@@ -314,7 +322,7 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 
 	switch ( iProtocol ) {
 	case 47:
-		g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_MILES_SPEEX;
+		g_PlayerVCodec[ iId ].m_vcodec = VOICECODEC_MILES_SPEEX;
 
 		break;
 	case 48:
@@ -326,7 +334,7 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 		break;
 	}
 
-	if ( g_PlayerVCodec[ iId ].m_voiceCodec != VOICECODEC_NONE ) {
+	if ( g_PlayerVCodec[ iId ].m_vcodec != VOICECODEC_NONE ) {
 #ifdef VTC_DEBUG
 		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Miles/Speex)", iId, pszName, pszAddress, iProtocol );
 #endif
@@ -336,31 +344,34 @@ qboolean ClientConnect_Pre ( edict_t *pEntity, const char *pszName, const char *
 #ifdef VTC_DEBUG
 		LOG_MESSAGE( PLID, "Connected(%d) (%s) from(%s) protocol(%d) vcodec(Check...)", iId, pszName, pszAddress, iProtocol );
 #endif
+		LOG_MESSAGE(PLID, "Player %d default(%s)", iId, g_pcvarVtcDefaultCodec->string);
+		g_pLog->Printf("Player %d default(%s)", iId, g_pcvarVtcDefaultCodec->string);
+		g_PlayerVCodec[iId].m_vcodec = (strcmp(g_pcvarVtcDefaultCodec->string, "speex") == 0) ? VOICECODEC_MILES_SPEEX : VOICECODEC_SILK;
 	}
 
 	RETURN_META_VALUE( MRES_IGNORED, TRUE );
 }
 
 void StartFrame ( void ) {
-	if (strcmp(g_pcvarVoiceCodec->string, "voice_speex") != 0) {
+	if (strcmp(g_pcvarSvVoiceCodec->string, "voice_speex") != 0) {
 		LOG_MESSAGE( PLID, "Warning voicecodec isn't speex. sv_voicecodec directly set to voice_speex." );
 		g_pLog->Printf("WARNING: voicecodec isn't speex. sv_voicecodec directly set to voice_speex.\n");
 
-		g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceCodec, "voice_speex");
-	} else if (g_pcvarVoiceQuality->value != g_iOldVoiceQuality) {
-		if (g_pcvarVoiceQuality->value < 1) {
+		g_engfuncs.pfnCvar_DirectSet(g_pcvarSvVoiceCodec, "voice_speex");
+	} else if (g_pcvarSvVoiceQuality->value != g_iOldVoiceQuality) {
+		if (g_pcvarSvVoiceQuality->value < 1) {
 			LOG_MESSAGE( PLID, "Warning voicequality < 1. sv_voicequality directly set to 1." );
 			g_pLog->Printf("WARNING: voicequality < 1. sv_voicequality directly set to 1.\n");
 
-			g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceQuality, "1");
-		} else if (g_pcvarVoiceQuality->value > 5) {
+			g_engfuncs.pfnCvar_DirectSet(g_pcvarSvVoiceQuality, "1");
+		} else if (g_pcvarSvVoiceQuality->value > 5) {
 			LOG_MESSAGE( PLID, "Warning voicequality > 5. sv_voicequality directly set to 5." );
 			g_pLog->Printf("WARNING: voicequality > 5. sv_voicequality directly set to 5.\n");
 
-			g_engfuncs.pfnCvar_DirectSet(g_pcvarVoiceQuality, "5");
+			g_engfuncs.pfnCvar_DirectSet(g_pcvarSvVoiceQuality, "5");
 		}
 
-		g_iOldVoiceQuality = g_pcvarVoiceQuality->value;
+		g_iOldVoiceQuality = g_pcvarSvVoiceQuality->value;
 		
 		for (int i = 0; i < MAX_CLIENTS; i++) {
 			delete g_pVoiceSpeex[i];
@@ -374,7 +385,7 @@ void StartFrame ( void ) {
 				RETURN_META( MRES_IGNORED );
 			}
 
-			if ( !g_pVoiceSpeex[i]->Init(g_pcvarVoiceQuality->value) ) {
+			if ( !g_pVoiceSpeex[i]->Init(g_pcvarSvVoiceQuality->value) ) {
 				LOG_ERROR( PLID, "Couldn't initialize speex codec" );
 				g_pLog->Printf("ERROR: Couldn't initialize speex codec\n");
 
@@ -420,12 +431,12 @@ void CvarValue2_Pre ( const edict_t *pEnt, int iRequestID, const char *pszCvarNa
 	g_pLog->Printf("[%d %s %d]\n", iId, pszBuild, iBuild);
 
 	if ( iBuild > 4554 ) {
-		g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_SILK;
+		g_PlayerVCodec[ iId ].m_vcodec = VOICECODEC_SILK;
 	} else {
-		g_PlayerVCodec[ iId ].m_voiceCodec = VOICECODEC_MILES_SPEEX;
+		g_PlayerVCodec[ iId ].m_vcodec = VOICECODEC_MILES_SPEEX;
 	}
 
-	if (g_PlayerVCodec[ iId ].m_voiceCodec == VOICECODEC_MILES_SPEEX) {
+	if (g_PlayerVCodec[ iId ].m_vcodec == VOICECODEC_MILES_SPEEX) {
 #ifdef VTC_DEBUG
 		LOG_MESSAGE( PLID, "Checked(%d) build(%d) vcodec(Miles/Speex)", iId, iBuild );
 #endif

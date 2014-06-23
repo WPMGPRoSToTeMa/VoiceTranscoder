@@ -1,5 +1,5 @@
 #pragma once
 
-typedef unsigned long size_t;
+#include <stddef.h>
 
 extern size_t GetPluginDir(char *pszDest);

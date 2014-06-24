@@ -66,9 +66,14 @@ qboolean VTC_Init( void ) {
 	GetPluginDir(szDirectory);
 	strcat(szDirectory, "vtc.cfg");
 
+	char *pszDir = &szDirectory[strlen(GET_GAME_INFO(PLID, GINFO_GAMEDIR))];
+	if (*pszDir == '/' || *pszDir == '\\') {
+		pszDir++;
+	}
+
 	char szCommand[256];
 	strcpy(szCommand, "exec \"");
-	strcat(szCommand, &szDirectory[strlen(GET_GAME_INFO(PLID, GINFO_GAMEDIR))]);
+	strcat(szCommand, pszDir);
 	strcat(szCommand, "\"\n");
 	SERVER_COMMAND(szCommand);
 	SERVER_EXECUTE();

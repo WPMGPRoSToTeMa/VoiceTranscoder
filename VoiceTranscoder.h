@@ -23,7 +23,7 @@ enum voicecodec_t {
 };
 
 struct playervcodec_t {
-	voicecodec_t	m_voiceCodec;
+	voicecodec_t	m_vcodec;
 	bool			m_fIsRequested;
 	int				m_iRequestID;
 };
@@ -39,11 +39,11 @@ extern playervcodec_t g_PlayerVCodec[ MAX_CLIENTS+1 ];
 extern CSpeex *g_pVoiceSpeex[ MAX_CLIENTS ];
 extern CSilk *g_pVoiceSilk[ MAX_CLIENTS ];
 
-extern cvar_t *g_pcvarVoiceEnable;
-extern cvar_t *g_pcvarVoiceCodec;
-extern cvar_t *g_pcvarVoiceQuality;
-extern cvar_t *g_pcvarVTCLogDir;
-extern cvar_t *g_pcvarVTCLog;
+extern cvar_t *g_pcvarSvVoiceEnable;
+extern cvar_t *g_pcvarSvVoiceCodec;
+extern cvar_t *g_pcvarSvVoiceQuality;
+extern cvar_t *g_pcvarVtcLogDir;
+extern cvar_t *g_pcvarVtcLog;
 
 extern qboolean VTC_Init( void );
 extern qboolean VTC_End( void );

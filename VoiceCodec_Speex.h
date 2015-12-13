@@ -2,39 +2,24 @@
 
 #include "VoiceCodec.h"
 
-#include "UtlBuffer.h"
-
 #include <speex.h>
 
-class CSpeex : public CVoiceCodec {
+class Speex final : public VoiceCodec {
 public:
-	static const int c_iMaxBufferSamples = 1024;
-	static const int c_iSampleRate = 8000;
-	static const int c_iRawFrameSize = 160;
-	static const int c_rgiEncodedFrameSize[11];
-	static const int c_nRawBytes = c_iRawFrameSize * c_iBytesPerSample;
-	static const int c_nRawSamples = c_iRawFrameSize;
+	static const size_t ENCODED_FRAMESIZE[];
+	static const size_t SAMPLERATE = 8000;
+	static const size_t FRAMESIZE = 160;
 
-	CSpeex();
-	virtual ~CSpeex();
-
-	virtual bool	Init(int iQuality);
-	virtual void	Release();
-	virtual int		Compress(const short *psDecompressed, int nDecompressedSamples, byte *pbCompressed, int nMaxCompressedBytes);
-	virtual int		Decompress(const byte *pbCompressed, int nCompressedBytes, short *psDecompressed, int nMaxDecompressedBytes);
-	virtual bool	ResetState();
-
-	CUtlBuffer		m_buffEncode;
-
-	int				m_nEncodedBytes;
+	Speex(size_t quality);
+	virtual ~Speex() final;
+	// Reinitialization without recreating object
+	virtual void ChangeQuality(size_t quality) final;
+	virtual void ResetState() final;
+	virtual size_t Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *encodedBytes, size_t maxEncodedBytes) final;
+	virtual size_t Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) final;
 
 private:
-	bool			InitStates();
-	void			TermStates();
-
-	int				m_iQuality;
-	void *			m_pEncoderState;
-	void *			m_pDecoderState;
-
-	SpeexBits		m_bits;
+	void *m_encoder, *m_decoder;
+	size_t m_encodedBytes;
+	SpeexBits m_bits;
 };

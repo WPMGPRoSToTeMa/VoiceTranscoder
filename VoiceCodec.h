@@ -1,17 +1,16 @@
 #pragma once
 
-#include "Util.h"
+#include "UtilTypes.h"
 
-class CVoiceCodec {
+class VoiceCodec {
 protected:
-	static const int	c_iBytesPerSample = 2;
+	static const size_t BYTES_PER_SAMPLE = sizeof(uint16_t);
 
-	virtual				~CVoiceCodec() {}
-
+	virtual ~VoiceCodec() {}
 public:
-	virtual bool		Init(int iQuality) = 0;
-	virtual void		Release() = 0;
-	virtual int			Compress(const short *psDecompressed, int nDecompressedSamples, byte *pbCompressed, int nMaxCompressedBytes) = 0;
-	virtual int			Decompress(const byte *pbCompressed, int nCompressedBytes, short *psDecompressed, int nMaxDecompressedBytes) = 0;
-	virtual bool		ResetState() = 0;
+	// Reinitialization without recreating object
+	virtual void ChangeQuality(size_t quality) = 0;
+	virtual void ResetState() = 0;
+	virtual size_t Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *encodedBytes, size_t maxEncodedBytes) = 0;
+	virtual size_t Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) = 0;
 };

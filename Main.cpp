@@ -62,14 +62,16 @@ void (* g_pfnSvDropClient)(client_t *pClient, bool fCrash, char *pszFormat, ...)
 client_t *g_firstClientPtr;
 
 // Cvars
-cvar_t g_cvarVersion = {"VTC_Version", Plugin_info.version, FCVAR_EXTDLL | FCVAR_SERVER, 0, NULL};
+cvar_t g_cvarVersion = {"VTC_Version", Plugin_info.version, FCVAR_EXTDLL | FCVAR_SERVER, 0, nullptr};
 cvar_t *g_pcvarVersion;
-cvar_t g_cvarDefaultCodec = {"VTC_DefaultCodec", "old", FCVAR_EXTDLL, 0, NULL};
+cvar_t g_cvarDefaultCodec = {"VTC_DefaultCodec", "old", FCVAR_EXTDLL, 0, nullptr};
 cvar_t *g_pcvarDefaultCodec;
-cvar_t g_cvarHltvCodec = {"VTC_HltvCodec", "old", FCVAR_EXTDLL, 0, NULL};
+cvar_t g_cvarHltvCodec = {"VTC_HltvCodec", "old", FCVAR_EXTDLL, 0, nullptr};
 cvar_t *g_pcvarHltvCodec;
-cvar_t g_cvarThreadMode = {"VTC_ThreadMode", "0", FCVAR_EXTDLL, 0, NULL};
+cvar_t g_cvarThreadMode = {"VTC_ThreadMode", "0", FCVAR_EXTDLL, 0, nullptr};
 cvar_t *g_pcvarThreadMode;
+cvar_t g_cvarMaxDelta = {"VTC_MaxDelta", "150", FCVAR_EXTDLL, 0, nullptr};
+cvar_t *g_pcvarMaxDelta;
 cvar_t *g_pcvarVoiceEnable;
 
 // Engine API
@@ -285,23 +287,11 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 	int64_t currentMicroSeconds = GetCurrentTimeInMicroSeconds();
 
-	//if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
-	//	double ratio = (pClientData->m_voiceTimeElapsedMicroSeconds/1000000.0) / ((currentMicroSeconds - pClientData->m_realStartTime)/1000000.0);
-	//
-	//	
-	//}
-
-	/*if (llCurTime < pClientData->m_llNextPacketUsec) {
-		static double maxDelta = 0;
-
-		if ((pClientData->m_llNextPacketUsec - llCurTime)/1000000.0 > maxDelta) {
-			maxDelta = (pClientData->m_llNextPacketUsec - llCurTime)/1000000.0;
+	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
+		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000000.0 > g_pcvarMaxDelta->value) {
+			return;
 		}
-
-		LOG_MESSAGE(PLID, "Flood! curTime %f nextTime %f delta %f (max %f)", llCurTime/1000000.0, pClientData->m_llNextPacketUsec/1000000.0, (pClientData->m_llNextPacketUsec - llCurTime)/1000000.0, maxDelta);
-
-		return;
-	}*/
+	}
 
 	bool needTranscode = false;
 	for (size_t i = 0; i < gpGlobals->maxClients; i++) {
@@ -450,53 +440,11 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 	int64_t frameTimeLength = rawSampleCount * 1000000 / 8000;
 
-	//LOG_MESSAGE(PLID, "Voice packet: time %f size %u length %f", currentMicroSeconds / 1000000.0, receivedBytesCount, frameTimeLength / 1000000.0);
-
-	// Trying to flood ?
-	static double maxRatio[20] = {0};
-	static double maxDelta[20] = {0};
-
 	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
-		double ratio = (pClientData->m_voiceTimeElapsedMicroSeconds / 1000000.0) / ((currentMicroSeconds - pClientData->m_realStartTime) / 1000000.0);
-		//LOG_MESSAGE(PLID, "%d %g", pClientData->m_packetsCountInARow, ratio);
-
-		size_t ratioIndex = (pClientData->m_packetsCountInARow > 20) ? 20 : pClientData->m_packetsCountInARow;
-		if (ratio > maxRatio[ratioIndex-1]) {
-			maxRatio[ratioIndex-1] = ratio;
-		}
-		
-		double delta = (pClientData->m_voiceTimeElapsedMicroSeconds - (currentMicroSeconds - pClientData->m_realStartTime)) / 1000000.0;
-
-		if (delta > maxDelta[ratioIndex-1]) {
-			maxDelta[ratioIndex-1] = delta;
-		}
-
-		pClientData->m_packetsCountInARow++;
-		pClientData->m_voiceTimeElapsedMicroSeconds += frameTimeLength;
 		pClientData->m_nextPacketTimeMicroSeconds += frameTimeLength;
 	} else {
-		pClientData->m_realStartTime = currentMicroSeconds;
-		pClientData->m_voiceTimeElapsedMicroSeconds = frameTimeLength;
-		pClientData->m_packetsCountInARow = 1;
 		pClientData->m_nextPacketTimeMicroSeconds = currentMicroSeconds + frameTimeLength;
-
-		/*FILE *pFile = fopen("VoiceTranscoder_Ratio.log", "wt");
-		for (size_t i = 0; i < 20; i++) {
-			fprintf(pFile, "%g\n", maxRatio[i]);
-		}
-		fclose(pFile);*/
-		FILE *pFile = fopen("VoiceTranscoder_Delta.log", "wt");
-		for (size_t i = 0; i < 20; i++) {
-			fprintf(pFile, "%g\n", maxDelta[i]);
-		}
-		fclose(pFile);
 	}
-
-	// Length
-	//static double totalSpoken = 0;
-	//LOG_MESSAGE(PLID, "Voice packet: time %g, timeLength %g, total %g", currentMicroSeconds / 1000000.0, rawSampleCount / 8000.0, totalSpoken);
-	//totalSpoken += rawSampleCount / 8000.0;
-	//LOG_MESSAGE(PLID, "Packet length %f", ((int64_t)nDecompressedSize * 1000000) / 8000 / 1000000.0);
 
 	// Ok only thread
 	if (g_fThreadModeEnabled && needTranscode) {
@@ -601,6 +549,8 @@ void VTC_InitCvars(void) {
 	g_pcvarHltvCodec = CVAR_GET_POINTER(g_cvarHltvCodec.name);
 	CVAR_REGISTER(&g_cvarThreadMode);
 	g_pcvarThreadMode = CVAR_GET_POINTER(g_cvarThreadMode.name);
+	CVAR_REGISTER(&g_cvarMaxDelta);
+	g_pcvarMaxDelta = CVAR_GET_POINTER(g_cvarMaxDelta.name);
 	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
 }
 

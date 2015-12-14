@@ -9,9 +9,6 @@ struct clientData_t {
 	bool m_fIsChecking;
 	bool m_fIsVguiRunScriptRecvd;
 	int64_t m_nextPacketTimeMicroSeconds;
-	uint16_t m_packetsCountInARow;
-	int64_t m_realStartTime;
-	int64_t m_voiceTimeElapsedMicroSeconds;
 	VoiceCodec *m_pNewCodec;
 	VoiceCodec *m_pOldCodec;
 };

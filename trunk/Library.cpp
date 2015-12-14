@@ -1,6 +1,4 @@
 #include "Library.h"
-#include "Hook_Call.h"
-#include "List.h"
 
 AnyPointer Library::FindSymbol(const char *pszSymbol) {
 #ifdef WIN32

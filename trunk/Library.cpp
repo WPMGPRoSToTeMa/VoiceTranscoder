@@ -2,7 +2,7 @@
 #include "Hook_Call.h"
 #include "List.h"
 
-void *Library::FindSymbol(const char *pszSymbol) {
+AnyPointer Library::FindSymbol(const char *pszSymbol) {
 #ifdef WIN32
 	return GetProcAddress((HMODULE)m_dwHandle, pszSymbol);
 #else
@@ -10,15 +10,11 @@ void *Library::FindSymbol(const char *pszSymbol) {
 #endif
 }
 
-void Library::FindSymbol(void *p, const char *pszSymbol) {
-	*(void **)p = FindSymbol(pszSymbol);
-}
-
-dword Library::FindReference(dword dwAddr) {
+uint32_t Library::FindReference(uint32_t dwAddr) {
 #ifdef WIN32
 	for (size_t n = 0; n < m_nRelocs; n++) {
 		if (*m_rgpdwRelocs[n] == dwAddr) {
-			return (dword)m_rgpdwRelocs[n];
+			return (uint32_t)m_rgpdwRelocs[n];
 		}
 	}
 
@@ -29,23 +25,22 @@ dword Library::FindReference(dword dwAddr) {
 #endif
 }
 
-dword Library::FindAllReference(dword dwAddr, dword *pdwCur) {
+uint32_t Library::FindAllReference(uint32_t dwAddr, uint32_t *pdwCur) {
 #ifdef WIN32
 	for (size_t n = *pdwCur; n < m_nRelocs; n++) {
 		if (*m_rgpdwRelocs[n] == dwAddr) {
 			*pdwCur = n;
-			return (dword)m_rgpdwRelocs[n];
+			return (uint32_t)m_rgpdwRelocs[n];
 		}
 	}
 #endif
 	return 0;
 }
 
-dword Library::FindString(const char *pszString) {
-#ifdef WIN32
+uint32_t Library::FindString(const char *pszString) {
 	Section *pSection = m_pRData;
 
-	dword dwStrAddr;
+	uint32_t dwStrAddr;
 
 	while (pSection) {
 		dwStrAddr = pSection->FindString(pszString);
@@ -56,26 +51,26 @@ dword Library::FindString(const char *pszString) {
 
 		pSection = pSection->Next();
 	}
-#endif
+
 	return 0;
 }
 
-dword Library::FindStringUsing(const char *pszString) {
+uint32_t Library::FindStringUsing(const char *pszString) {
 #ifdef WIN32
-	dword dwStr = FindString(pszString);
+	uint32_t dwStr = FindString(pszString);
 	return FindReference(dwStr);
 #else
 	return 0;
 #endif
 }
 
-dword Library::FindFunctionBeginning(dword dwAddr) {
+uint32_t Library::FindFunctionBeginning(uint32_t dwAddr) {
 #ifdef WIN32
-	dword dwCur = dwAddr - 3;
-	dword dwEnd = m_code.Start();
+	uint32_t dwCur = dwAddr - 3;
+	uint32_t dwEnd = m_code.Start();
 
 	while (dwCur >= dwEnd) {
-		if ((*(dword *)dwCur & 0xFFFFFF) == 0xEC8B55) {
+		if ((*(uint32_t *)dwCur & 0xFFFFFF) == 0xEC8B55) {
 			return dwCur;
 		}
 
@@ -85,44 +80,29 @@ dword Library::FindFunctionBeginning(dword dwAddr) {
 	return 0;
 }
 
-void *Library::FindFunctionByString(const char *pszString) {
+AnyPointer Library::FindFunctionByString(const char *pszString) {
 #ifdef WIN32
-	dword dwStrUsingAddr = FindStringUsing(pszString);
-	return (void *)FindFunctionBeginning(dwStrUsingAddr);
+	uint32_t dwStrUsingAddr = FindStringUsing(pszString);
+	return FindFunctionBeginning(dwStrUsingAddr);
 #else
-	return NULL;
+	return nullptr;
 #endif
 }
 
-void Library::FindFunctionByString(void *p, const char *pszString) {
-	*(void **)p = FindFunctionByString(pszString);
+Hook_Begin *Library::HookFunction(void *pfnAddr, void *pfnCallback) {
+	Hook_Begin *hook = new Hook_Begin(pfnAddr, pfnCallback);
+
+	return hook;
 }
 
-List<Hook_Call> &Library::HookFunctionCalls(void *pAddr, void *pCallback) {
-	byte *pbCur = (byte *)m_code.Start();
-	byte *pbEnd = (byte *)m_code.End() - sizeof(byte) - sizeof(dword);
-	List<Hook_Call> listHooks;
-
-	while (pbCur <= pbEnd) {
-		if (*pbCur++ == 0xE8) {
-			long lOffset = (long)pAddr - ((long)pbCur + sizeof(long));
-
-			if (*(long *)pbCur == lOffset) {
-				listHooks.Add(Hook_Call(pbCur, pCallback));
-			}
-		}
-	}
-
-	return listHooks;
-}
-
-Library::Library(const char *pszName) {
+Library::Library(AnyPointer dwAddr) {
 #ifdef WIN32
-	m_dwBase = m_dwHandle = (dword)GetModuleHandleA(pszName);
+	GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT | GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)dwAddr, (HMODULE *)&m_dwHandle);
+	m_dwBase = m_dwHandle;
 
 	PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)m_dwBase;
 	PIMAGE_NT_HEADERS pNtHeaders = (PIMAGE_NT_HEADERS)(m_dwBase + pDosHeader->e_lfanew);
-	PIMAGE_SECTION_HEADER pSection = (PIMAGE_SECTION_HEADER)((dword)&pNtHeaders->OptionalHeader + pNtHeaders->FileHeader.SizeOfOptionalHeader);
+	PIMAGE_SECTION_HEADER pSection = (PIMAGE_SECTION_HEADER)((uint32_t)&pNtHeaders->OptionalHeader + pNtHeaders->FileHeader.SizeOfOptionalHeader);
 
 	m_pRData = NULL;
 	m_pVData = NULL;
@@ -133,15 +113,15 @@ Library::Library(const char *pszName) {
 			PIMAGE_BASE_RELOCATION pBaseReloc = (PIMAGE_BASE_RELOCATION)(m_dwBase + pSection->VirtualAddress);
 
 			// upper bound size
-			m_rgpdwRelocs = (dword **)malloc(pSection->Misc.VirtualSize / sizeof(word) * sizeof(dword));
+			m_rgpdwRelocs = (uint32_t **)malloc(pSection->Misc.VirtualSize / sizeof(uint16_t) * sizeof(uint32_t));
 
 			pBaseReloc = (PIMAGE_BASE_RELOCATION)(m_dwBase + pSection->VirtualAddress);
 			size_t nTotalSize = 0;
 			PWORD pReloc, pEnd;
-			dword dwBase;
+			uint32_t dwBase;
 			size_t nReloc = 0;
 			while (pBaseReloc->SizeOfBlock) {
-				pEnd = (PWORD)((dword)pBaseReloc + pBaseReloc->SizeOfBlock);
+				pEnd = (PWORD)((uint32_t)pBaseReloc + pBaseReloc->SizeOfBlock);
 
 				dwBase = m_dwBase + pBaseReloc->VirtualAddress;
 
@@ -150,16 +130,16 @@ Library::Library(const char *pszName) {
 						continue;
 					}
 
-					nTotalSize += sizeof(dword);
+					nTotalSize += sizeof(uint32_t);
 
-					((dword *)m_rgpdwRelocs)[nReloc++] = ((*pReloc) & 0xFFF) + dwBase;
+					((uint32_t *)m_rgpdwRelocs)[nReloc++] = ((*pReloc) & 0xFFF) + dwBase;
 				}
 
-				pBaseReloc = (PIMAGE_BASE_RELOCATION)((dword)pBaseReloc + pBaseReloc->SizeOfBlock);
+				pBaseReloc = (PIMAGE_BASE_RELOCATION)((uint32_t)pBaseReloc + pBaseReloc->SizeOfBlock);
 			}
 
 			// real size
-			m_rgpdwRelocs = (dword **)realloc(m_rgpdwRelocs, nTotalSize);
+			m_rgpdwRelocs = (uint32_t **)realloc(m_rgpdwRelocs, nTotalSize);
 			m_nRelocs = nReloc - 1;
 		} else if (pSection->VirtualAddress == pNtHeaders->OptionalHeader.BaseOfCode) {
 			m_code.Set(m_dwBase + pSection->VirtualAddress, m_dwBase + pSection->VirtualAddress + pSection->Misc.VirtualSize);
@@ -184,26 +164,22 @@ Library::Library(const char *pszName) {
 			}
 		}
 	}
-#endif
-}
-
-Library::Library(dword dwAddr) {
-#ifndef WIN32 // linux chtoli
+#else // linux chtoli
 	Dl_info dlinfo;
 
 	dladdr((void *)dwAddr, &dlinfo);
 
-	m_dwHandle = (dword)dlopen(dlinfo.dli_fname, RTLD_NOW);
-	m_dwBase = (dword)dlinfo.dli_fbase;
+	m_dwHandle = (uint32_t)dlopen(dlinfo.dli_fname, RTLD_NOW);
+	m_dwBase = (uint32_t)dlinfo.dli_fbase;
 
 	FILE *pFile = fopen(dlinfo.dli_fname, "rb");
 	fseek(pFile, 0, SEEK_END);
 	size_t nSize = ftell(pFile);
 	fseek(pFile, 0, SEEK_SET);
 	void *pBuf = malloc(nSize);
-	fread(pBuf, sizeof(byte), nSize, pFile);
+	fread(pBuf, sizeof(uint8_t), nSize, pFile);
 	fclose(pFile);
-	dword dwFileBase = (dword)pBuf;
+	uint32_t dwFileBase = (uint32_t)pBuf;
 
 	m_pRData = NULL;
 	m_pVData = NULL;

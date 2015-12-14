@@ -7,7 +7,7 @@ public:
 	void Init();
 	void Update(const void *pBuf, size_t nLen);
 	void Final();
-	dword ConvertToDWord();
+	uint32_t ConvertToUInt32();
 protected:
-	dword dwChecksum;
+	uint32_t dwChecksum;
 };

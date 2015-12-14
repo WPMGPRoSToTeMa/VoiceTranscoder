@@ -3,5 +3,5 @@
 #include "Util.h"
 
 namespace EngineUTIL {
-	size_t GetClientId(client_t *pClient);
+	size_t GetClientIndex(client_t *pClient);
 }

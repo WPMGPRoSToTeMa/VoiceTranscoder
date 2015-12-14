@@ -24,15 +24,18 @@ public:
 
 	template <typename T>
 	T ReadType();
-	byte ReadByte();
-	word ReadWord();
-	dword ReadDWord();
-	qword ReadQWord();
+	uint8_t ReadUInt8();
+	uint16_t ReadUInt16();
+	uint32_t ReadUInt32();
+	uint64_t ReadUInt64();
+	uint8_t PeekUInt8();
+
+	void SkipBytes(size_t bytesCount);
 protected:
-	byte *m_pData;
-	byte *m_pEnd;
-	byte *m_pEndAllocated;
-	byte *m_pReadPos;
+	uint8_t *m_pData;
+	uint8_t *m_pEnd;
+	uint8_t *m_pEndAllocated;
+	uint8_t *m_pReadPos;
 };
 
 template <typename T>

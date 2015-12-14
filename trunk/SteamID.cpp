@@ -1,11 +1,16 @@
 #include "SteamID.h"
 
-SteamID::SteamID(qword nQuadPart) {
-	m_steamid.m_nQuadPart = nQuadPart;
+SteamID::SteamID(uint64_t quadPart) {
+	m_steamid.m_quadPart = quadPart;
 }
 
-qword SteamID::ConvertToQWord() const {
-	return m_steamid.m_nQuadPart;
+// TODO: delegate constructor
+SteamID::SteamID() {
+	m_steamid.m_quadPart = 0;
+}
+
+uint64_t SteamID::ConvertToUInt64() const {
+	return m_steamid.m_quadPart;
 }
 
 bool SteamID::IsValid() const {
@@ -16,21 +21,33 @@ bool SteamID::IsValid() const {
 		return false;
 	}
 	if (m_steamid.m_comp.m_accountType == ACCOUNT_TYPE_INDIVIDUAL) {
-		if (m_steamid.m_comp.m_nAccountID == 0 || m_steamid.m_comp.m_nAccountInstance > STEAMUSER_WEBINSTANCE) {
+		if (m_steamid.m_comp.m_accountID == 0 || m_steamid.m_comp.m_accountInstance > STEAMUSER_WEBINSTANCE) {
 			return false;
 		}
 	}
 	if (m_steamid.m_comp.m_accountType == ACCOUNT_TYPE_CLAN) {
-		if (m_steamid.m_comp.m_nAccountID == 0 || m_steamid.m_comp.m_nAccountInstance != 0) {
+		if (m_steamid.m_comp.m_accountID == 0 || m_steamid.m_comp.m_accountInstance != 0) {
 			return false;
 		}
 	}
 	if (m_steamid.m_comp.m_accountType == ACCOUNT_TYPE_GAMESERVER) {
-		if (m_steamid.m_comp.m_nAccountID == 0) {
+		if (m_steamid.m_comp.m_accountID == 0) {
 			return false;
 		}
 		// Any limit on instances? We use them for local users and bots
 	}
 
 	return true;
+}
+
+void SteamID::SetUniverse(universe_t universe) {
+	m_steamid.m_comp.m_universe = universe;
+}
+
+void SteamID::SetAccountType(accountType_t accountType) {
+	m_steamid.m_comp.m_accountType = accountType;
+}
+
+void SteamID::SetAccountId(size_t accountId) {
+	m_steamid.m_comp.m_accountID = accountId;
 }

@@ -2,4 +2,4 @@
 
 #include "UtilTypes.h"
 
-extern longlong GetCurTime(void);
+extern int64_t GetCurrentTimeInMicroSeconds(void);

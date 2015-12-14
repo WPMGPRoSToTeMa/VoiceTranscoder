@@ -4,9 +4,7 @@
 
 class Hook {
 public:
-	virtual void ReHook() = NULL;
+	virtual void ReHook() = NULL; // i want nullptr
 	virtual void UnHook() = NULL;
-	virtual ~Hook() {
-		UnHook();
-	}
+	virtual ~Hook() {}
 };

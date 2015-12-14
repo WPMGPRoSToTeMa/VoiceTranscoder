@@ -2,17 +2,17 @@
 
 #include "Util.h"
 
-class NetMsgBuf : public sizebuf_t {
+class NetMsgBuf {
 public:
 	sizebuf_t *m_pNetMsg;
 	size_t *m_pMsgReadCount;
 	bool *m_pMsgBadRead;
 
 	void *Get(void) {
-		return &data[*m_pMsgReadCount];
+		return &m_pNetMsg->data[*m_pMsgReadCount];
 	}
 	bool BoundRead(size_t n) {
-		if (*m_pMsgReadCount + n > cursize) {
+		if (*m_pMsgReadCount + n > m_pNetMsg->cursize) {
 			*m_pMsgBadRead = true;
 
 			return false;
@@ -32,8 +32,8 @@ public:
 
 		return tResult;
 	}
-	word ReadWord(void) {
-		return ReadType<word>();
+	uint16_t ReadUInt16(void) {
+		return ReadType<uint16_t>();
 	}
 	void ReadBuf(void *pMem, size_t nSize) {
 		if (!BoundRead(nSize)) {

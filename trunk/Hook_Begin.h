@@ -10,10 +10,12 @@ public:
 	virtual void UnHook() final;
 	virtual ~Hook_Begin() final {
 		UnHook();
+
+		delete m_pPatch;
 	}
 private:
-	Patch<sizeof(byte) + sizeof(long)> *m_pPatch;
-	byte m_rgbOriginalBytes[sizeof(byte) + sizeof(long)];
-	byte m_rgbPatchedBytes[sizeof(byte) + sizeof(long)];
+	Patch<sizeof(uint8_t) + sizeof(long)> *m_pPatch;
+	uint8_t m_rgbOriginalBytes[sizeof(uint8_t) + sizeof(long)];
+	uint8_t m_rgbPatchedBytes[sizeof(uint8_t) + sizeof(long)];
 	void *m_pfnAddr;
 };

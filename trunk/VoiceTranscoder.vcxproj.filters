@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\VoiceCodecs">
+      <UniqueIdentifier>{43f6e5a2-7a70-41a9-b547-a834645b9e60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Speex">
+      <UniqueIdentifier>{e401d77d-8bfe-4841-8720-ce931e384842}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\SILK">
+      <UniqueIdentifier>{b37e44c0-be66-4e4f-931a-1c6703d6ea61}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -60,14 +69,476 @@
     <ClCompile Include="Section.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Template.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HookList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Hook_Call.cpp">
+    <ClCompile Include="BinaryPattern.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AnyPointer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\speex_callbacks.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\speex_header.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\stereo.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\vbr.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\vq.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\bits.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\cb_search.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\exc_5_64_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\exc_5_256_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\exc_8_128_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\exc_10_16_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\exc_10_32_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\exc_20_32_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\filters.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\gain_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\gain_table_lbr.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\hexc_10_32_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\hexc_table.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\high_lsp_tables.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\lpc.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\lsp.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\lsp_tables_nb.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\ltp.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\math_approx.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\misc.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\modes.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\nb_celp.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\quant_lsp.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\sb_celp.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodec_SILK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_type_offset.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_VAD.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_VQ_nearest_neighbor_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_warped_autocorrelation_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_wrappers_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_A2NLSF.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_allpass_int.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_allpass_int_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_ana_filt_bank_1.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_apply_sine_window_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_autocorrelation_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_biquad.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_biquad_alt.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_burg_modified_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_bwexpander.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_bwexpander_32.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_bwexpander_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_CNG.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_code_signs.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_control_audio_bandwidth.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_control_codec_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_corrMatrix_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_create_init_destroy.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_dec_API.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decimate2_coarse_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decimate2_coarsest_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decode_core.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decode_frame.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decode_parameters.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decode_pitch.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decode_pulses.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_decoder_set_fs.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_detect_SWB_input.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_enc_API.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_encode_frame_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_encode_parameters.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_encode_pulses.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_energy_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_find_LPC_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_find_LTP_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_find_pitch_lags_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_find_pred_coefs_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_gain_quant.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_HP_variable_cutoff_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_init_encoder_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_inner_product_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_interpolate.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_k2a_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LBRR_reset.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_levinsondurbin_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_lin2log.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_log2lin.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_lowpass_int.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_lowpass_short.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LP_variable_cutoff.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LPC_analysis_filter_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LPC_inv_pred_gain.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LPC_inv_pred_gain_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LPC_synthesis_filter.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LPC_synthesis_order16.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LSF_cos_table.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LTP_analysis_filter_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_LTP_scale_ctrl_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_MA.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF_MSVQ_decode.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF_MSVQ_decode_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF_MSVQ_encode_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF_stabilize.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF_VQ_rate_distortion_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF_VQ_sum_error_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF_VQ_weights_laroia_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF2A.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NLSF2A_stable.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_noise_shape_analysis_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NSQ.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_NSQ_del_dec.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_pitch_analysis_core_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_pitch_est_tables.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_PLC.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_prefilter_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_process_gains_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_process_NLSFs_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_quant_LTP_gains_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_range_coder.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_regularize_correlations_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_down2.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_down2_3.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_down3.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_AR2.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_ARMA4.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_copy.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_down_FIR.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_down4.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_IIR_FIR.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_up2_HQ.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_private_up4.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_rom.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_resampler_up2.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_residual_energy_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_scale_copy_vector_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_scale_vector_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_schur_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_shell_coder.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_sigm_Q15.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_solve_LS_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_sort.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_sort_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_sum_sqr_shift.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_gain.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_LTP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB0_10.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB0_10_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB0_16.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB0_16_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB1_10.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB1_10_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB1_16.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB1_16_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_other.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_other_FLP.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_pitch_lag.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_pulses_per_block.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_sign.c">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,17 +602,137 @@
     <ClInclude Include="Section.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Template.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HookList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="List.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Hook_Call.h">
+    <ClInclude Include="BinaryPattern.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnyPointer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\stack_alloc.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\vbr.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\vq.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\cb_search.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\filters.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\filters_sse.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\lpc.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\lsp.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\ltp.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\ltp_sse.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\math_approx.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\misc.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\modes.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\nb_celp.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\quant_lsp.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Speex\sb_celp.h">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodec_SILK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tuning_parameters.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_common_pitch_est_defines.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_define.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_Inlines.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_macros.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_main.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_main_FLP.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_pitch_est_defines.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_pitch_est_defines_FLP.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_PLC.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_resampler_private.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_resampler_rom.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_resampler_structs.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_setup_complexity.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_SigProc_FIX.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_SigProc_FLP.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_structs.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_structs_FLP.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tables.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tables_FLP.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB0_10.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB0_16.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB1_10.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB1_16.h">
+      <Filter>Source Files\VoiceCodecs\SILK</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

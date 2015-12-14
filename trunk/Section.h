@@ -6,18 +6,18 @@
 class Section {
 public:
 	Section() {}
-	Section(dword dwStart, dword dwSize) : m_dwStart(dwStart), m_dwEnd(dwStart + dwSize) {}
-	void Set(dword dwStart, dword dwEnd) {
+	Section(uint32_t dwStart, uint32_t dwSize) : m_dwStart(dwStart), m_dwEnd(dwStart + dwSize) {}
+	void Set(uint32_t dwStart, uint32_t dwEnd) {
 		m_dwStart = dwStart;
 		m_dwEnd = dwEnd;
 	}
-	dword FindString(const char *pszString);
+	uint32_t FindString(const char *pszString);
 	Section *Next() { return m_pNext; }
-	dword Start() { return m_dwStart; }
-	dword End() { return m_dwEnd; }
+	uint32_t Start() { return m_dwStart; }
+	uint32_t End() { return m_dwEnd; }
 	void SetNext(Section *pSection) { m_pNext = pSection; }
 private:
-	dword m_dwStart;
-	dword m_dwEnd;
+	uint32_t m_dwStart;
+	uint32_t m_dwEnd;
 	Section *m_pNext;
 };

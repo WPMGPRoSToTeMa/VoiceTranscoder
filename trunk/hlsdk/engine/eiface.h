@@ -415,6 +415,8 @@ typedef struct
 
 #define ARRAYSIZE(p)		(sizeof(p)/sizeof(p[0]))
 
+typedef unsigned int bool32_t;
+
 typedef struct 
 {
 	// Initialize/shutdown the game (one-time call after loading of game .dll )
@@ -436,7 +438,7 @@ typedef struct
 	void			(*pfnRestoreGlobalState)	( SAVERESTOREDATA * );
 	void			(*pfnResetGlobalState)		( void );
 
-	qboolean		(*pfnClientConnect)		( edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ] );
+	bool32_t		(*pfnClientConnect)		( edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ] );
 	
 	void			(*pfnClientDisconnect)	( edict_t *pEntity );
 	void			(*pfnClientKill)		( edict_t *pEntity );

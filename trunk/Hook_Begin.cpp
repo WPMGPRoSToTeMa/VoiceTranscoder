@@ -5,10 +5,10 @@ Hook_Begin::Hook_Begin(void *pfnAddr, void *pfnCallback, bool fHook /*= true*/) 
 	m_pfnAddr = pfnAddr;
 
 	// Patched bytes
-	byte rgbPatchedBytes[sizeof(byte) + sizeof(long)];
+	uint8_t rgbPatchedBytes[sizeof(uint8_t) + sizeof(long)];
 	rgbPatchedBytes[0] = 0xE9; // jmp
-	*(long *)&rgbPatchedBytes[sizeof(byte)] = (long)pfnCallback - ((long)pfnAddr + sizeof(byte) + sizeof(long));
-	m_pPatch = new Patch<sizeof(byte) + sizeof(long)>(m_pfnAddr, rgbPatchedBytes, fHook);
+	*(long *)&rgbPatchedBytes[sizeof(uint8_t)] = (long)pfnCallback - ((long)pfnAddr + sizeof(uint8_t) + sizeof(long));
+	m_pPatch = new Patch<sizeof(uint8_t) + sizeof(long)>(m_pfnAddr, rgbPatchedBytes, fHook);
 }
 
 void Hook_Begin::ReHook() {

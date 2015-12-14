@@ -2,5 +2,5 @@
 
 #include "Util.h"
 
-extern server_static_t *g_psvs;
-extern size_t g_nClientStructSize;
+extern client_t *g_firstClientPtr;
+extern size_t g_clientStructSize;

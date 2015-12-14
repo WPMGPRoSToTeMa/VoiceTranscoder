@@ -54,7 +54,7 @@ struct precachedevent_t
 typedef struct
 {
 	const char	*name;
-	qboolean	fIsSound;
+	bool32_t	fIsSound;
 	int			iResId;
 	int			iMD5Hash;
 	FORCE_TYPE	force_state;
@@ -64,8 +64,8 @@ typedef struct
 struct sizebuf_t
 {
 	char *descr;
-	qboolean OverflowFlags;
-	byte *data;
+	bool32_t OverflowFlags;
+	uint8_t *data;
 	size_t maxsize;
 	size_t cursize;
 };
@@ -81,9 +81,9 @@ typedef struct fragbuf_s
 	struct fragbuf_s	*next;
 	int					bufferid;
 	sizebuf_t			frag_message;
-	byte				frag_message_buf[1400];
-	qboolean			isfile;
-	qboolean			isbuffer;
+	uint8_t				frag_message_buf[1400];
+	bool32_t			isfile;
+	bool32_t			isbuffer;
 	char				filename[64];
 	int					foffset;
 	int					size;
@@ -124,9 +124,9 @@ enum netadrtype_t
 struct netadr_t
 {
 	netadrtype_t type;
-	byte ip[4];
-	byte ipx[10];
-	word port;
+	uint8_t ip[4];
+	uint8_t ipx[10];
+	uint16_t port;
 };
 
 struct netchan_t
@@ -148,18 +148,18 @@ struct netchan_t
 	void *GetFragSize_param;
 	void *GetFragSize_func;
 	sizebuf_t msg;
-	byte msg_buf[3992];
+	uint8_t msg_buf[3992];
 	int reliable_length;
-	byte reliable_buf[3992];
+	uint8_t reliable_buf[3992];
 	fragbufwaiting_t *waitlist[2];
 	int reliable_fragment[2];
 	unsigned int reliable_fragid[2];
 	fragbuf_t *fragbufs[2];
 	int fragbufcount[2];
-	ushort frag_startpos[2];
-	ushort frag_length[2];
+	uint16_t frag_startpos[2];
+	uint16_t frag_length[2];
 	fragbuf_t *incomingbufs[2];
-	qboolean incomingready[2];
+	bool32_t incomingready[2];
 	char incoming_filename[260];
 	char *CustFileBuffer;
 	int CustFileSize;
@@ -218,15 +218,15 @@ struct server_t
 typedef struct usercmd_s
 {
 	short			lerp_msec;
-	byte			msec;
+	uint8_t			msec;
 	vec3_t			viewangles;
 	float			forwardmove;
 	float			sidemove;
 	float			upmove;
-	byte			lightlevel;
+	uint8_t			lightlevel;
 	unsigned short	buttons;
-	byte			impulse;
-	byte			weaponselect;
+	uint8_t			impulse;
+	uint8_t			weaponselect;
 	int				impact_index;
 	vec3_t			impact_position;
 } usercmd_t;
@@ -273,18 +273,18 @@ struct clientid_t
 
 struct client_t
 {
-	qboolean		m_fActive;
-	qboolean		m_fSpawned;
-	qboolean		m_fZombie;
-	qboolean		m_fConnected;
-	qboolean		m_fResListReceived;
-	qboolean		m_fNewReceived;
-	qboolean		m_fConsistencyListSend;
+	bool32_t		m_fActive;
+	bool32_t		m_fSpawned;
+	bool32_t		m_fZombie;
+	bool32_t		m_fConnected;
+	bool32_t		m_fResListReceived;
+	bool32_t		m_fNewReceived;
+	bool32_t		m_fConsistencyListSend;
 	netchan_t		m_netchan;
 	int				m_nChokeCount;
 	int				m_iDeltaSequence;
-	qboolean		m_fFakeClient;
-	qboolean		m_fHltv;
+	bool32_t		m_fFakeClient;
+	bool32_t		m_fHltv;
 	usercmd_t		m_ucmdLast;
 	double			m_dbLastCmdTime;
 	double			m_dbLastMoveTime;
@@ -299,8 +299,8 @@ struct client_t
 	double			m_dbConnectionStarted;
 	double			m_dbNextMessageTime;
 	double			m_dbNextMessageInterval;
-	qboolean		m_fSendMessage;
-	qboolean		m_fSkipMessage;
+	bool32_t		m_fSendMessage;
+	bool32_t		m_fSkipMessage;
 	void *			frames;
 	event_info_t	events[64];
 	edict_t *		m_pEdict;
@@ -308,7 +308,7 @@ struct client_t
 	int				m_iUserID;
 	clientid_t		m_clientID;
 	char			m_szUserInfo[256];
-	qboolean		m_fUpdateUserInfo;
+	bool32_t		m_fUpdateUserInfo;
 	float			m_flNextUserInfoUpdate;
 	char			m_szHashedCDKey[64];
 	char			m_szPlayerName[32];
@@ -321,8 +321,8 @@ struct client_t
 	customization_t customization_list;
 	customization_t *customization_ptr;
 	int				m_iUserMapCRC;
-	qboolean		m_fLocalWeapons;
-	qboolean		m_fLagCompensation;
+	bool32_t		m_fLocalWeapons;
+	bool32_t		m_fLagCompensation;
 	char			m_szPhysInfo[256];
 	bool			m_bLoopback;
 	unsigned long	m_bsVoiceStreams[2];
@@ -354,14 +354,14 @@ typedef struct svstats_s
 
 struct server_static_t
 {
-	qboolean			m_fDllInitialized;
+	bool32_t			m_fDllInitialized;
 	client_t *			m_pClients;
 	int					m_iMaxClients;
 	int					m_iMaxClientsLimit;
 	int					m_iSpawnCount;
 	int					m_iServerFlags;
-	qboolean			m_fLogToFile;
-	qboolean			m_fRemoteLog;
+	bool32_t			m_fLogToFile;
+	bool32_t			m_fRemoteLog;
 	netadr_t			m_RemoteLogAddr;
 	void *				m_pLogFile;
 	svstats_t			m_Stats;

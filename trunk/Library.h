@@ -4,45 +4,45 @@
 #include "Section.h"
 #include "List.h"
 #include "Hook_Call.h"
+#include "Hook_Begin.h"
+#include "BinaryPattern.h"
+#include "AnyPointer.h"
 #include <Windows.h>
 
 class Library {
 public:
-	Library(dword dwAddr);
-	Library(const char *pszName);
-	void *Library::FindSymbol(const char *pszSymbol);
-	void Library::FindSymbol(void *p, const char *pszSymbol);
-	void *FindFunctionByString(const char *pszString);
-	void FindFunctionByString(void *p, const char *pszString);
-	List<Hook_Call> &HookFunctionCalls(void *pAddr, void *pCallback);
+	Library(AnyPointer funcPtr);
+	AnyPointer FindSymbol(const char *symbolName);
+	AnyPointer FindFunctionByString(const char *pszString);
+	Hook_Begin *HookFunction(void *pfnAddr, void *pfnCallback);
 	template <typename T>
-	dword SearchForTemplate(Template tpl, T startAddr, size_t nSize, size_t nAddOffset = 0);
+	uint32_t SearchForTemplate(BinaryPattern tpl, T startAddr, size_t nSize, size_t nAddOffset = 0);
 	template <typename T>
-	dword SearchForTemplateBackward(Template tpl, T startAddr, size_t nSize, size_t nAddOffset = 0);
-	dword FindStringUsing(const char *pszString);
+	uint32_t SearchForTemplateBackward(BinaryPattern tpl, T startAddr, size_t nSize, size_t nAddOffset = 0);
+	uint32_t FindStringUsing(const char *pszString);
 private:
-	dword FindString(const char *pszString);
-	dword FindFunctionBeginning(dword dwAddr);
-	dword FindReference(dword dwAddr);
-	dword FindAllReference(dword dwAddr, dword *pdwCur);
+	uint32_t FindString(const char *pszString);
+	uint32_t FindFunctionBeginning(uint32_t dwAddr);
+	uint32_t FindReference(uint32_t dwAddr);
+	uint32_t FindAllReference(uint32_t dwAddr, uint32_t *pdwCur);
 #ifdef WIN32
-	dword **m_rgpdwRelocs;
+	uint32_t **m_rgpdwRelocs;
 	size_t m_nRelocs;
 
 	//dword FindRefInRelocs(dword dwAddr);
 #endif
 
-	dword m_dwHandle;
-	dword m_dwBase;
+	uint32_t m_dwHandle;
+	uint32_t m_dwBase;
 	Section m_code;
 	Section *m_pRData;
 	Section *m_pVData;
 };
 
 template <typename T>
-dword Library::SearchForTemplate(Template tpl, T startAddr, size_t nSize, size_t nAddOffset /* = 0 */) {
-	dword dwCur = (dword)startAddr;
-	dword dwEnd = dwCur + nSize - tpl.m_nBytes;
+uint32_t Library::SearchForTemplate(BinaryPattern tpl, T startAddr, size_t nSize, size_t nAddOffset /* = 0 */) {
+	uint32_t dwCur = (uint32_t)startAddr;
+	uint32_t dwEnd = dwCur + nSize - tpl.m_nBytes;
 
 	while (dwCur <= dwEnd) {
 		if (tpl.IsEqual(dwCur)) {
@@ -56,9 +56,9 @@ dword Library::SearchForTemplate(Template tpl, T startAddr, size_t nSize, size_t
 }
 
 template <typename T>
-dword Library::SearchForTemplateBackward(Template tpl, T startAddr, size_t nSize, size_t nAddOffset /* = 0 */) {
-	dword dwCur = (dword)startAddr - tpl.m_nBytes;
-	dword dwEnd = dwCur - nSize;
+uint32_t Library::SearchForTemplateBackward(BinaryPattern tpl, T startAddr, size_t nSize, size_t nAddOffset /* = 0 */) {
+	uint32_t dwCur = (uint32_t)startAddr - tpl.m_nBytes;
+	uint32_t dwEnd = dwCur - nSize;
 
 	while (dwCur >= dwEnd) {
 		if (tpl.IsEqual(dwCur)) {

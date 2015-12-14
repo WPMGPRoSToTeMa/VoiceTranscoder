@@ -6,7 +6,9 @@
 class VoiceBuf {
 public:
 	void *m_pBuf;
+	void *m_pOutBuf;
 	size_t m_nSize;
+	size_t m_nOutBufSize;
 	size_t m_nPlayerIndex;
 	size_t m_nUserID;
 	bool m_fIsNewCodec;
@@ -18,6 +20,10 @@ public:
 	VoiceBuf *m_pFirst;
 	VoiceBuf *m_pLast;
 
+	VoiceBufQueue() {
+		m_pFirst = nullptr;
+		m_pLast = nullptr;
+	}
 	bool IsEmpty(void) {
 		if (m_pFirst == NULL) {
 			return true;
@@ -51,3 +57,4 @@ extern void VTC_ThreadInit();
 extern void VTC_ThreadDeinit();
 extern void VTC_ThreadAddVoicePacket(client_t *pClient, size_t nClientIndex, clientData_t *pClientData, void *pData, size_t nDataSize);
 extern void VTC_ThreadHandler(void);
+extern void VTC_ThreadVoiceFlusher();

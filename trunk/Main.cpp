@@ -264,6 +264,7 @@ size_t MSG_GetRemainBytesCount(sizebuf_t *buf) {
 }
 
 // Flush remaining
+// TODO: check for small packets
 void SV_ParseVoiceData_Hook(client_t *pClient) {
 	size_t clientIndex = EngineUTIL::GetClientIndex(pClient);
 	clientData_t *pClientData = &g_rgClientData[clientIndex-1];
@@ -289,7 +290,9 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	int64_t currentMicroSeconds = GetCurrentTimeInMicroSeconds();
 
 	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
-		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000000.0 > g_pcvarMaxDelta->value) {
+		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0 > g_pcvarMaxDelta->value) {
+			//LOG_MESSAGE(PLID, "Delta is %g", (pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0);
+
 			return;
 		}
 	}
@@ -386,8 +389,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 						return;
 					}
 
-					memset(&rawSamples[rawSampleCount], 0, silenceSampleCount * sizeof(int16_t));
-					rawSampleCount += silenceSampleCount;
+					/*memset(&rawSamples[rawSampleCount], 0, silenceSampleCount * sizeof(int16_t));
+					rawSampleCount += silenceSampleCount;*/
 				}
 				break;
 				case VPC_VDATA_SILK: {

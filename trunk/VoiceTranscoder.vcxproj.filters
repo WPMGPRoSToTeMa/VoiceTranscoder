@@ -602,9 +602,6 @@
     <ClInclude Include="Section.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="List.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BinaryPattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>

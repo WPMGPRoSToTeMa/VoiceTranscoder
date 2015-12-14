@@ -261,6 +261,7 @@ size_t MSG_GetRemainBytesCount(sizebuf_t *buf) {
 	return buf->maxsize - buf->cursize;
 }
 
+// Flush remaining
 void SV_ParseVoiceData_Hook(client_t *pClient) {
 	size_t clientIndex = EngineUTIL::GetClientIndex(pClient);
 	clientData_t *pClientData = &g_rgClientData[clientIndex-1];

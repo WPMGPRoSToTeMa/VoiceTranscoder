@@ -265,7 +265,6 @@
     <ClInclude Include="Hook.h" />
     <ClInclude Include="Hook_Begin.h" />
     <ClInclude Include="Library.h" />
-    <ClInclude Include="List.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="MetaUTIL.h" />
     <ClInclude Include="MultiThread.h" />

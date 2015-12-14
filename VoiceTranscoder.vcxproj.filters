@@ -69,9 +69,6 @@
     <ClCompile Include="Section.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HookList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BinaryPattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -85,7 +85,6 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="EngineUTIL.cpp" />
     <ClCompile Include="AnyPointer.cpp" />
-    <ClCompile Include="HookList.cpp" />
     <ClCompile Include="Hook_Begin.cpp" />
     <ClCompile Include="Library.cpp" />
     <ClCompile Include="Main.cpp" />

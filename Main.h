@@ -29,6 +29,7 @@ enum : size_t {
 	VPC_SETSAMPLERATE = 11
 };
 const size_t SVC_STUFFTEXT = 9;
+const size_t SVC_VOICEINIT = 52;
 const size_t SVC_VOICEDATA = 53;
 const size_t MAX_VOICEPACKET_SIZE = 2048; // or 4096? or 8192?
 const size_t MAX_DECOMPRESSED_VOICEPACKET_SIZE = 4096; // or 8192?
@@ -58,6 +59,7 @@ extern void VTC_InitCvars(void);
 extern void VTC_ExecConfig(void);
 extern void VTC_InitConfig(void);
 extern void VTC_InitCodecs(void);
+extern void VTC_UpdateCodecs();
 //extern bool EngineParser(void);
 extern void Hacks_Init();
 extern void Hacks_Deinit();

@@ -1,16 +1,20 @@
 #include "Timer.h"
-#include <Windows.h>
+#ifdef WIN32
+	#include <Windows.h>
+#else
+	#include <sys/time.h>
+#endif
 
 int64_t GetCurrentTimeInMicroSeconds(void) {
 #if defined(linux)
-	static int64_t llBaseSecs = 0;
+	static int64_t baseMicroSeconds = 0;
 	timeval tv;
 	gettimeofday(&tv, NULL);
-	if (!llBaseSecs) {
-		llBaseSecs = (int64_t)tv.tv_sec * 1000000 + (int64_t)tv.tv_usec;
+	if (!baseMicroSeconds) {
+		baseMicroSeconds = (int64_t)tv.tv_sec * 1000000 + (int64_t)tv.tv_usec;
 	}
 
-	return (int64_t)tv.tv_sec * 1000000 + (int64_t)tv.tv_usec - llBaseSecs;
+	return (int64_t)tv.tv_sec * 1000000 + (int64_t)tv.tv_usec - baseMicroSeconds;
 #else
 	static LARGE_INTEGER tickFrequency;
 	static LARGE_INTEGER tickCountBase;

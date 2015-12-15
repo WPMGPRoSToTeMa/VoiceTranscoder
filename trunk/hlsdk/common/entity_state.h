@@ -12,13 +12,15 @@
 *   without written permission from Valve LLC.
 *
 ****/
-#if !defined( ENTITY_STATEH )
-#define ENTITY_STATEH
+
+#ifndef ENTITY_STATE_H
+#define ENTITY_STATE_H
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
+
+#include "const.h"
+
 
 // For entityType below
 #define ENTITY_NORMAL		(1<<0)
@@ -33,11 +35,11 @@ struct entity_state_s
 // Fields which are filled in by routines outside of delta compression
 	int			entityType;
 	// Index into cl_entities array for this entity.
-	int			number;      
+	int			number;
 	float		msg_time;
 
 	// Message number last time the player/entity state was updated.
-	int			messagenum;		
+	int			messagenum;
 
 	// Fields which can be transitted and reconstructed over the network stream
 	vec3_t		origin;
@@ -69,7 +71,7 @@ struct entity_state_s
 	vec3_t		velocity;
 
 	// Send bbox down to client for use during prediction.
-	vec3_t		mins;    
+	vec3_t		mins;
 	vec3_t		maxs;
 
 	int			aiment;
@@ -77,37 +79,37 @@ struct entity_state_s
 	int			owner; 
 
 	// Friction, for prediction.
-	float		friction;       
+	float		friction;
 	// Gravity multiplier
-	float		gravity;		
+	float		gravity;
 
 // PLAYER SPECIFIC
 	int			team;
 	int			playerclass;
 	int			health;
-	qboolean	spectator;  
-	int         weaponmodel;
+	qboolean	spectator;
+	int			weaponmodel;
 	int			gaitsequence;
 	// If standing on conveyor, e.g.
-	vec3_t		basevelocity;   
+	vec3_t		basevelocity;
 	// Use the crouched hull, or the regular player hull.
-	int			usehull;		
+	int			usehull;
 	// Latched buttons last time state updated.
-	int			oldbuttons;     
+	int			oldbuttons;
 	// -1 = in air, else pmove entity number
-	int			onground;		
+	int			onground;
 	int			iStepLeft;
 	// How fast we are falling
-	float		flFallVelocity;  
+	float		flFallVelocity;
 
 	float		fov;
 	int			weaponanim;
 
 	// Parametric movement overrides
-	vec3_t				startpos;
-	vec3_t				endpos;
-	float				impacttime;
-	float				starttime;
+	vec3_t		startpos;
+	vec3_t		endpos;
+	float		impacttime;
+	float		starttime;
 
 	// For mods
 	int			iuser1;
@@ -187,9 +189,9 @@ typedef struct clientdata_s
 
 typedef struct local_state_s
 {
-	entity_state_t playerstate;
-	clientdata_t   client;
-	weapon_data_t  weapondata[ 32 ];
+	entity_state_t	playerstate;
+	clientdata_t	client;
+	weapon_data_t	weapondata[ 64 ];
 } local_state_t;
 
-#endif // !ENTITY_STATEH
+#endif // ENTITY_STATE_H

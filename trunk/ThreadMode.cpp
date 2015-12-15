@@ -4,6 +4,7 @@
 #include "MultiThread.h"
 #include "Util.h"
 #include "Main.h"
+#include "EngineUTIL.h"
 
 VoiceBufQueue *g_pVoiceRawBufQueue, *g_pVoiceTranscodedBufQueue;
 Mutex *g_pRawQueueMutex, *g_pTranscodedQueueMutex;
@@ -66,9 +67,32 @@ void VTC_ThreadHandler(void) {
 
 		// Transcode
 		if (pVoiceBuf->m_fIsNewCodec) {
-			pVoiceBuf->m_nOutBufSize = g_rgClientData->m_pOldCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, (uint8_t *)pVoiceBuf->m_pOutBuf, 2048);
+			ChangeSamplesVolume((int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, g_pcvarVolumeNewToOld->value);
+
+			pVoiceBuf->m_nOutBufSize = g_rgClientData->m_pOldCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, pVoiceBuf->m_pOutBuf, 2048);
 		} else {
-			pVoiceBuf->m_nOutBufSize = g_rgClientData->m_pNewCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, (uint8_t *)pVoiceBuf->m_pOutBuf, 2048);
+			ChangeSamplesVolume((int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, g_pcvarVolumeOldToNew->value);
+
+			pVoiceBuf->m_nOutBufSize = g_rgClientData->m_pNewCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, &pVoiceBuf->m_pOutBuf[14], 2048 - 18);
+
+			SteamID steamid;
+			steamid.SetUniverse(UNIVERSE_PUBLIC);
+			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
+			steamid.SetAccountId(0xFFFFFFFF); // 0 is invalid, but maximum value valid, TODO: randomize or get non-steam user steamid?
+			*(uint64_t *)pVoiceBuf->m_pOutBuf = steamid.ConvertToUInt64();
+			*(uint8_t *)&pVoiceBuf->m_pOutBuf[8] = VPC_SETSAMPLERATE;
+			*(uint16_t *)&pVoiceBuf->m_pOutBuf[9] = 8000;
+			*(uint8_t *)&pVoiceBuf->m_pOutBuf[11] = VPC_VDATA_SILK;
+			*(uint16_t *)&pVoiceBuf->m_pOutBuf[12] = (uint16_t)pVoiceBuf->m_nOutBufSize;
+
+			CRC32 checksum;
+			checksum.Init();
+			checksum.Update(pVoiceBuf->m_pOutBuf, 14 + pVoiceBuf->m_nOutBufSize);
+			checksum.Final();
+
+			*(uint32_t *)&pVoiceBuf->m_pOutBuf[14 + pVoiceBuf->m_nOutBufSize] = checksum.ConvertToUInt32();
+
+			pVoiceBuf->m_nOutBufSize += 18;
 		}
 
 		g_pTranscodedQueueMutex->Lock();
@@ -93,11 +117,11 @@ void VTC_ThreadVoiceFlusher(void) {
 		pVoiceBuf = g_pVoiceTranscodedBufQueue->Pop();
 
 		// Send players and delete
-		client_t *pClient = (client_t *)((uintptr_t)g_firstClientPtr + g_clientStructSize * (pVoiceBuf->m_nPlayerIndex - 1));
+		if (g_engfuncs.pfnGetPlayerUserId(g_engfuncs.pfnPEntityOfEntIndex(pVoiceBuf->m_nPlayerIndex)) == pVoiceBuf->m_nUserID) {
+			client_t *pClient = EngineUTIL::GetClientByIndex(pVoiceBuf->m_nPlayerIndex);
 
-		if (pVoiceBuf->m_fIsNewCodec && g_engfuncs.pfnGetPlayerUserId(g_engfuncs.pfnPEntityOfEntIndex(pVoiceBuf->m_nPlayerIndex)) == pVoiceBuf->m_nUserID) {
 			for (size_t i = 0; i < gpGlobals->maxClients; i++) {
-				client_t *pDestClient = (client_t *)((uintptr_t)g_firstClientPtr + g_clientStructSize * i);
+				client_t *pDestClient = EngineUTIL::GetClientByIndex(i + 1);
 
 				if (!pDestClient->m_fActive) {
 					continue;
@@ -109,11 +133,11 @@ void VTC_ThreadVoiceFlusher(void) {
 				void *buf = pVoiceBuf->m_pOutBuf;
 				size_t byteCount = pVoiceBuf->m_nOutBufSize;
 
-				if (g_rgClientData[i].hasNewCodec != g_rgClientData[pVoiceBuf->m_nPlayerIndex-1].hasNewCodec && MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
-					MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, 53);
-					MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, pVoiceBuf->m_nPlayerIndex - 1);
-					MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);
-					MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, buf, byteCount);
+				if (g_rgClientData[i].hasNewCodec != g_rgClientData[pVoiceBuf->m_nPlayerIndex-1].hasNewCodec && EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
+					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, 53);
+					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, pVoiceBuf->m_nPlayerIndex - 1);
+					EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);
+					EngineUTIL::MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, buf, byteCount);
 
 					//LOG_MESSAGE(PLID, "Sended threaded recoded voice frame");
 				}

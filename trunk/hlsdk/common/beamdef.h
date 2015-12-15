@@ -15,9 +15,7 @@
 #if !defined ( BEAMDEFH )
 #define BEAMDEFH
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 #define FBEAM_STARTENTITY		0x00000001

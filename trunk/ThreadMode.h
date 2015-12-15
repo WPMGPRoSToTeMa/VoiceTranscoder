@@ -6,7 +6,7 @@
 class VoiceBuf {
 public:
 	void *m_pBuf;
-	void *m_pOutBuf;
+	uint8_t *m_pOutBuf;
 	size_t m_nSize;
 	size_t m_nOutBufSize;
 	size_t m_nPlayerIndex;

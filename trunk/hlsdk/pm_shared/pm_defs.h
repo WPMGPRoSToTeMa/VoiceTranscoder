@@ -16,11 +16,10 @@
 #if !defined( PM_DEFSH )
 #define PM_DEFSH
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
+#include "archtypes.h"     // DAL
 #define	MAX_PHYSENTS 600 		  // Must have room for all entities in the world.
 #define MAX_MOVEENTS 64
 #define	MAX_CLIP_PLANES	5
@@ -44,6 +43,9 @@
 #if !defined ( USERCMD_H )
 #include "usercmd.h"
 #endif
+
+#include "const.h"
+
 
 // physent_t
 typedef struct physent_s
@@ -182,9 +184,9 @@ typedef struct playermove_s
 
 	char			physinfo[ MAX_PHYSINFO_STRING ]; // Physics info string
 
-	struct movevars_s *movevars;
-	vec3_t player_mins[ 4 ];
-	vec3_t player_maxs[ 4 ];
+	struct movevars_s *_movevars;
+	vec3_t _player_mins[ 4 ];
+	vec3_t _player_maxs[ 4 ];
 	
 	// Common functions
 	const char		*(*PM_Info_ValueForKey) ( const char *s, const char *key );
@@ -200,14 +202,14 @@ typedef struct playermove_s
 	int				(*PM_HullPointContents) ( struct hull_s *hull, int num, float *p);   
 	pmtrace_t		(*PM_PlayerTrace) (float *start, float *end, int traceFlags, int ignore_pe );
 	struct pmtrace_s *(*PM_TraceLine)( float *start, float *end, int flags, int usehulll, int ignore_pe );
-	long			(*RandomLong)( long lLow, long lHigh );
+	int32			(*RandomLong)( int32 lLow, int32 lHigh );
 	float			(*RandomFloat)( float flLow, float flHigh );
 	int				(*PM_GetModelType)( struct model_s *mod );
 	void			(*PM_GetModelBounds)( struct model_s *mod, float *mins, float *maxs );
 	void			*(*PM_HullForBsp)( physent_t *pe, float *offset );
 	float			(*PM_TraceModel)( physent_t *pEnt, float *start, float *end, trace_t *trace );
 	int				(*COM_FileSize)(char *filename);
-	byte			*(*COM_LoadFile) (char *path, int usehunk, int *pLength);
+	byte			*(*COM_LoadFile) (const char *path, int usehunk, int *pLength);
 	void			(*COM_FreeFile) ( void *buffer );
 	char			*(*memfgets)( byte *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize );
 

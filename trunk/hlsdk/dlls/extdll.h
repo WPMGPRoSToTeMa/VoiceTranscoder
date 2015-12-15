@@ -32,6 +32,8 @@
 #pragma warning(disable : 4514)		// unreferenced inline function removed
 #pragma warning(disable : 4100)		// unreferenced formal parameter
 
+#include "archtypes.h"     // DAL
+
 // Prevent tons of unused windows definitions
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -39,16 +41,23 @@
 #define NOSERVICE
 #define NOMCX
 #define NOIME
+#include "winsani_in.h"
 #include "windows.h"
+#include "winsani_out.h"
 #else // _WIN32
+#ifndef TRUE
 #define FALSE 0
 #define TRUE (!FALSE)
-typedef unsigned long ULONG;
+#endif //TRUE
+typedef uint32 ULONG;
 typedef unsigned char BYTE;
 typedef int BOOL;
+#ifndef MAX_PATH
 #define MAX_PATH PATH_MAX
+#endif // MAX_PATH
 #include <limits.h>
 #include <stdarg.h>
+#include <string.h> // memset 
 #ifndef min
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
 #endif
@@ -64,8 +73,8 @@ typedef int BOOL;
 #include "math.h"
 
 // Header file containing definition of globalvars_t and entvars_t
-typedef int	func_t;					//
-typedef int	string_t;				// from engine's pr_comp.h;
+typedef unsigned int func_t;					//
+typedef unsigned int string_t;				// from engine's pr_comp.h;
 typedef float vec_t;				// needed before including progdefs.h
 
 // Vector class

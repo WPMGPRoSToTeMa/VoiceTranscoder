@@ -67,7 +67,7 @@ size_t SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *e
 	size_t curRawSample = 0;
 
 	while (rawSampleCount >= MIN_SAMPLES) {
-		int16_t bytesOut = maxEncodedBytes - encodedBytesCount;
+		int16_t bytesOut = int16_t(maxEncodedBytes - encodedBytesCount);
 
 		if (bytesOut <= sizeof(int16_t)) {
 			return 0;
@@ -130,7 +130,7 @@ size_t SILK::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16
 		if (payloadSize <= 0) {
 			return 0;
 		}
-		if (payloadSize > encodedBytesCount) {
+		if (payloadSize > (int16_t)encodedBytesCount) {
 			return 0;
 		}
 

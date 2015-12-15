@@ -15,9 +15,7 @@
 #if !defined( EVENT_FLAGSH )
 #define EVENT_FLAGSH
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 // Skip local host for event send.

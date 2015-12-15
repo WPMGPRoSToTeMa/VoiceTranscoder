@@ -12,8 +12,10 @@
 *   without written permission from Valve LLC.
 *
 ****/
+
 #ifndef VECTOR_H
 #define VECTOR_H
+
 
 //=========================================================
 // 2DVector - used for many pathfinding and many other 
@@ -103,10 +105,9 @@ public:
 	// Members
 	vec_t x, y, z;
 };
+
 inline Vector operator*(float fl, const Vector& v)	{ return v * fl; }
 inline float DotProduct(const Vector& a, const Vector& b) { return(a.x*b.x+a.y*b.y+a.z*b.z); }
 inline Vector CrossProduct(const Vector& a, const Vector& b) { return Vector( a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x ); }
-
-
 
 #endif

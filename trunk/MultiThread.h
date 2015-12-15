@@ -46,8 +46,8 @@ public:
 	void Lock();
 	void Unlock();
 
-	friend Signal;
-protected:
+	//friend Signal;
+/*protected:*/
 #ifdef WIN32
 	CRITICAL_SECTION m_critSect;
 #else

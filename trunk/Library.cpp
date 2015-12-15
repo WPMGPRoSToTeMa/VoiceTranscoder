@@ -1,4 +1,9 @@
 #include "Library.h"
+#include <stdlib.h>
+#include <stdio.h>
+#if !defined WIN32
+	#include <elf.h>
+#endif
 
 AnyPointer Library::FindSymbol(const char *pszSymbol) {
 #ifdef WIN32
@@ -83,7 +88,7 @@ AnyPointer Library::FindFunctionByString(const char *pszString) {
 	uint32_t dwStrUsingAddr = FindStringUsing(pszString);
 	return FindFunctionBeginning(dwStrUsingAddr);
 #else
-	return nullptr;
+	return (uintptr_t)NULL;
 #endif
 }
 

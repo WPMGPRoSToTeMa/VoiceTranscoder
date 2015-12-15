@@ -44,19 +44,19 @@ bool g_isUsingRehldsAPI;
 IRehldsApi *g_pRehldsAPI;
 
 // Cvars
-cvar_t g_cvarVersion = {"VTC_Version", Plugin_info.version, FCVAR_EXTDLL | FCVAR_SERVER, 0, nullptr};
+cvar_t g_cvarVersion = {"VTC_Version", Plugin_info.version, FCVAR_EXTDLL | FCVAR_SERVER, 0, NULL};
 cvar_t *g_pcvarVersion;
-cvar_t g_cvarDefaultCodec = {"VTC_DefaultCodec", "old", FCVAR_EXTDLL, 0, nullptr};
+cvar_t g_cvarDefaultCodec = {"VTC_DefaultCodec", "old", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarDefaultCodec;
-cvar_t g_cvarHltvCodec = {"VTC_HltvCodec", "old", FCVAR_EXTDLL, 0, nullptr};
+cvar_t g_cvarHltvCodec = {"VTC_HltvCodec", "old", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarHltvCodec;
-cvar_t g_cvarThreadMode = {"VTC_ThreadMode", "0", FCVAR_EXTDLL, 0, nullptr};
+cvar_t g_cvarThreadMode = {"VTC_ThreadMode", "0", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarThreadMode;
-cvar_t g_cvarMaxDelta = {"VTC_MaxDelta", "200", FCVAR_EXTDLL, 0, nullptr};
+cvar_t g_cvarMaxDelta = {"VTC_MaxDelta", "200", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarMaxDelta;
-cvar_t g_cvarVolumeOldToNew = {"VTC_Volume_OldToNew", "1.0", FCVAR_EXTDLL, 0, nullptr};
+cvar_t g_cvarVolumeOldToNew = {"VTC_Volume_OldToNew", "1.0", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarVolumeOldToNew;
-cvar_t g_cvarVolumeNewToOld = {"VTC_Volume_NewToOld", "1.0", FCVAR_EXTDLL, 0, nullptr};
+cvar_t g_cvarVolumeNewToOld = {"VTC_Volume_NewToOld", "1.0", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarVolumeNewToOld;
 cvar_t *g_pcvarVoiceEnable;
 
@@ -151,7 +151,7 @@ void ServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMa
 		if (!g_clientStructSize) {
 			g_clientStructSize = size_t(g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(2)) - g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(1))); // Asmodai idea
 		}
-		g_firstClientPtr = (decltype(g_firstClientPtr))(g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(1)) - offsetof(client_t, m_szUserInfo));
+		g_firstClientPtr = /*(decltype(g_firstClientPtr))*/(client_t *)(g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(1)) - offsetof(client_t, m_szUserInfo));
 	}
 
 	RETURN_META(MRES_IGNORED);
@@ -581,13 +581,13 @@ Hook_Begin *g_phookSvParseVoiceData;
 bool TryGetRehldsAPI(Library *pEngine) {
 	void *(* CreateInterface)(const char *interfaceName, size_t *returnCode) = pEngine->FindSymbol("CreateInterface");
 
-	if (CreateInterface == nullptr) {
+	if (CreateInterface == NULL) {
 		return false;
 	}
 
-	g_pRehldsAPI = (IRehldsApi *)CreateInterface("VREHLDS_HLDS_API_VERSION001", nullptr);
+	g_pRehldsAPI = (IRehldsApi *)CreateInterface("VREHLDS_HLDS_API_VERSION001", NULL);
 
-	if (g_pRehldsAPI == nullptr) {
+	if (g_pRehldsAPI == NULL) {
 		return false;
 	}
 	if (g_pRehldsAPI->GetMajorVersion() != REHLDS_API_VERSION_MAJOR) {
@@ -614,7 +614,7 @@ void HandleNetCommand_Hook(IRehldsHook_HandleNetCommand *chain, IGameClient *cli
 void Hacks_Init() {
 	AnyPointer pfnSvParseVoiceData;
 
-	g_pEngine = new Library(g_engfuncs.pfnPrecacheModel);
+	g_pEngine = new Library((uintptr_t)g_engfuncs.pfnPrecacheModel);
 
 	if (TryGetRehldsAPI(g_pEngine)) {
 		g_isUsingRehldsAPI = true;
@@ -641,13 +641,13 @@ void Hacks_Init() {
 		pfnSvParseVoiceData = g_pEngine->FindFunctionByString("SV_ParseVoiceData: invalid incoming packet.\n");
 #else
 		g_pfnSvDropClient = g_pEngine->FindSymbol("SV_DropClient");
-		g_netMessage.m_pMsgReadCount = (decltype(g_netMessage.m_pMsgReadCount))g_pEngine->FindSymbol("msg_readcount");
-		g_netMessage.m_pMsgBadRead = (decltype(g_netMessage.m_pMsgBadRead))g_pEngine->FindSymbol("msg_badread");
-		g_netMessage.m_pNetMsg = (decltype(g_netMessage.m_pNetMsg))g_pEngine->FindSymbol("net_message");
+		g_netMessage.m_pMsgReadCount = /*(decltype(g_netMessage.m_pMsgReadCount))*/(size_t *)g_pEngine->FindSymbol("msg_readcount");
+		g_netMessage.m_pMsgBadRead = /*(decltype(g_netMessage.m_pMsgBadRead))*/(bool *)g_pEngine->FindSymbol("msg_badread");
+		g_netMessage.m_pNetMsg = /*(decltype(g_netMessage.m_pNetMsg))*/(sizebuf_t *)g_pEngine->FindSymbol("net_message");
 		pfnSvParseVoiceData = g_pEngine->FindSymbol("SV_ParseVoiceData");
 #endif
 
-		g_phookSvParseVoiceData = g_pEngine->HookFunction(pfnSvParseVoiceData, &SV_ParseVoiceData_Hook);
+		g_phookSvParseVoiceData = g_pEngine->HookFunction((void *)pfnSvParseVoiceData, (void *)&SV_ParseVoiceData_Hook);
 	}
 }
 

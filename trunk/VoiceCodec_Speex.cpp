@@ -34,22 +34,22 @@ void Speex::ChangeQuality(size_t quality) {
 	quality = (quality - 1) * 2;
 	m_encodedBytes = ENCODED_FRAMESIZE[quality];
 	speex_encoder_ctl(m_encoder, SPEEX_SET_QUALITY, &quality);
-	speex_encoder_ctl(m_encoder, SPEEX_RESET_STATE, nullptr);
+	speex_encoder_ctl(m_encoder, SPEEX_RESET_STATE, NULL);
 }
 
 void Speex::ResetState() {
-	speex_encoder_ctl(m_encoder, SPEEX_RESET_STATE, nullptr);
-	speex_decoder_ctl(m_encoder, SPEEX_RESET_STATE, nullptr);
+	speex_encoder_ctl(m_encoder, SPEEX_RESET_STATE, NULL);
+	speex_decoder_ctl(m_encoder, SPEEX_RESET_STATE, NULL);
 }
 
 size_t Speex::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *encodedBytes, size_t maxEncodedBytes) {
-	if (rawSamples == nullptr) {
+	if (rawSamples == NULL) {
 		return 0;
 	}
 	if (rawSampleCount == 0) {
 		return 0;
 	}
-	if (encodedBytes == nullptr) {
+	if (encodedBytes == NULL) {
 		return 0;
 	}
 	if (maxEncodedBytes == 0) {
@@ -87,7 +87,7 @@ size_t Speex::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *
 }
 
 size_t Speex::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) {
-	if (encodedBytes == nullptr) {
+	if (encodedBytes == NULL) {
 		return 0;
 	}
 	if (encodedBytesCount == 0) {
@@ -97,7 +97,7 @@ size_t Speex::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int1
 	if (encodedBytesCount % m_encodedBytes != 0) {
 		return 0;
 	}
-	if (rawSamples == nullptr) {
+	if (rawSamples == NULL) {
 		return 0;
 	}
 	if (maxRawSamples == 0) {

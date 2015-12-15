@@ -6,9 +6,9 @@
 class Hook_Begin : public Hook {
 public:
 	Hook_Begin(void *pfnAddr, void *pfnCallback, bool fHook = true);
-	virtual void ReHook() final;
-	virtual void UnHook() final;
-	virtual ~Hook_Begin() final {
+	virtual void ReHook() /*final*/;
+	virtual void UnHook() /*final*/;
+	virtual ~Hook_Begin() /*final*/ {
 		UnHook();
 
 		delete m_pPatch;

@@ -10,7 +10,7 @@ DWORD WINAPI Thread::Handler(LPVOID lpParam) {
 
 Thread::Thread(void (* pfnHandler)(void)) {
 	m_pfnHandler = pfnHandler;
-	m_hThread = CreateThread(nullptr, 0, &Thread::Handler, this, 0, nullptr);
+	m_hThread = CreateThread(NULL, 0, &Thread::Handler, this, 0, NULL);
 }
 
 Thread::~Thread() {
@@ -19,7 +19,7 @@ Thread::~Thread() {
 
 // SIGNAL
 Signal::Signal() {
-	m_hEvent = CreateEvent(nullptr, FALSE /* Or TRUE ? */, FALSE, nullptr);
+	m_hEvent = CreateEvent(NULL, FALSE /* Or TRUE ? */, FALSE, NULL);
 }
 
 Signal::~Signal() {
@@ -58,12 +58,12 @@ void Mutex::Unlock() {
 void *Thread::Handler(void *param) {
 	(*((Thread *)param)->m_pfnHandler)();
 
-	return nullptr;
+	return NULL;
 }
 
 Thread::Thread(void (* pfnHandler)(void)) {
 	m_pfnHandler = pfnHandler;
-	pthread_create(&m_thread, nullptr, &Thread::Handler, this);
+	pthread_create(&m_thread, NULL, &Thread::Handler, this);
 }
 
 Thread::~Thread() {
@@ -72,7 +72,7 @@ Thread::~Thread() {
 
 // SIGNAL
 Signal::Signal() {
-	pthread_cond_init(&m_cond, nullptr);
+	pthread_cond_init(&m_cond, NULL);
 }
 
 Signal::~Signal() {
@@ -89,7 +89,7 @@ void Signal::Wait(Mutex *pMutex) {
 
 // MUTEX
 Mutex::Mutex() {
-	pthread_mutex_init(&m_mutex, nullptr);
+	pthread_mutex_init(&m_mutex, NULL);
 }
 
 Mutex::~Mutex() {

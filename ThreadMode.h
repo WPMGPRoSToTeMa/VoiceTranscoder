@@ -21,8 +21,8 @@ public:
 	VoiceBuf *m_pLast;
 
 	VoiceBufQueue() {
-		m_pFirst = nullptr;
-		m_pLast = nullptr;
+		m_pFirst = NULL;
+		m_pLast = NULL;
 	}
 	bool IsEmpty(void) {
 		if (m_pFirst == NULL) {

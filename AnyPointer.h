@@ -6,7 +6,7 @@ class AnyPointer {
 	uintptr_t m_ptr;
 public:
 	AnyPointer() {
-		m_ptr = (uintptr_t)nullptr;
+		m_ptr = (uintptr_t)NULL;
 	}
 	AnyPointer(uintptr_t ptr) {
 		m_ptr = ptr;

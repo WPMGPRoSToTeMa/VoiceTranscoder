@@ -50,13 +50,13 @@ void SILK::ResetState() {
 
 // TODO: maxEncodedBytes change to ptr which save encodedBytesCount
 size_t SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *encodedBytes, size_t maxEncodedBytes) {
-	if (rawSamples == nullptr) {
+	if (rawSamples == NULL) {
 		return 0;
 	}
 	if (rawSampleCount == 0) {
 		return 0;
 	}
-	if (encodedBytes == nullptr) {
+	if (encodedBytes == NULL) {
 		return 0;
 	}
 	if (maxEncodedBytes == 0) {
@@ -101,13 +101,13 @@ size_t SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *e
 }
 
 size_t SILK::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) {
-	if (encodedBytes == nullptr) {
+	if (encodedBytes == NULL) {
 		return 0;
 	}
 	if (encodedBytesCount == 0) {
 		return 0;
 	}
-	if (rawSamples == nullptr) {
+	if (rawSamples == NULL) {
 		return 0;
 	}
 	if (maxRawSamples == 0) {

@@ -40,6 +40,8 @@ NetMsgBuf g_netMessage;
 void (* g_pfnSvDropClient)(client_t *pClient, bool fCrash, char *pszFormat, ...);
 client_t *g_firstClientPtr;
 
+bool g_isUnregisteredVoiceCvars;
+
 bool g_isUsingRehldsAPI;
 IRehldsApi *g_pRehldsAPI;
 
@@ -58,6 +60,7 @@ cvar_t g_cvarVolumeOldToNew = {"VTC_Volume_OldToNew", "1.0", FCVAR_EXTDLL, 0, NU
 cvar_t *g_pcvarVolumeOldToNew;
 cvar_t g_cvarVolumeNewToOld = {"VTC_Volume_NewToOld", "1.0", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarVolumeNewToOld;
+cvar_t g_cvarVoiceQuality = {"sv_voicequality", "5", FCVAR_EXTDLL, 0, NULL};
 cvar_t *g_pcvarVoiceEnable;
 
 // Engine API
@@ -145,7 +148,14 @@ void ServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMa
 	MESSAGE_END();
 
 	VTC_ExecConfig();
-	VTC_InitCodecs();
+	VTC_UpdateCodecs();
+
+	if (g_isUnregisteredVoiceCvars) {
+		MESSAGE_BEGIN(MSG_INIT, SVC_VOICEINIT);
+		WRITE_STRING("voice_speex");
+		WRITE_BYTE((size_t)CVAR_GET_FLOAT("sv_voicequality"));
+		MESSAGE_END();
+	}
 
 	if (!g_isUsingRehldsAPI) {
 		if (!g_clientStructSize) {
@@ -169,8 +179,8 @@ void StartFrame_PostHook() {
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION, // ifvers
 	"VoiceTranscoder",      // name
-	"2.0 Reloaded",         // version
-	"Dec 21 2014",          // date
+	"2.0Beta Reloaded",     // version
+	"Dec 16 2015 1:30:00",  // date
 	"WPMG.PR0SToCoder",     // author
 	"http://vtc.wpmg.ru/",  // url
 	"VTC",                  // logtag, all caps please
@@ -204,6 +214,7 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	VTC_InitConfig();
 	VTC_ExecConfig();
 	VTC_InitCodecs();
+
 	if (g_pcvarThreadMode->value != 0.0f) {
 		g_fThreadModeEnabled = true;
 
@@ -540,8 +551,14 @@ Crock - help with thread
 
 void VTC_InitCodecs(void) {
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
-		g_rgClientData[i].m_pOldCodec = new Speex(5);
+		g_rgClientData[i].m_pOldCodec = new Speex((size_t)CVAR_GET_FLOAT("sv_voicequality"));
 		g_rgClientData[i].m_pNewCodec = new SILK(5);
+	}
+}
+
+void VTC_UpdateCodecs() {
+	for (size_t i = 0; i < MAX_CLIENTS; i++) {
+		g_rgClientData[i].m_pOldCodec->ChangeQuality((size_t)CVAR_GET_FLOAT("sv_voicequality"));
 	}
 }
 
@@ -561,6 +578,12 @@ void VTC_InitCvars(void) {
 	CVAR_REGISTER(&g_cvarVolumeOldToNew);
 	g_pcvarVolumeOldToNew = CVAR_GET_POINTER(g_cvarVolumeOldToNew.name);
 	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
+
+	if (CVAR_GET_POINTER("sv_voicequality") == NULL) {
+		CVAR_REGISTER(&g_cvarVoiceQuality);
+
+		g_isUnregisteredVoiceCvars = true;
+	}
 }
 
 void VTC_InitConfig(void) {
@@ -655,6 +678,8 @@ void Hacks_Deinit() {
 	if (!g_isUsingRehldsAPI) {
 		g_phookSvParseVoiceData->UnHook();
 		delete g_phookSvParseVoiceData;
+	} else {
+		g_pRehldsAPI->GetHookchains()->HandleNetCommand()->unregisterHook((void(*)(IRehldsHook_HandleNetCommand *, IGameClient *, int8))&HandleNetCommand_Hook);
 	}
 
 	delete g_pEngine;

@@ -15,9 +15,7 @@
 #if !defined( STUDIO_EVENTH )
 #define STUDIO_EVENTH
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 typedef struct mstudioevent_s

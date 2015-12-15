@@ -15,9 +15,7 @@
 #if !defined ( EVENT_APIH )
 #define EVENT_APIH
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 #define EVENT_API_VERSION 1

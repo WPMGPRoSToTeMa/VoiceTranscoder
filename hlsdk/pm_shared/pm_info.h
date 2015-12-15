@@ -13,14 +13,13 @@
 *
 ****/
 // Physics info string definition
-#if !defined( PM_INFOH )
-#define PM_INFOH
+
+#ifndef PM_INFO_H
+#define PM_INFO_H
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 #define MAX_PHYSINFO_STRING 256
 
-#endif // PM_INFOH
+#endif // PM_INFO_H

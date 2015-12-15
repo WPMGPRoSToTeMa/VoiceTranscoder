@@ -5,7 +5,11 @@
 #include "Hook_Begin.h"
 #include "BinaryPattern.h"
 #include "AnyPointer.h"
-#include <Windows.h>
+#ifdef WIN32
+	#include <Windows.h>
+#else
+	#include <dlfcn.h>
+#endif
 
 class Library {
 public:

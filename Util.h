@@ -3,6 +3,8 @@
 #include "UtilTypes.h"
 
 #include <extdll.h>
+#include <netadr.h>
+#include <common_rehlds.h>
 
 #if 0
 struct sv_t
@@ -61,15 +63,6 @@ typedef struct
 	vec3_t		mins, maxs;
 } consistency2_t;
 
-struct sizebuf_t
-{
-	char *descr;
-	bool32_t OverflowFlags;
-	uint8_t *data;
-	size_t maxsize;
-	size_t cursize;
-};
-
 enum netsrc_t
 {
 	NS_CLIENT = 0x0,
@@ -110,24 +103,6 @@ typedef struct flow_s
 	float		kbytespersec;
 	float		avgkbytespersec;
 } flow_t;
-
-enum netadrtype_t
-{
-	NA_UNUSED = 0x0,
-	NA_LOOPBACK = 0x1,
-	NA_BROADCAST = 0x2,
-	NA_IP = 0x3,
-	NA_IPX = 0x4,
-	NA_BROADCAST_IPX = 0x5,
-};
-
-struct netadr_t
-{
-	netadrtype_t type;
-	uint8_t ip[4];
-	uint8_t ipx[10];
-	uint16_t port;
-};
 
 struct netchan_t
 {

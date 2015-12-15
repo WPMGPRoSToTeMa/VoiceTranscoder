@@ -338,6 +338,7 @@ public:
 	void PrintState( void );
 
 	virtual CBasePlayerItem *GetWeaponPtr( void ) { return (CBasePlayerItem *)this; };
+	float GetNextAttackDelay( float delay );
 
 	float m_flPumpTime;
 	int		m_fInSpecialReload;									// Are we in the middle of a reload for the shotguns
@@ -352,6 +353,10 @@ public:
 	int		m_fInReload;										// Are we in the middle of a reload;
 
 	int		m_iDefaultAmmo;// how much ammo you get when you pick up this weapon as placed by a level designer.
+	
+	// hle time creep vars
+	float	m_flPrevPrimaryAttack;
+	float	m_flLastFireTime;			
 
 };
 
@@ -538,7 +543,6 @@ public:
 	void Holster( int skiplocal = 0 );
 	void Reload( void );
 	void WeaponIdle( void );
-	float m_flSoundDelay;
 
 	BOOL m_fInZoom;// don't save this. 
 

@@ -15,9 +15,7 @@
 #ifndef IN_BUTTONS_H
 #define IN_BUTTONS_H
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 #define IN_ATTACK	(1 << 0)

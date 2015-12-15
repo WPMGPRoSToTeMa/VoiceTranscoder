@@ -15,9 +15,11 @@
 #if !defined( CON_NPRINTH )
 #define CON_NPRINTH
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 typedef struct con_nprint_s
@@ -27,7 +29,10 @@ typedef struct con_nprint_s
 	float	color[ 3 ];		// RGB colors ( 0.0 -> 1.0 scale )
 } con_nprint_t;
 
-void Con_NPrintf( int idx, char *fmt, ... );
-void Con_NXPrintf( struct con_nprint_s *info, char *fmt, ... );
+void Con_NPrintf( int idx, const char *fmt, ... );
+void Con_NXPrintf( struct con_nprint_s *info, const char *fmt, ... );
+#ifdef __cplusplus
+}
+#endif
 
 #endif

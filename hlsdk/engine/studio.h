@@ -12,12 +12,7 @@
 *   without written permission from Valve LLC.
 *
 ****/
-
-
-
-
-#ifndef _STUDIO_H_
-#define _STUDIO_H_
+#pragma once
 
 /*
 ==============================================================================
@@ -31,14 +26,14 @@ Studio models are position independent, so the cache manager can move them.
 
 #define MAXSTUDIOTRIANGLES	20000	// TODO: tune this
 #define MAXSTUDIOVERTS		2048	// TODO: tune this
-#define MAXSTUDIOSEQUENCES	256		// total animation sequences
+#define MAXSTUDIOSEQUENCES	2048	// total animation sequences
 #define MAXSTUDIOSKINS		100		// total textures
 #define MAXSTUDIOSRCBONES	512		// bones allowed at source movement
 #define MAXSTUDIOBONES		128		// total bones actually used
 #define MAXSTUDIOMODELS		32		// sub-models per model
 #define MAXSTUDIOBODYPARTS	32
 #define MAXSTUDIOGROUPS		16
-#define MAXSTUDIOANIMATIONS	512		// per sequence
+#define MAXSTUDIOANIMATIONS	2048	// per sequence
 #define MAXSTUDIOMESHES		256
 #define MAXSTUDIOEVENTS		1024
 #define MAXSTUDIOPIVOTS		256
@@ -141,21 +136,13 @@ typedef struct
 	vec3_t				bbmax;		
 } mstudiobbox_t;
 
-#if !defined( CACHE_USER ) && !defined( QUAKEDEF_H )
-#define CACHE_USER
-typedef struct cache_user_s
-{
-	void *data;
-} cache_user_t;
-#endif
-
 // demand loaded sequence groups
 typedef struct
 {
 	char				label[32];	// textual name
 	char				name[64];	// file name
-	cache_user_t		cache;		// cache index pointer
-	int					data;		// hack for group 0
+	int32				unused1;    // was "cache"  - index pointer
+	int					unused2;    // was "data" -  hack for group 0
 } mstudioseqgroup_t;
 
 // sequence descriptions
@@ -327,6 +314,10 @@ typedef struct
 #define STUDIO_NF_FLATSHADE		0x0001
 #define STUDIO_NF_CHROME		0x0002
 #define STUDIO_NF_FULLBRIGHT	0x0004
+#define STUDIO_NF_NOMIPS		0x0008
+#define STUDIO_NF_ALPHA			0x0010
+#define STUDIO_NF_ADDITIVE		0x0020
+#define STUDIO_NF_MASKED		0x0040
 
 // motion flags
 #define STUDIO_X		0x0001
@@ -359,4 +350,9 @@ typedef struct
 #define RAD_TO_STUDIO		(32768.0/M_PI)
 #define STUDIO_TO_RAD		(M_PI/32768.0)
 
-#endif
+
+#define STUDIO_NUM_HULLS 128
+#define STUDIO_NUM_PLANES (STUDIO_NUM_HULLS * 6)
+#define STUDIO_CACHE_SIZE 16
+
+

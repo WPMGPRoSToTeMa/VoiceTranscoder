@@ -4,42 +4,21 @@
 #include "NetMsgBuf.h"
 #include "Util.h"
 #include "Timer.h"
-#include "CRC32.h"
 #include "Buffer.h"
 #include "ThreadMode.h"
 #include "Main.h"
 #include "MetaUTIL.h"
 #include "EngineUTIL.h"
-#include "SteamID.h"
 #include "Library.h"
-#include "VoiceCodec_Speex.h"
-#include "VoiceCodec_SILK.h"
+#include <rehlds_api.h>
 
 #ifdef WIN32
 	#pragma comment(linker, "/EXPORT:GiveFnptrsToDll=_GiveFnptrsToDll@8,@1")
 #endif
 
 // Constants
-const size_t SVC_STUFFTEXT = 9;
-const size_t MAX_VOICEPACKET_SIZE = 2048; // or 4096? or 8192?
-const size_t MAX_DECOMPRESSED_VOICEPACKET_SIZE = 4096; // or 8192?
 const char *VTC_CONFIGNAME = "VoiceTranscoder.cfg";
-// VoicePacketCommand
-// Now work only raw and silk
-enum : size_t {
-	VPC_VDATA_SILENCE = 0,
-	VPC_VDATA_MILES = 1, // Really unknown, deprecated
-	VPC_VDATA_SPEEX = 2, // Deprecated
-	VPC_VDATA_RAW = 3,
-	VPC_VDATA_SILK = 4,
-	VPC_UNKNOWN = 10,
-	VPC_SETSAMPLERATE = 11
-};
-const size_t SVC_VOICEDATA = 53;
-// uint64_t(steamid) + uint8_t(VPC_SETSAMPLERATE or VPC_VDATA_SILK or VPC_VDATA_SILENCE) + uint16_t(arg) + ... + uint32_t(CRC32 checksum)
-const size_t MIN_VOICEPACKET_SIZE = sizeof(uint64_t) + sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint32_t);
 const size_t WANTED_SAMPLERATE = 16000;
-#define SV_DropClient (*g_pfnSvDropClient)
 
 // Externs
 extern size_t *g_pnMsgReadCount;
@@ -61,6 +40,9 @@ NetMsgBuf g_netMessage;
 void (* g_pfnSvDropClient)(client_t *pClient, bool fCrash, char *pszFormat, ...);
 client_t *g_firstClientPtr;
 
+bool g_isUsingRehldsAPI;
+IRehldsApi *g_pRehldsAPI;
+
 // Cvars
 cvar_t g_cvarVersion = {"VTC_Version", Plugin_info.version, FCVAR_EXTDLL | FCVAR_SERVER, 0, nullptr};
 cvar_t *g_pcvarVersion;
@@ -70,8 +52,12 @@ cvar_t g_cvarHltvCodec = {"VTC_HltvCodec", "old", FCVAR_EXTDLL, 0, nullptr};
 cvar_t *g_pcvarHltvCodec;
 cvar_t g_cvarThreadMode = {"VTC_ThreadMode", "0", FCVAR_EXTDLL, 0, nullptr};
 cvar_t *g_pcvarThreadMode;
-cvar_t g_cvarMaxDelta = {"VTC_MaxDelta", "150", FCVAR_EXTDLL, 0, nullptr};
+cvar_t g_cvarMaxDelta = {"VTC_MaxDelta", "200", FCVAR_EXTDLL, 0, nullptr};
 cvar_t *g_pcvarMaxDelta;
+cvar_t g_cvarVolumeOldToNew = {"VTC_Volume_OldToNew", "1.0", FCVAR_EXTDLL, 0, nullptr};
+cvar_t *g_pcvarVolumeOldToNew;
+cvar_t g_cvarVolumeNewToOld = {"VTC_Volume_NewToOld", "1.0", FCVAR_EXTDLL, 0, nullptr};
+cvar_t *g_pcvarVolumeNewToOld;
 cvar_t *g_pcvarVoiceEnable;
 
 // Engine API
@@ -129,7 +115,8 @@ void ClientCommand_PostHook(edict_t *pClient) {
 	RETURN_META(MRES_IGNORED);
 }
 
-bool32_t ClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason) {
+// TODO: bool32_t
+qboolean ClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason) {
 	int nClientIndex = ENTINDEX(pClient);
 	clientData_t *pClientData = &g_rgClientData[nClientIndex-1];
 
@@ -160,10 +147,12 @@ void ServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMa
 	VTC_ExecConfig();
 	VTC_InitCodecs();
 
-	if (!g_clientStructSize) {
-		g_clientStructSize = size_t(g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(2)) - g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(1))); // Asmodai idea
+	if (!g_isUsingRehldsAPI) {
+		if (!g_clientStructSize) {
+			g_clientStructSize = size_t(g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(2)) - g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(1))); // Asmodai idea
+		}
+		g_firstClientPtr = (decltype(g_firstClientPtr))(g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(1)) - offsetof(client_t, m_szUserInfo));
 	}
-	g_firstClientPtr = (decltype(g_firstClientPtr))(g_engfuncs.pfnGetInfoKeyBuffer(g_engfuncs.pfnPEntityOfEntIndex(1)) - offsetof(client_t, m_szUserInfo));
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -240,38 +229,46 @@ C_DLLEXPORT int Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 // Another code
 /* forcehltv
  * forcesendvoicecodec*/
-void MSG_WriteUInt8_UnSafe(sizebuf_t *buf, uint8_t value) {
-	*(uint8_t *)&buf->data[buf->cursize] = value;
 
-	buf->cursize += sizeof(uint8_t);
-}
+void ChangeSamplesVolume(int16_t *samples, size_t sampleCount, double volume) {
+	if (volume == 1.0) {
+		return;
+	}
 
-void MSG_WriteUInt16_UnSafe(sizebuf_t *buf, uint16_t value) {
-	*(uint16_t *)&buf->data[buf->cursize] = value;
+	for (size_t i = 0; i < sampleCount; i++) {
+		double sample = samples[i] * volume;
 
-	buf->cursize += sizeof(uint16_t);
-}
+		if (sample > 32767) {
+			sample = 32767;
+		} else if (sample < -32768) {
+			sample = -32768;
+		}
 
-void MSG_WriteBuf_UnSafe(sizebuf_t *buf, void *binBuf, size_t byteCount) {
-	memcpy(&buf->data[buf->cursize], binBuf, byteCount);
+		double volumeChange = sample / samples[i];
+		if (volumeChange < volume) {
+			volume = volumeChange;
+		}
+	}
 
-	buf->cursize += byteCount;
-}
+	if (volume == 1.0) {
+		return;
+	}
 
-size_t MSG_GetRemainBytesCount(sizebuf_t *buf) {
-	return buf->maxsize - buf->cursize;
+	for (size_t i = 0; i < sampleCount; i++) {
+		samples[i] = (int16_t)(samples[i] * volume);
+	}
 }
 
 // Flush remaining
 // TODO: check for small packets
-void SV_ParseVoiceData_Hook(client_t *pClient) {
-	size_t clientIndex = EngineUTIL::GetClientIndex(pClient);
+void SV_ParseVoiceData_Hook(client_t *client) {
+	size_t clientIndex = EngineUTIL::GetClientIndex(client);
 	clientData_t *pClientData = &g_rgClientData[clientIndex-1];
 
 	size_t receivedBytesCount = g_netMessage.ReadUInt16();
 	if (receivedBytesCount > MAX_VOICEPACKET_SIZE) {
-		LOG_MESSAGE(PLID, "Oversize voice packet, size = %u (max = %u) from %s", receivedBytesCount, MAX_VOICEPACKET_SIZE, pClient->m_szPlayerName);
-		SV_DropClient(pClient, false, "Oversize voice packet, size = %u (max = %u)", receivedBytesCount, MAX_VOICEPACKET_SIZE);
+		LOG_MESSAGE(PLID, "Oversize voice packet, size = %u (max = %u) from %s", receivedBytesCount, MAX_VOICEPACKET_SIZE, client->m_szPlayerName);
+		EngineUTIL::DropClient(client, false, "Oversize voice packet, size = %u (max = %u)", receivedBytesCount, MAX_VOICEPACKET_SIZE);
 
 		return;
 	}
@@ -282,7 +279,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	if (g_pcvarVoiceEnable->value == 0.0f) {
 		return;
 	}
-	if (!pClient->m_fActive) {
+	if (!client->m_fActive) {
 		return;
 	}
 
@@ -298,15 +295,15 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 	bool needTranscode = false;
 	for (size_t i = 0; i < gpGlobals->maxClients; i++) {
-		client_t *pDestClient = (client_t *)((uintptr_t)g_firstClientPtr + g_clientStructSize * i);
+		client_t *pDestClient = EngineUTIL::GetClientByIndex(i+1);
 
-		if (pDestClient == pClient) {
+		if (pDestClient == client) {
 			continue;
 		} else {
 			if (!pDestClient->m_fActive) {
 				continue;
 			}
-			if (!(pClient->m_bsVoiceStreams[0] & (1 << i))) {
+			if (!(client->m_bsVoiceStreams[0] & (1 << i))) {
 				continue;
 			}
 		}
@@ -324,8 +321,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	// Validate new codec packet
 	if (pClientData->hasNewCodec) {
 		if (receivedBytesCount < MIN_VOICEPACKET_SIZE) {
-			LOG_MESSAGE(PLID, "Too small voice packet (real = %u, min = %u) from %s", receivedBytesCount, MIN_VOICEPACKET_SIZE, pClient->m_szPlayerName);
-			SV_DropClient(pClient, false, "Too small voice packet (real = %u, min = %u)", receivedBytesCount, MIN_VOICEPACKET_SIZE);
+			LOG_MESSAGE(PLID, "Too small voice packet (real = %u, min = %u) from %s", receivedBytesCount, MIN_VOICEPACKET_SIZE, client->m_szPlayerName);
+			EngineUTIL::DropClient(client, false, "Too small voice packet (real = %u, min = %u)", receivedBytesCount, MIN_VOICEPACKET_SIZE);
 
 			return;
 		}
@@ -341,8 +338,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		uint32_t dwRecvdChecksum = buf.ReadUInt32();
 
 		if (checksum.ConvertToUInt32() != dwRecvdChecksum) {
-			LOG_MESSAGE(PLID, "Voice packet checksum validation failed for %s", pClient->m_szPlayerName);
-			SV_DropClient(pClient, false, "Voice packet checksum validation failed");
+			LOG_MESSAGE(PLID, "Voice packet checksum validation failed for %s", client->m_szPlayerName);
+			EngineUTIL::DropClient(client, false, "Voice packet checksum validation failed");
 
 			return;
 		}
@@ -356,8 +353,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		// Validate SteamID
 		SteamID steamid(qwSteamID);
 		if (!steamid.IsValid()) {
-			LOG_MESSAGE(PLID, "Invalid steamid (%llu) in voice packet from %s", steamid.ConvertToUInt64(), pClient->m_szPlayerName);
-			SV_DropClient(pClient, false, "Invalid steamid (%llu) in voice packet", steamid.ConvertToUInt64());
+			LOG_MESSAGE(PLID, "Invalid steamid (%llu) in voice packet from %s", steamid.ConvertToUInt64(), client->m_szPlayerName);
+			EngineUTIL::DropClient(client, false, "Invalid steamid (%llu) in voice packet", steamid.ConvertToUInt64());
 
 			return;
 		}
@@ -371,8 +368,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 					uint16_t sampleRate = buf.ReadUInt16();
 
 					if (sampleRate != WANTED_SAMPLERATE) {
-						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u) from %s", sampleRate, WANTED_SAMPLERATE, pClient->m_szPlayerName);
-						SV_DropClient(pClient, false, "Voice packet unwanted samplerate (cur = %u, want = %u)", sampleRate, WANTED_SAMPLERATE);
+						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u) from %s", sampleRate, WANTED_SAMPLERATE, client->m_szPlayerName);
+						EngineUTIL::DropClient(client, false, "Voice packet unwanted samplerate (cur = %u, want = %u)", sampleRate, WANTED_SAMPLERATE);
 
 						return;
 					}
@@ -382,8 +379,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 					size_t silenceSampleCount = buf.ReadUInt16();
 
 					if (silenceSampleCount > ARRAYSIZE(rawSamples) - rawSampleCount) {
-						LOG_MESSAGE(PLID, "Too many silence samples (cur %u, max %u) from %s", rawSampleCount, ARRAYSIZE(rawSamples), pClient->m_szPlayerName);
-						SV_DropClient(pClient, false, "Too many silence samples (cur %u, max %u)", rawSampleCount, ARRAYSIZE(rawSamples), steamid.ConvertToUInt64());
+						LOG_MESSAGE(PLID, "Too many silence samples (cur %u, max %u) from %s", rawSampleCount, ARRAYSIZE(rawSamples), client->m_szPlayerName);
+						EngineUTIL::DropClient(client, false, "Too many silence samples (cur %u, max %u)", rawSampleCount, ARRAYSIZE(rawSamples), steamid.ConvertToUInt64());
 
 						return;
 					}
@@ -400,8 +397,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 						size_t remainSamples = ARRAYSIZE(rawSamples) - rawSampleCount;
 
 						if (remainSamples == 0) {
-							LOG_MESSAGE(PLID, "Voice packet not enough space for samples from %s", pClient->m_szPlayerName);
-							SV_DropClient(pClient, false, "Voice packet not enough space for samples");
+							LOG_MESSAGE(PLID, "Voice packet not enough space for samples from %s", client->m_szPlayerName);
+							EngineUTIL::DropClient(client, false, "Voice packet not enough space for samples");
 
 							return;
 						}
@@ -409,16 +406,16 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 						rawSampleCount += pClientData->m_pNewCodec->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
 						buf.SkipBytes(bytesCount);
 					} else {
-						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);
-						SV_DropClient(pClient, false, "Voice packet invalid vdata size (cur = %u, need = %u)", remainBytes, bytesCount);
+						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, client->m_szPlayerName);
+						EngineUTIL::DropClient(client, false, "Voice packet invalid vdata size (cur = %u, need = %u)", remainBytes, bytesCount);
 
 						return;
 					}
 				}
 				break;
 				default: {
-					LOG_MESSAGE(PLID, "Voice packet unknown command %u from %s", vpc, pClient->m_szPlayerName);
-					SV_DropClient(pClient, false, "Voice packet unknown command %u", vpc);
+					LOG_MESSAGE(PLID, "Voice packet unknown command %u from %s", vpc, client->m_szPlayerName);
+					EngineUTIL::DropClient(client, false, "Voice packet unknown command %u", vpc);
 
 					/*FILE *pFile = fopen("VoiceTranscoder_UnknownDump.dat", "wb");
 					fwrite(receivedBytes, sizeof(uint8_t), receivedBytesCount, pFile);
@@ -432,8 +429,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 		size_t remainBytes = buf.Size() - buf.TellRead() - sizeof(uint32_t);
 		if (remainBytes) {
-			LOG_MESSAGE(PLID, "Voice packet unknown remain bytes, vpc is %u from %s", buf.PeekUInt8(), pClient->m_szPlayerName);
-			SV_DropClient(pClient, false, "Voice packet unknown remain bytes, vpc is %u", buf.PeekUInt8());
+			LOG_MESSAGE(PLID, "Voice packet unknown remain bytes, vpc is %u from %s", buf.PeekUInt8(), client->m_szPlayerName);
+			EngineUTIL::DropClient(client, false, "Voice packet unknown remain bytes, vpc is %u", buf.PeekUInt8());
 
 			return;
 		}
@@ -452,49 +449,53 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	// Ok only thread
 	if (g_fThreadModeEnabled && needTranscode) {
 		// TODO
-		VTC_ThreadAddVoicePacket(pClient, clientIndex, pClientData, rawSamples, rawSampleCount);
+		VTC_ThreadAddVoicePacket(client, clientIndex, pClientData, rawSamples, rawSampleCount);
 	}
 
 	// After some manipulations...
 	// Non-thread
-	uint8_t bRecompressed[MAX_VOICEPACKET_SIZE];
-	size_t nRecompressedSize;
+	uint8_t recompressed[MAX_VOICEPACKET_SIZE];
+	size_t recompressedSize;
 	if (!g_fThreadModeEnabled && needTranscode) {
 		if (pClientData->hasNewCodec) {
-			nRecompressedSize = pClientData->m_pOldCodec->Encode(rawSamples, rawSampleCount, bRecompressed, ARRAYSIZE(bRecompressed));
+			ChangeSamplesVolume(rawSamples, rawSampleCount, g_pcvarVolumeNewToOld->value);
+
+			recompressedSize = pClientData->m_pOldCodec->Encode(rawSamples, rawSampleCount, recompressed, ARRAYSIZE(recompressed));
 		} else {
-			nRecompressedSize = pClientData->m_pNewCodec->Encode(rawSamples, rawSampleCount, &bRecompressed[14], ARRAYSIZE(bRecompressed) - 14);
+			ChangeSamplesVolume(rawSamples, rawSampleCount, g_pcvarVolumeOldToNew->value);
+
+			recompressedSize = pClientData->m_pNewCodec->Encode(rawSamples, rawSampleCount, &recompressed[14], ARRAYSIZE(recompressed) - 18);
 
 			SteamID steamid;
 			steamid.SetUniverse(UNIVERSE_PUBLIC);
 			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
 			steamid.SetAccountId(0xFFFFFFFF); // 0 is invalid, but maximum value valid, TODO: randomize or get non-steam user steamid?
-			*(uint64_t *)&bRecompressed = steamid.ConvertToUInt64();
-			*(uint8_t *)&bRecompressed[8] = VPC_SETSAMPLERATE;
-			*(uint16_t *)&bRecompressed[9] = 8000;
-			*(uint8_t *)&bRecompressed[11] = VPC_VDATA_SILK;
-			*(uint16_t *)&bRecompressed[12] = nRecompressedSize;
+			*(uint64_t *)recompressed = steamid.ConvertToUInt64();
+			*(uint8_t *)&recompressed[8] = VPC_SETSAMPLERATE;
+			*(uint16_t *)&recompressed[9] = 8000;
+			*(uint8_t *)&recompressed[11] = VPC_VDATA_SILK;
+			*(uint16_t *)&recompressed[12] = (uint16_t)recompressedSize;
 
 			CRC32 checksum;
 			checksum.Init();
-			checksum.Update(bRecompressed, 14 + nRecompressedSize);
+			checksum.Update(recompressed, 14 + recompressedSize);
 			checksum.Final();
 
-			*(uint32_t *)&bRecompressed[14 + nRecompressedSize] = checksum.ConvertToUInt32();
+			*(uint32_t *)&recompressed[14 + recompressedSize] = checksum.ConvertToUInt32();
 
-			nRecompressedSize += 18;
+			recompressedSize += 18;
 		}
 	}
 
 	for (size_t i = 0; i < gpGlobals->maxClients; i++) {
-		client_t *pDestClient = (client_t *)((uintptr_t)g_firstClientPtr + g_clientStructSize * i);
+		client_t *pDestClient = EngineUTIL::GetClientByIndex(i + 1);
 
-		if (pDestClient == pClient) {
-			if (!pClient->m_bLoopback) {
-				if (MSG_GetRemainBytesCount(&pClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t)) { // zachem tam eshe 2 byte v originale?
-					MSG_WriteUInt8_UnSafe(&pClient->m_Datagram, SVC_VOICEDATA);
-					MSG_WriteUInt8_UnSafe(&pClient->m_Datagram, clientIndex - 1);
-					MSG_WriteUInt16_UnSafe(&pClient->m_Datagram, 0);
+		if (pDestClient == client) {
+			if (!client->m_bLoopback) {
+				if (EngineUTIL::MSG_GetRemainBytesCount(&client->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t)) { // zachem tam eshe 2 byte v originale?
+					EngineUTIL::MSG_WriteUInt8_UnSafe(&client->m_Datagram, SVC_VOICEDATA);
+					EngineUTIL::MSG_WriteUInt8_UnSafe(&client->m_Datagram, clientIndex - 1);
+					EngineUTIL::MSG_WriteUInt16_UnSafe(&client->m_Datagram, 0);
 				}
 
 				continue;
@@ -503,7 +504,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			if (!pDestClient->m_fActive) {
 				continue;
 			}
-			if (!(pClient->m_bsVoiceStreams[0] & (1 << i))) {
+			if (!(client->m_bsVoiceStreams[0] & (1 << i))) {
 				continue;
 			}
 		}
@@ -518,15 +519,15 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 				continue;
 			}
 
-			buf = bRecompressed;
-			byteCount = nRecompressedSize;
+			buf = recompressed;
+			byteCount = recompressedSize;
 		}
 
-		if (MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
-			MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, SVC_VOICEDATA);
-			MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, clientIndex - 1);
-			MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);
-			MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, buf, byteCount);
+		if (EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
+			EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, SVC_VOICEDATA);
+			EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, clientIndex - 1);
+			EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);
+			EngineUTIL::MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, buf, byteCount);
 		}
 	}
 }
@@ -554,6 +555,10 @@ void VTC_InitCvars(void) {
 	g_pcvarThreadMode = CVAR_GET_POINTER(g_cvarThreadMode.name);
 	CVAR_REGISTER(&g_cvarMaxDelta);
 	g_pcvarMaxDelta = CVAR_GET_POINTER(g_cvarMaxDelta.name);
+	CVAR_REGISTER(&g_cvarVolumeNewToOld);
+	g_pcvarVolumeNewToOld = CVAR_GET_POINTER(g_cvarVolumeNewToOld.name);
+	CVAR_REGISTER(&g_cvarVolumeOldToNew);
+	g_pcvarVolumeOldToNew = CVAR_GET_POINTER(g_cvarVolumeOldToNew.name);
 	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
 }
 
@@ -570,39 +575,84 @@ void VTC_ExecConfig(void) {
 
 Hook_Begin *g_phookSvParseVoiceData;
 
+bool TryGetRehldsAPI(Library *pEngine) {
+	void *(* CreateInterface)(const char *interfaceName, size_t *returnCode) = pEngine->FindSymbol("CreateInterface");
+
+	if (CreateInterface == nullptr) {
+		return false;
+	}
+
+	g_pRehldsAPI = (IRehldsApi *)CreateInterface("VREHLDS_HLDS_API_VERSION001", nullptr);
+
+	if (g_pRehldsAPI == nullptr) {
+		return false;
+	}
+	if (g_pRehldsAPI->GetMajorVersion() != REHLDS_API_VERSION_MAJOR) {
+		return false;
+	}
+	if (g_pRehldsAPI->GetMinorVersion() < REHLDS_API_VERSION_MINOR) {
+		return false;
+	}
+
+	return true;
+}
+
+void HandleNetCommand_Hook(IRehldsHook_HandleNetCommand *chain, IGameClient *client, uint8_t netcmd) {
+	if (netcmd == CLC_VOICEDATA) {
+		SV_ParseVoiceData_Hook(g_pRehldsAPI->GetServerStatic()->GetClient_t(client->GetId()));
+
+		return;
+	}
+
+	chain->callNext(client, netcmd);
+}
+
 // Init base?
 void Hacks_Init() {
 	AnyPointer pfnSvParseVoiceData;
 
 	g_pEngine = new Library(g_engfuncs.pfnPrecacheModel);
+
+	if (TryGetRehldsAPI(g_pEngine)) {
+		g_isUsingRehldsAPI = true;
+
+		g_netMessage.m_pMsgReadCount = (size_t *)g_pRehldsAPI->GetFuncs()->GetMsgReadCount();
+		g_netMessage.m_pMsgBadRead = (bool *)g_pRehldsAPI->GetFuncs()->GetMsgBadRead();
+		g_netMessage.m_pNetMsg = g_pRehldsAPI->GetFuncs()->GetNetMessage();
+
+		g_pRehldsAPI->GetHookchains()->HandleNetCommand()->registerHook((void (*)(IRehldsHook_HandleNetCommand *, IGameClient *, int8))&HandleNetCommand_Hook);
+	} else {
 #ifdef WIN32
-	g_pfnSvDropClient = g_pEngine->FindFunctionByString("Dropped %s from server\nReason:  %s\n");
+		g_pfnSvDropClient = g_pEngine->FindFunctionByString("Dropped %s from server\nReason:  %s\n");
 
-	// TODO: we can simple find next reloc
-	uintptr_t ptr = g_pEngine->FindStringUsing("Failed command checksum for %s:%s\n");
-	ptr = *(uintptr_t *)g_pEngine->SearchForTemplate(BinaryPattern("\xC7\x05\x00\x00\x00\x00\x01\x00\x00\x00", "\xFF\xFF\x00\x00\x00\x00\xFF\xFF\xFF\xFF", 10), ptr, 0x20, 2);
-	g_netMessage.m_pMsgReadCount = (decltype(g_netMessage.m_pMsgReadCount))(ptr - 4);
-	g_netMessage.m_pMsgBadRead = (decltype(g_netMessage.m_pMsgBadRead))ptr;
+		// TODO: we can simple find next reloc
+		uintptr_t ptr = g_pEngine->FindStringUsing("Failed command checksum for %s:%s\n");
+		ptr = *(uintptr_t *)g_pEngine->SearchForTemplate(BinaryPattern("\xC7\x05\x00\x00\x00\x00\x01\x00\x00\x00", "\xFF\xFF\x00\x00\x00\x00\xFF\xFF\xFF\xFF", 10), ptr, 0x20, 2);
+		g_netMessage.m_pMsgReadCount = (decltype(g_netMessage.m_pMsgReadCount))(ptr - 4);
+		g_netMessage.m_pMsgBadRead = (decltype(g_netMessage.m_pMsgBadRead))ptr;
 
-	ptr = g_pEngine->FindStringUsing("net_message");
-	ptr = *(uintptr_t *)(ptr - 4);
-	g_netMessage.m_pNetMsg = (decltype(g_netMessage.m_pNetMsg))(ptr - offsetof(sizebuf_t, descr));
+		ptr = g_pEngine->FindStringUsing("net_message");
+		ptr = *(uintptr_t *)(ptr - 4);
+		g_netMessage.m_pNetMsg = (decltype(g_netMessage.m_pNetMsg))(ptr - offsetof(sizebuf_t, buffername));
 
-	pfnSvParseVoiceData = g_pEngine->FindFunctionByString("SV_ParseVoiceData: invalid incoming packet.\n");
+		pfnSvParseVoiceData = g_pEngine->FindFunctionByString("SV_ParseVoiceData: invalid incoming packet.\n");
 #else
-	g_pfnSvDropClient = g_pEngine->FindSymbol("SV_DropClient");
-	g_netMessage.m_pMsgReadCount = (decltype(g_netMessage.m_pMsgReadCount))g_pEngine->FindSymbol("msg_readcount");
-	g_netMessage.m_pMsgBadRead = (decltype(g_netMessage.m_pMsgBadRead))g_pEngine->FindSymbol("msg_badread");
-	g_netMessage.m_pNetMsg = (decltype(g_netMessage.m_pNetMsg))g_pEngine->FindSymbol("net_message");
-	pfnSvParseVoiceData = g_pEngine->FindSymbol("SV_ParseVoiceData");
+		g_pfnSvDropClient = g_pEngine->FindSymbol("SV_DropClient");
+		g_netMessage.m_pMsgReadCount = (decltype(g_netMessage.m_pMsgReadCount))g_pEngine->FindSymbol("msg_readcount");
+		g_netMessage.m_pMsgBadRead = (decltype(g_netMessage.m_pMsgBadRead))g_pEngine->FindSymbol("msg_badread");
+		g_netMessage.m_pNetMsg = (decltype(g_netMessage.m_pNetMsg))g_pEngine->FindSymbol("net_message");
+		pfnSvParseVoiceData = g_pEngine->FindSymbol("SV_ParseVoiceData");
 #endif
 
-	g_phookSvParseVoiceData = g_pEngine->HookFunction(pfnSvParseVoiceData, &SV_ParseVoiceData_Hook);
+		g_phookSvParseVoiceData = g_pEngine->HookFunction(pfnSvParseVoiceData, &SV_ParseVoiceData_Hook);
+	}
 }
 
 void Hacks_Deinit() {
-	g_phookSvParseVoiceData->UnHook();
-	delete g_phookSvParseVoiceData;
+	if (!g_isUsingRehldsAPI) {
+		g_phookSvParseVoiceData->UnHook();
+		delete g_phookSvParseVoiceData;
+	}
 
 	delete g_pEngine;
 }

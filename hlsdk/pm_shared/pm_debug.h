@@ -15,9 +15,7 @@
 #ifndef PM_DEBUG_H
 #define PM_DEBUG_H
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 void PM_ViewEntity( void );

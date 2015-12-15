@@ -1,6 +1,10 @@
 #pragma once
 
-#include <Windows.h>
+#ifdef WIN32
+	#include <Windows.h>
+#else
+	#include <pthread.h>
+#endif
 
 class Mutex;
 
@@ -9,9 +13,15 @@ public:
 	Thread(void (* pfnHandler)(void));
 	~Thread();
 protected:
+#ifdef WIN32
 	static DWORD WINAPI Handler(LPVOID lpParam);
 
 	HANDLE m_hThread;
+#else
+	static void *Handler(void *param);
+
+	pthread_t m_thread;
+#endif
 	void (* m_pfnHandler)(void);
 };
 
@@ -25,7 +35,7 @@ protected:
 #ifdef WIN32
 	HANDLE m_hEvent;
 #else
-	pthread_cond_t m_Cond;
+	pthread_cond_t m_cond;
 #endif
 };
 
@@ -39,8 +49,8 @@ public:
 	friend Signal;
 protected:
 #ifdef WIN32
-	CRITICAL_SECTION m_CritSect;
+	CRITICAL_SECTION m_critSect;
 #else
-	pthread_mutex_t m_Mutex;
+	pthread_mutex_t m_mutex;
 #endif
 };

@@ -15,14 +15,13 @@
 #if !defined( QFONTH )
 #define QFONTH
 #ifdef _WIN32
-#ifndef __MINGW32__
 #pragma once
-#endif /* not __MINGW32__ */
 #endif
 
 // Font stuff
 
 #define NUM_GLYPHS 256
+// does not exist: // #include "basetypes.h"
 
 typedef struct
 {
@@ -36,7 +35,7 @@ typedef struct qfont_s
 	int			rowcount;
 	int			rowheight;
 	charinfo	fontinfo[ NUM_GLYPHS ];
-	byte 		data[4];
+	unsigned char data[4];
 } qfont_t;
 
 #endif // qfont.h

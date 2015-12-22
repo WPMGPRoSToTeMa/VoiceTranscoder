@@ -1,7 +1,7 @@
 #include "VoiceCodec_SILK.h"
-#include <stdlib.h>
+#include <cstdlib>
 
-SILK::SILK(size_t quality) {
+VoiceCodec_SILK::VoiceCodec_SILK(size_t quality) {
 	int size;
 	SKP_Silk_SDK_Get_Encoder_Size(&size);
 	m_encState = malloc(size);
@@ -23,14 +23,14 @@ SILK::SILK(size_t quality) {
 	m_decControl.API_sampleRate = 8000;
 }
 
-SILK::~SILK() {
+VoiceCodec_SILK::~VoiceCodec_SILK() {
 	free(m_encState);
 	free(m_decState);
 }
 
-void SILK::ChangeQuality(size_t quality) {}
+void VoiceCodec_SILK::ChangeQuality(size_t quality) {}
 
-void SILK::ResetState() {
+void VoiceCodec_SILK::ResetState() {
 	if (m_encState) {
 		SKP_Silk_SDK_InitEncoder(m_encState, &m_encControl);
 
@@ -49,14 +49,18 @@ void SILK::ResetState() {
 }
 
 // TODO: maxEncodedBytes change to ptr which save encodedBytesCount
-size_t SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *encodedBytes, size_t maxEncodedBytes) {
-	if (rawSamples == NULL) {
+size_t VoiceCodec_SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *encodedBytes, size_t maxEncodedBytes) {
+	if (rawSamples == nullptr) {
 		return 0;
 	}
 	if (rawSampleCount == 0) {
 		return 0;
 	}
-	if (encodedBytes == NULL) {
+	// TODO
+	if (rawSampleCount % MIN_SAMPLES != 0) {
+		return 0;
+	}
+	if (encodedBytes == nullptr) {
 		return 0;
 	}
 	if (maxEncodedBytes == 0) {
@@ -66,7 +70,7 @@ size_t SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *e
 	size_t encodedBytesCount = 0;
 	size_t curRawSample = 0;
 
-	while (rawSampleCount >= MIN_SAMPLES) {
+	while (rawSampleCount != 0) {
 		int16_t bytesOut = int16_t(maxEncodedBytes - encodedBytesCount);
 
 		if (bytesOut <= sizeof(int16_t)) {
@@ -75,11 +79,6 @@ size_t SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *e
 
 		bytesOut -= sizeof(int16_t);
 		encodedBytesCount += sizeof(int16_t);
-
-		// TODO
-		//for (size_t i = rawSampleCount; i < MIN_SAMPLES; i++) {
-		//
-		//}
 
 		if (SKP_Silk_SDK_Encode(m_encState, &m_encControl, &rawSamples[curRawSample], MIN_SAMPLES, &encodedBytes[encodedBytesCount], &bytesOut) != SKP_SILK_NO_ERROR) {
 			return 0;
@@ -100,14 +99,14 @@ size_t SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *e
 	return encodedBytesCount;
 }
 
-size_t SILK::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) {
-	if (encodedBytes == NULL) {
+size_t VoiceCodec_SILK::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) {
+	if (encodedBytes == nullptr) {
 		return 0;
 	}
 	if (encodedBytesCount == 0) {
 		return 0;
 	}
-	if (rawSamples == NULL) {
+	if (rawSamples == nullptr) {
 		return 0;
 	}
 	if (maxRawSamples == 0) {
@@ -118,6 +117,7 @@ size_t SILK::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16
 	size_t decodedRawSamples = 0;
 
 	while (encodedBytesCount > sizeof(int16_t)) {
+		// TODO
 		if (decodedRawSamples + MIN_SAMPLES > maxRawSamples) {
 			return 0;
 		}

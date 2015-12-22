@@ -46,6 +46,6 @@ size_t BinaryPattern::GetByteCount() const {
 }
 
 
-BinaryPattern operator""bp(const char *patternString, size_t strLength) {
+/*BinaryPattern operator""bp(const char *patternString, size_t strLength) {
 	return BinaryPattern(patternString);
-}
+}*/

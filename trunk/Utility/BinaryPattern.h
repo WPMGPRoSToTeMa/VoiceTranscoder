@@ -18,4 +18,4 @@ private:
 	size_t m_byteCount;
 };
 
-extern BinaryPattern operator""bp(const char *patternString, size_t strLength);
+//extern BinaryPattern operator""bp(const char *patternString, size_t strLength);

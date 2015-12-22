@@ -47,7 +47,7 @@ void EngineUTIL::Init(Module &engineModule) {
 
 		// TODO: we can simple find next reloc
 		uintptr_t ptr = engineModule.FindStringReference("Failed command checksum for %s:%s\n");
-		ptr = *(uintptr_t *)engineModule.SearchDownForBinaryPattern(ptr, "C7 05 ?? ?? ?? ?? 01 00 00 00"bp, 0x20, 2);
+		ptr = *(uintptr_t *)engineModule.SearchDownForBinaryPattern(ptr, "C7 05 ?? ?? ?? ?? 01 00 00 00", 0x20, 2);
 		g_pMsgReadCount = (AnyPointer)(ptr - 4);
 		g_pMsgBadRead = (AnyPointer)ptr;
 

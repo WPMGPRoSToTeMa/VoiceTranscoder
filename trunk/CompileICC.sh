@@ -187,4 +187,4 @@
 	VoiceCodecs/SILK/SKP_Silk_tables_pulses_per_block.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_sign.c \
 -lpthread \
--o VoiceTranscoder.so
+-o VoiceTranscoderICC.so

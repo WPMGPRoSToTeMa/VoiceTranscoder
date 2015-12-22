@@ -52,7 +52,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VOICETRANSCODER_EXPORTS;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>hlsdk\common;hlsdk\dlls;hlsdk\engine;hlsdk\pm_shared;metamod;speex;silk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>hlsdk\common;hlsdk\dlls;hlsdk\engine;hlsdk\pm_shared;metamod;speex;silk;MultiThreading;Utility;Hashers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -69,33 +69,36 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VOICETRANSCODER_EXPORTS;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>hlsdk\common;hlsdk\dlls;hlsdk\engine;hlsdk\pm_shared;metamod;speex;silk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>hlsdk\common;hlsdk\dlls;hlsdk\engine;hlsdk\pm_shared;metamod;speex;silk;MultiThreading;Utility;Hashers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>No</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Buffer.cpp" />
-    <ClCompile Include="CRC32.cpp" />
-    <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="EngineUTIL.cpp" />
-    <ClCompile Include="AnyPointer.cpp" />
-    <ClCompile Include="Hook_Begin.cpp" />
-    <ClCompile Include="Library.cpp" />
+    <ClCompile Include="API.cpp" />
+    <ClCompile Include="Hashers\CRC32.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MetaUTIL.cpp" />
-    <ClCompile Include="MultiThread.cpp" />
-    <ClCompile Include="Patch.cpp" />
-    <ClCompile Include="Section.cpp" />
-    <ClCompile Include="SteamID.cpp" />
-    <ClCompile Include="BinaryPattern.cpp" />
+    <ClCompile Include="MultiThreading\Mutex.cpp" />
+    <ClCompile Include="MultiThreading\Signal.cpp" />
+    <ClCompile Include="MultiThreading\Thread.cpp" />
     <ClCompile Include="ThreadMode.cpp" />
-    <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Utility\BinaryPattern.cpp" />
+    <ClCompile Include="Utility\Buffer.cpp" />
+    <ClCompile Include="Utility\EngineUTIL.cpp" />
+    <ClCompile Include="Utility\FunctionHook_Beginning.cpp" />
+    <ClCompile Include="Utility\JmpOpcode.cpp" />
+    <ClCompile Include="Utility\MemoryUnlocker.cpp" />
+    <ClCompile Include="Utility\MetaUTIL.cpp" />
+    <ClCompile Include="Utility\Module.cpp" />
+    <ClCompile Include="Utility\Section.cpp" />
+    <ClCompile Include="Utility\SteamID.cpp" />
+    <ClCompile Include="Utility\Time.cpp" />
+    <ClCompile Include="Utility\UtilFunctions.cpp" />
     <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_A2NLSF.c" />
     <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_allpass_int.c" />
     <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_allpass_int_FLP.c" />
@@ -253,25 +256,29 @@
     <ClCompile Include="VoiceCodec_Speex.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Buffer.h" />
-    <ClInclude Include="CRC32.h" />
-    <ClInclude Include="EngineUTIL.h" />
-    <ClInclude Include="AnyPointer.h" />
-    <ClInclude Include="Hook.h" />
-    <ClInclude Include="Hook_Begin.h" />
-    <ClInclude Include="Library.h" />
+    <ClInclude Include="API.h" />
+    <ClInclude Include="Hashers\CRC32.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="MetaUTIL.h" />
-    <ClInclude Include="MultiThread.h" />
-    <ClInclude Include="NetMsgBuf.h" />
-    <ClInclude Include="Patch.h" />
-    <ClInclude Include="Section.h" />
-    <ClInclude Include="SteamID.h" />
-    <ClInclude Include="BinaryPattern.h" />
+    <ClInclude Include="MultiThreading\Mutex.h" />
+    <ClInclude Include="MultiThreading\Signal.h" />
+    <ClInclude Include="MultiThreading\Thread.h" />
     <ClInclude Include="ThreadMode.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="Util.h" />
-    <ClInclude Include="UtilTypes.h" />
+    <ClInclude Include="Utility\AnyPointer.h" />
+    <ClInclude Include="Utility\BinaryPattern.h" />
+    <ClInclude Include="Utility\Buffer.h" />
+    <ClInclude Include="Utility\EngineUTIL.h" />
+    <ClInclude Include="Utility\FunctionHook.h" />
+    <ClInclude Include="Utility\FunctionHook_Beginning.h" />
+    <ClInclude Include="Utility\JmpOpcode.h" />
+    <ClInclude Include="Utility\MemoryUnlocker.h" />
+    <ClInclude Include="Utility\MetaUTIL.h" />
+    <ClInclude Include="Utility\Module.h" />
+    <ClInclude Include="Utility\Section.h" />
+    <ClInclude Include="Utility\SteamID.h" />
+    <ClInclude Include="Utility\Time.h" />
+    <ClInclude Include="Utility\GoldSrcEngineStructs.h" />
+    <ClInclude Include="Utility\UtilFunctions.h" />
+    <ClInclude Include="Utility\UtilTypes.h" />
     <ClInclude Include="VoiceCodec.h" />
     <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_common_pitch_est_defines.h" />
     <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_define.h" />

@@ -21,11 +21,11 @@ public:
 	VoiceBuf *m_pLast;
 
 	VoiceBufQueue() {
-		m_pFirst = NULL;
-		m_pLast = NULL;
+		m_pFirst = nullptr;
+		m_pLast = nullptr;
 	}
 	bool IsEmpty(void) {
-		if (m_pFirst == NULL) {
+		if (m_pFirst == nullptr) {
 			return true;
 		}
 
@@ -35,13 +35,13 @@ public:
 		if (IsEmpty()) {
 			m_pFirst = m_pLast = pVoiceBuf;
 		} else {
-			pVoiceBuf->m_pNext = NULL;
+			pVoiceBuf->m_pNext = nullptr;
 			m_pLast->m_pNext = pVoiceBuf;
 		}
 	}
 	VoiceBuf *Pop(void) {
 		if (m_pFirst == m_pLast) {
-			m_pFirst = NULL;
+			m_pFirst = nullptr;
 
 			return m_pLast;
 		}

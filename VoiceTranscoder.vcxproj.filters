@@ -22,57 +22,24 @@
     <Filter Include="Source Files\VoiceCodecs\SILK">
       <UniqueIdentifier>{b37e44c0-be66-4e4f-931a-1c6703d6ea61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\MultiThreading">
+      <UniqueIdentifier>{332e8ae7-c49a-473f-a484-721d815dd4f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{d067c9b4-0721-49cc-83e9-1e2c716b6d09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Hashers">
+      <UniqueIdentifier>{b9a285e8-15db-4b1e-8dd5-e4b6d6800ed0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MultiThread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CRC32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ThreadMode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MetaUTIL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineUTIL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SteamID.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VoiceCodec_Speex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Hook_Begin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Patch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Library.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Section.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="BinaryPattern.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AnyPointer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VoiceCodecs\Speex\speex_callbacks.c">
@@ -537,69 +504,69 @@
     <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_tables_sign.c">
       <Filter>Source Files\VoiceCodecs\SILK</Filter>
     </ClCompile>
+    <ClCompile Include="MultiThreading\Signal.cpp">
+      <Filter>Source Files\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiThreading\Thread.cpp">
+      <Filter>Source Files\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="MultiThreading\Mutex.cpp">
+      <Filter>Source Files\MultiThreading</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashers\CRC32.cpp">
+      <Filter>Source Files\Hashers</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Time.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\JmpOpcode.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\MemoryUnlocker.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Module.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\FunctionHook_Beginning.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Section.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\SteamID.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\BinaryPattern.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Buffer.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\MetaUTIL.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\EngineUTIL.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\UtilFunctions.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="API.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UtilTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MultiThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NetMsgBuf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CRC32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadMode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MetaUTIL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineUTIL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SteamID.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VoiceCodec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VoiceCodec_Speex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Hook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Hook_Begin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Patch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Library.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Section.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BinaryPattern.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AnyPointer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VoiceCodecs\Speex\stack_alloc.h">
@@ -724,6 +691,69 @@
     </ClInclude>
     <ClInclude Include="VoiceCodecs\SILK\SKP_Silk_tables_NLSF_CB1_16.h">
       <Filter>Source Files\VoiceCodecs\SILK</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiThreading\Mutex.h">
+      <Filter>Source Files\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiThreading\Signal.h">
+      <Filter>Source Files\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiThreading\Thread.h">
+      <Filter>Source Files\MultiThreading</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashers\CRC32.h">
+      <Filter>Source Files\Hashers</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\AnyPointer.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Time.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\FunctionHook_Beginning.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\JmpOpcode.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\MemoryUnlocker.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Module.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\SteamID.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\FunctionHook.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Section.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\BinaryPattern.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Buffer.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\UtilFunctions.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\UtilTypes.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\GoldSrcEngineStructs.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\MetaUTIL.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\EngineUTIL.h">
+      <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="API.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

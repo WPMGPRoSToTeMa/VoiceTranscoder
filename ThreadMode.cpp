@@ -1,10 +1,15 @@
+#include "ThreadMode.h"
 #include <extdll.h>
 #include <meta_api.h>
-#include "ThreadMode.h"
-#include "MultiThread.h"
-#include "Util.h"
+#include <Thread.h>
+#include <Mutex.h>
+#include <Signal.h>
+#include <GoldSrcEngineStructs.h>
 #include "Main.h"
-#include "EngineUTIL.h"
+#include <EngineUTIL.h>
+#include <UtilFunctions.h>
+#include <CRC32.h>
+#include <SteamID.h>
 
 VoiceBufQueue *g_pVoiceRawBufQueue, *g_pVoiceTranscodedBufQueue;
 Mutex *g_pRawQueueMutex, *g_pTranscodedQueueMutex;
@@ -35,7 +40,7 @@ void VTC_ThreadAddVoicePacket(client_t *pClient, size_t nClientIndex, clientData
 	VoiceBuf *pVoiceBuf = new VoiceBuf;
 	pVoiceBuf->m_nPlayerIndex = nClientIndex;
 	pVoiceBuf->m_nUserID = pClient->m_iUserID; // Check for player disconnect
-	pVoiceBuf->m_fIsNewCodec = pClientData->hasNewCodec;
+	pVoiceBuf->m_fIsNewCodec = pClientData->m_hasNewCodec;
 	pVoiceBuf->m_pBuf = new uint16_t[nDataSize];
 	pVoiceBuf->m_nSize = nDataSize;
 	memcpy(pVoiceBuf->m_pBuf, pData, nDataSize*sizeof(uint16_t));
@@ -69,11 +74,11 @@ void VTC_ThreadHandler(void) {
 		if (pVoiceBuf->m_fIsNewCodec) {
 			ChangeSamplesVolume((int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, g_pcvarVolumeNewToOld->value);
 
-			pVoiceBuf->m_nOutBufSize = g_rgClientData->m_pOldCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, pVoiceBuf->m_pOutBuf, 2048);
+			pVoiceBuf->m_nOutBufSize = g_clientData->m_pOldCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, pVoiceBuf->m_pOutBuf, 2048);
 		} else {
 			ChangeSamplesVolume((int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, g_pcvarVolumeOldToNew->value);
 
-			pVoiceBuf->m_nOutBufSize = g_rgClientData->m_pNewCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, &pVoiceBuf->m_pOutBuf[14], 2048 - 18);
+			pVoiceBuf->m_nOutBufSize = g_clientData->m_pNewCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, &pVoiceBuf->m_pOutBuf[14], 2048 - 18);
 
 			SteamID steamid;
 			steamid.SetUniverse(UNIVERSE_PUBLIC);
@@ -90,7 +95,7 @@ void VTC_ThreadHandler(void) {
 			checksum.Update(pVoiceBuf->m_pOutBuf, 14 + pVoiceBuf->m_nOutBufSize);
 			checksum.Final();
 
-			*(uint32_t *)&pVoiceBuf->m_pOutBuf[14 + pVoiceBuf->m_nOutBufSize] = checksum.ConvertToUInt32();
+			*(uint32_t *)&pVoiceBuf->m_pOutBuf[14 + pVoiceBuf->m_nOutBufSize] = checksum.ToUInt32();
 
 			pVoiceBuf->m_nOutBufSize += 18;
 		}
@@ -126,14 +131,16 @@ void VTC_ThreadVoiceFlusher(void) {
 				if (!pDestClient->m_fActive) {
 					continue;
 				}
-				if (!(pClient->m_bsVoiceStreams[0] & (1 << i))) {
-					continue;
+				if (!pDestClient->m_fHltv || g_pcvarForceSendHLTV->value == 0) {
+					if (!(pClient->m_bsVoiceStreams[0] & (1 << i))) {
+						continue;
+					}
 				}
 
 				void *buf = pVoiceBuf->m_pOutBuf;
 				size_t byteCount = pVoiceBuf->m_nOutBufSize;
 
-				if (g_rgClientData[i].hasNewCodec != g_rgClientData[pVoiceBuf->m_nPlayerIndex-1].hasNewCodec && EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
+				if (g_clientData[i].m_hasNewCodec != g_clientData[pVoiceBuf->m_nPlayerIndex-1].m_hasNewCodec && EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
 					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, 53);
 					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, pVoiceBuf->m_nPlayerIndex - 1);
 					EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);

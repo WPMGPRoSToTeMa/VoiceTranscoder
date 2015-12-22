@@ -15,6 +15,7 @@ g++ \
 		-Wpedantic \
 		-Wfatal-errors \
 		-Wno-error=narrowing \
+		-m32 \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 	Main.cpp \
 	API.cpp \

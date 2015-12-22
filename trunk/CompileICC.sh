@@ -11,6 +11,7 @@
 		-fno-builtin \
 		-std=c++14 \
 		-fPIC \
+		-m32 \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 	Main.cpp \
 	API.cpp \

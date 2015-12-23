@@ -202,6 +202,8 @@ C_DLLEXPORT int Meta_Query(char *pchInterfaceVersion, plugin_info_t **pPluginInf
 	return TRUE;
 }
 
+#include <cstdio>
+
 C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, meta_globals_t *pMGlobals, gamedll_funcs_t *pGamedllFuncs) {
 	// Reset
 	memset(pFunctionTable, 0, sizeof(*pFunctionTable));
@@ -216,6 +218,10 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	g_engineModule.Open(g_engfuncs.pfnPrecacheModel);
 	EngineUTIL::Init(g_engineModule);
 
+	FILE *pFile = fopen("vtc.txt", "wt");
+	fprintf(pFile, "%d", 1);
+	fclose(pFile);
+
 	if (!EngineUTIL::IsReHLDS()) {
 #ifdef _WIN32
 		g_engineModule.Analyze();
@@ -228,6 +234,10 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 		g_hookSvParseVoiceData.Create(pfnSvParseVoiceData, &SV_ParseVoiceData_Hook);
 	} else {
 		EngineUTIL::GetRehldsAPI()->GetHookchains()->HandleNetCommand()->registerHook((void(*)(IRehldsHook_HandleNetCommand *, IGameClient *, int8))&HandleNetCommand_Hook);
+
+		FILE *pFile = fopen("vtc.txt", "wt");
+		fprintf(pFile, "%d", 2);
+		fclose(pFile);
 	}
 
 	VTC_InitCvars();

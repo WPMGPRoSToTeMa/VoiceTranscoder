@@ -1,5 +1,5 @@
 /opt/intel/bin/icc \
-		-mia32 -O3 -s -fasm-blocks -funroll-loops -fomit-frame-pointer -fno-rtti -fno-stack-protector -falign-functions=2 -fno-builtin -fno-exceptions \
+		-mia32 -m32 -O3 -s -fasm-blocks -funroll-loops -fomit-frame-pointer -fno-rtti -fno-stack-protector -falign-functions=2 -fno-builtin -fno-exceptions \
 		-Wno-unknown-pragmas -static-intel -shared -static-libgcc -no-intel-extensions -std=c++14 \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 	Main.cpp \

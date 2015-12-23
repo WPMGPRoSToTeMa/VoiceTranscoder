@@ -7,7 +7,6 @@ g++ \
 		-falign-functions=2 \
 		-Wno-unknown-pragmas \
 		-shared  \
-		-static-libgcc \
 		-fno-builtin \
 		-std=c++14 \
 		-fPIC \

@@ -36,6 +36,7 @@ const size_t MAX_DECOMPRESSED_VOICEPACKET_SAMPLES = 32768; // or 8192?
 const size_t MIN_VOICEPACKET_SIZE = sizeof(uint64_t) + sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint32_t);
 const char VTC_CONFIGNAME[] = "VoiceTranscoder.cfg";
 const size_t NEWCODEC_WANTED_SAMPLERATE = 16000;
+const uint64_t SPEAKING_TIMEOUT = 200000;
 
 // Externs
 extern clientData_t g_clientData[MAX_CLIENTS];

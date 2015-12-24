@@ -1,6 +1,8 @@
-/opt/intel/bin/icc \
-		-mia32 -m32 -O3 -s -fasm-blocks -funroll-loops -fomit-frame-pointer -fno-rtti -fno-stack-protector -falign-functions=2 -fno-builtin -fno-exceptions \
-		-Wno-unknown-pragmas -static-intel -shared -static-libgcc -no-intel-extensions -std=c++14 \
+/opt/intel/bin/icpc \
+		-O3 \
+		-fno-builtin -fno-rtti -Qoption,cpp,--treat_func_as_string_literal_cpp -no-intel-extensions -fno-stack-protector -std=c++14 \
+		-ipo -s -static-libgcc -static-intel -static-libstdc++ \
+		-lrt -ldl -lm \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 	Main.cpp \
 	API.cpp \
@@ -176,5 +178,4 @@
 	VoiceCodecs/SILK/SKP_Silk_tables_pitch_lag.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_pulses_per_block.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_sign.c \
--ldl -lm \
 -o VoiceTranscoderICC.so

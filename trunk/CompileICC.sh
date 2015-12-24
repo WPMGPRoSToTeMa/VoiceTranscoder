@@ -1,8 +1,7 @@
 /opt/intel/bin/icpc \
-		-O3 \
+		-O3 -m32 \
 		-fno-builtin -fno-rtti -Qoption,cpp,--treat_func_as_string_literal_cpp -no-intel-extensions -fno-stack-protector -std=c++14 \
 		-ipo -s -static-libgcc -static-intel -static-libstdc++ \
-		-lrt -ldl -lm \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 	Main.cpp \
 	API.cpp \
@@ -178,4 +177,5 @@
 	VoiceCodecs/SILK/SKP_Silk_tables_pitch_lag.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_pulses_per_block.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_sign.c \
+-lrt -ldl -lm \
 -o VoiceTranscoderICC.so

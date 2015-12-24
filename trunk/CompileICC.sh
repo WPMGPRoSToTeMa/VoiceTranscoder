@@ -178,5 +178,5 @@
 	VoiceCodecs/SILK/SKP_Silk_tables_pitch_lag.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_pulses_per_block.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_sign.c \
--lrt -ldl -lm \
+-lrt -ldl -lm -lpthread \
 -o VoiceTranscoderICC.so

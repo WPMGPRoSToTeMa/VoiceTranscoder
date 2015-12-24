@@ -76,7 +76,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Users\Artem\Documents\ReHLDS\cstri
       <AdditionalIncludeDirectories>hlsdk\common;hlsdk\dlls;hlsdk\engine;hlsdk\pm_shared;metamod;speex;silk;MultiThreading;Utility;Hashers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Strict</FloatingPointModel>
+      <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

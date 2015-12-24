@@ -182,7 +182,7 @@ void StartFrame_PostHook() {
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION, // ifvers
 	"VoiceTranscoder",      // name
-	"2.0RC1 Reloaded",      // version
+	PLUGIN_VERSION,         // version
 	"Dec 22 2015",          // date
 	"WPMG.PR0SToCoder",     // author
 	"http://vtc.wpmg.ru/",  // url

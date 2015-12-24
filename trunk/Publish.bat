@@ -2,7 +2,8 @@
 setlocal EnableDelayedExpansion
 
 mkdir Publish\addons\VoiceTranscoder\
-copy Invoker\* Publish\addons\VoiceTranscoder\
+copy Win32\* Publish\addons\VoiceTranscoder\
+copy Linux\* Publish\addons\VoiceTranscoder\
 copy *.cfg Publish\addons\VoiceTranscoder\
 
 for /F "eol=/ tokens=3,4*" %%i in (Main.h) do (

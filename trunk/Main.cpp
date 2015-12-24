@@ -168,7 +168,7 @@ void StartFrame_PostHook() {
 
 		clientData_t *pClientData = &g_clientData[i];
 		uint64_t currentTimeMicroSeconds = GetCurrentTimeInMicroSeconds();
-		if (pClientData->m_isSpeaking && currentTimeMicroSeconds >= pClientData->m_nextPacketTimeMicroSeconds + 100000) {
+		if (pClientData->m_isSpeaking && currentTimeMicroSeconds >= pClientData->m_nextPacketTimeMicroSeconds) {
 			pClientData->m_isSpeaking = false;
 
 			g_callback_ClientStopSpeak.Call(i+1);
@@ -300,7 +300,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	uint64_t currentMicroSeconds = GetCurrentTimeInMicroSeconds();
 
 	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
-		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0 > g_pcvarMaxDelta->value) {
+		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0 > g_pcvarMaxDelta->value + SPEAKING_TIMEOUT) {
 			//LOG_MESSAGE(PLID, "Delta is %g", (pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0);
 
 			return;
@@ -437,7 +437,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
 		pClientData->m_nextPacketTimeMicroSeconds += frameTimeLength;
 	} else {
-		pClientData->m_nextPacketTimeMicroSeconds = currentMicroSeconds + frameTimeLength;
+		pClientData->m_nextPacketTimeMicroSeconds = currentMicroSeconds + frameTimeLength + SPEAKING_TIMEOUT;
 
 		if (!pClientData->m_isSpeaking) {
 			pClientData->m_isSpeaking = true;

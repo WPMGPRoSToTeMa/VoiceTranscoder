@@ -39,7 +39,7 @@ void VoiceCodec_Speex::ChangeQuality(size_t quality) {
 
 void VoiceCodec_Speex::ResetState() {
 	speex_encoder_ctl(m_encoder, SPEEX_RESET_STATE, nullptr);
-	speex_decoder_ctl(m_encoder, SPEEX_RESET_STATE, nullptr);
+	speex_decoder_ctl(m_decoder, SPEEX_RESET_STATE, nullptr);
 }
 
 size_t VoiceCodec_Speex::Encode(const int16_t *rawSamples, size_t rawSampleCount, uint8_t *encodedBytes, size_t maxEncodedBytes) {

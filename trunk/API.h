@@ -1,26 +1,10 @@
 #pragma once
 
+#include "VoiceTranscoderAPI.h"
 #include <UtilTypes.h>
 #include <cstring>
 
-const size_t VOICETRANSCODER_API_VERSION_MAJOR = 1;
-const size_t VOICETRANSCODER_API_VERSION_MINOR = 0;
-
 const size_t MAX_CALLBACK_COUNT = 64;
-
-template <typename ...T_ARGS>
-class IVoidCallbackRegistry {
-public:
-	virtual ~IVoidCallbackRegistry() {}
-
-	typedef void (* callback_t)(T_ARGS...);
-
-	virtual void RegisterCallback(callback_t callback) = 0;
-	virtual void UnregisterCallback(callback_t callback) = 0;
-};
-
-typedef IVoidCallbackRegistry<size_t> ICallbackRegistry_ClientStartSpeak;
-typedef IVoidCallbackRegistry<size_t> ICallbackRegistry_ClientStopSpeak;
 
 template <typename ...T_ARGS>
 class VoidCallbackRegistry : public IVoidCallbackRegistry<T_ARGS...> {
@@ -68,22 +52,6 @@ public:
 typedef VoidCallbackRegistry<size_t> CallbackRegistry_ClientStartSpeak;
 typedef VoidCallbackRegistry<size_t> CallbackRegistry_ClientStopSpeak;
 
-class IVoiceTranscoderAPI {
-public:
-	virtual ~IVoiceTranscoderAPI() {}
-
-	virtual size_t GetMajorVersion() = 0;
-	virtual size_t GetMinorVersion() = 0;
-
-	virtual bool IsClientSpeaking(size_t clientIndex) = 0;
-
-	virtual ICallbackRegistry_ClientStartSpeak *ClientStartSpeak() = 0;
-	virtual ICallbackRegistry_ClientStopSpeak *ClientStopSpeak() = 0;
-
-	virtual void MuteClient(size_t clientIndex) = 0;
-	virtual void UnmuteClient(size_t clientIndex) = 0;
-};
-
 class VoiceTranscoderAPI : public IVoiceTranscoderAPI {
 public:
 	virtual ~VoiceTranscoderAPI() {}
@@ -98,6 +66,7 @@ public:
 
 	virtual void MuteClient(size_t clientIndex) override final;
 	virtual void UnmuteClient(size_t clientIndex) override final;
+	virtual bool IsClientMuted(size_t clientIndex) override final;
 };
 
 extern CallbackRegistry_ClientStartSpeak g_callback_ClientStartSpeak;

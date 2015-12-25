@@ -3,7 +3,7 @@
 #include <cstddef>
 
 const size_t VOICETRANSCODER_API_VERSION_MAJOR = 1;
-const size_t VOICETRANSCODER_API_VERSION_MINOR = 0;
+const size_t VOICETRANSCODER_API_VERSION_MINOR = 1;
 
 template <typename ...T_ARGS>
 class IVoidCallbackRegistry {
@@ -33,4 +33,5 @@ public:
 
 	virtual void MuteClient(size_t clientIndex) = 0;
 	virtual void UnmuteClient(size_t clientIndex) = 0;
+	virtual bool IsClientMuted(size_t clientIndex) = 0;
 };

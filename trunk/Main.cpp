@@ -59,7 +59,7 @@ C_DLLEXPORT
 #ifdef _WIN32
 __declspec(naked)
 #endif
-void WINAPI GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
+void GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
 #ifdef _WIN32
 	__asm
 	{

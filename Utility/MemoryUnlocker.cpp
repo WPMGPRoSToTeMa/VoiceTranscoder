@@ -17,7 +17,7 @@ MemoryUnlocker::MemoryUnlocker(AnyPointer _ptr, size_t size) {
 	VirtualProtect((AnyPointer)m_ptr, m_size, PAGE_EXECUTE_READWRITE, &m_oldProtection);
 #elif defined __linux__
 	m_ptr &= ~(PAGESIZE - 1);
-	m_size += m_ptr - ptr;
+	m_size += ptr - m_ptr;
 
 	mprotect((AnyPointer)m_ptr, m_size, PROT_EXEC | PROT_READ | PROT_WRITE);
 #endif

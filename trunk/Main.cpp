@@ -371,8 +371,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		// Validate SteamID
 		SteamID steamid(qwSteamID);
 		if (!steamid.IsValid()) {
-			LOG_MESSAGE(PLID, "Invalid steamid (%llu) in voice packet from %s", steamid.ConvertToUInt64(), pClient->m_szPlayerName);
-			EngineUTIL::DropClient(pClient, false, "Invalid steamid (%llu) in voice packet", steamid.ConvertToUInt64());
+			LOG_MESSAGE(PLID, "Invalid steamid (%llu) in voice packet from %s", steamid.ToUInt64(), pClient->m_szPlayerName);
+			EngineUTIL::DropClient(pClient, false, "Invalid steamid (%llu) in voice packet", steamid.ToUInt64());
 
 			return;
 		}
@@ -398,7 +398,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 					if (silenceSampleCount > ARRAYSIZE(rawSamples) - rawSampleCount) {
 						LOG_MESSAGE(PLID, "Too many silence samples (cur %u, max %u) from %s", rawSampleCount, ARRAYSIZE(rawSamples), pClient->m_szPlayerName);
-						EngineUTIL::DropClient(pClient, false, "Too many silence samples (cur %u, max %u)", rawSampleCount, ARRAYSIZE(rawSamples), steamid.ConvertToUInt64());
+						EngineUTIL::DropClient(pClient, false, "Too many silence samples (cur %u, max %u)", rawSampleCount, ARRAYSIZE(rawSamples), steamid.ToUInt64());
 
 						return;
 					}
@@ -533,7 +533,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			steamid.SetUniverse(UNIVERSE_PUBLIC);
 			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
 			steamid.SetAccountId(0xFFFFFFFF); // 0 is invalid, but maximum value valid, TODO: randomize or get non-steam user steamid?
-			*(uint64_t *)recompressed = steamid.ConvertToUInt64();
+			*(uint64_t *)recompressed = steamid.ToUInt64();
 			*(uint8_t *)&recompressed[8] = VPC_SETSAMPLERATE;
 			*(uint16_t *)&recompressed[9] = 8000;
 			*(uint8_t *)&recompressed[11] = VPC_VDATA_SILK;

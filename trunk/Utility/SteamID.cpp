@@ -1,15 +1,10 @@
 #include "SteamID.h"
 
 SteamID::SteamID(uint64_t quadPart) {
-	m_steamid.m_quadPart = quadPart;
+	Set(quadPart);
 }
 
-// TODO: delegate constructor
-SteamID::SteamID() {
-	m_steamid.m_quadPart = 0;
-}
-
-uint64_t SteamID::ConvertToUInt64() const {
+uint64_t SteamID::ToUInt64() const {
 	return m_steamid.m_quadPart;
 }
 
@@ -38,6 +33,10 @@ bool SteamID::IsValid() const {
 	}
 
 	return true;
+}
+
+void SteamID::Set(uint64_t quadPart) {
+	m_steamid.m_quadPart = quadPart;
 }
 
 void SteamID::SetUniverse(universe_t universe) {

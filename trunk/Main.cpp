@@ -183,7 +183,7 @@ plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION, // ifvers
 	"VoiceTranscoder",      // name
 	PLUGIN_VERSION,         // version
-	"Dec 22 2015",          // date
+	"Dec 25 2015",          // date
 	"WPMG.PR0SToCoder",     // author
 	"http://vtc.wpmg.ru/",  // url
 	"VTC",                  // logtag, all caps please
@@ -377,8 +377,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 						return;
 					}
 
-					/*memset(&rawSamples[rawSampleCount], 0, silenceSampleCount * sizeof(int16_t));
-					rawSampleCount += silenceSampleCount;*/
+					memset(&rawSamples[rawSampleCount], 0, silenceSampleCount * sizeof(int16_t));
+					rawSampleCount += silenceSampleCount;
 				}
 				break;
 				case VPC_VDATA_SILK: {
@@ -430,6 +430,15 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		rawSampleCount = pClientData->m_pOldCodec->Decode((const uint8_t *)receivedBytes, receivedBytesCount, rawSamples, ARRAYSIZE(rawSamples));
 	}
 
+	//LOG_CONSOLE(PLID, "%f %d %d", currentMicroSeconds / 1000000.0, receivedBytesCount, rawSampleCount);
+
+	/*if (!rawSampleCount) {
+		LOG_MESSAGE(PLID, "WTF");
+		FILE *pFile = fopen("VoiceTranscoder_VoiceDumpWTF.dat", "wb");
+		fwrite(receivedBytes, sizeof(uint8_t), receivedBytesCount, pFile);
+		fclose(pFile);
+	}*/
+
 	uint64_t frameTimeLength = rawSampleCount * 1000000 / 8000;
 
 	//LOG_MESSAGE(PLID, "Frame time: %f %f %d %d", currentMicroSeconds / 1000000.0, frameTimeLength / 1000.0, receivedBytesCount, needTranscode);
@@ -468,6 +477,10 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 			break;
 		}
+	}
+
+	if (!rawSampleCount) {
+		needTranscode = false;
 	}
 
 	// Ok only thread
@@ -542,6 +555,9 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			byteCount = receivedBytesCount;
 		} else {
 			if (g_fThreadModeEnabled) {
+				continue;
+			}
+			if (!needTranscode) {
 				continue;
 			}
 

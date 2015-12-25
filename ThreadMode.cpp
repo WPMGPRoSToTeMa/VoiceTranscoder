@@ -84,7 +84,7 @@ void VTC_ThreadHandler(void) {
 			steamid.SetUniverse(UNIVERSE_PUBLIC);
 			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
 			steamid.SetAccountId(0xFFFFFFFF); // 0 is invalid, but maximum value valid, TODO: randomize or get non-steam user steamid?
-			*(uint64_t *)pVoiceBuf->m_pOutBuf = steamid.ConvertToUInt64();
+			*(uint64_t *)pVoiceBuf->m_pOutBuf = steamid.ToUInt64();
 			*(uint8_t *)&pVoiceBuf->m_pOutBuf[8] = VPC_SETSAMPLERATE;
 			*(uint16_t *)&pVoiceBuf->m_pOutBuf[9] = 8000;
 			*(uint8_t *)&pVoiceBuf->m_pOutBuf[11] = VPC_VDATA_SILK;

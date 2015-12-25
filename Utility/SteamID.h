@@ -35,12 +35,13 @@ enum accountType_t : size_t {
 class SteamID {
 public:
 	SteamID(uint64_t quadPart);
-	SteamID();
+	SteamID() : SteamID(0) {}
 
-	uint64_t ConvertToUInt64() const;
+	uint64_t ToUInt64() const;
 
 	bool IsValid() const;
 
+	void Set(uint64_t quadPart);
 	void SetUniverse(universe_t universe);
 	void SetAccountType(accountType_t accountType);
 	void SetAccountId(size_t accountId);

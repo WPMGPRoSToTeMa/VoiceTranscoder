@@ -150,6 +150,8 @@ qboolean ClientConnect_PostHook(edict_t *pClient, const char *pszName, const cha
 	pClientData->m_nextPacketTimeMicroSeconds = 0;
 	pClientData->m_isSpeaking = false;
 	pClientData->m_isMuted = false;
+	pClientData->m_pNewCodec->ResetState();
+	pClientData->m_pOldCodec->ResetState();
 
 	RETURN_META_VALUE(MRES_IGNORED, META_RESULT_ORIG_RET(bool32_t));
 }

@@ -100,6 +100,7 @@ size_t VoiceCodec_SILK::Encode(const int16_t *rawSamples, size_t rawSampleCount,
 	return encodedBytesCount;
 }
 
+// TODO: add arg for error handling
 size_t VoiceCodec_SILK::Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) {
 	if (encodedBytes == nullptr) {
 		return 0;

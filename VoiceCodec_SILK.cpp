@@ -1,5 +1,6 @@
 #include "VoiceCodec_SILK.h"
 #include <cstdlib>
+#include <cstring>
 
 VoiceCodec_SILK::VoiceCodec_SILK(size_t quality) {
 	int size;
@@ -116,21 +117,29 @@ size_t VoiceCodec_SILK::Decode(const uint8_t *encodedBytes, size_t encodedBytesC
 	size_t curEncodedBytePos = 0;
 	size_t decodedRawSamples = 0;
 
-	while (encodedBytesCount > sizeof(int16_t)) {
+	while (encodedBytesCount >= sizeof(uint16_t)) {
 		// TODO
 		if (decodedRawSamples + MIN_SAMPLES > maxRawSamples) {
 			return 0;
 		}
 
-		int16_t payloadSize = *(int16_t *)&encodedBytes[curEncodedBytePos];
+		uint16_t payloadSize = *(uint16_t *)&encodedBytes[curEncodedBytePos];
 		
-		curEncodedBytePos += sizeof(int16_t);
-		encodedBytesCount -= sizeof(int16_t);
+		curEncodedBytePos += sizeof(uint16_t);
+		encodedBytesCount -= sizeof(uint16_t);
 
-		if (payloadSize <= 0) {
-			return 0;
+		if (payloadSize == 0) {
+			memset(&rawSamples[decodedRawSamples], 0, MIN_SAMPLES * sizeof(uint16_t));
+			decodedRawSamples += MIN_SAMPLES;
+
+			continue;
 		}
-		if (payloadSize > (int16_t)encodedBytesCount) {
+		if (payloadSize == 0xFFFF) {
+			ResetState();
+
+			return decodedRawSamples;
+		}
+		if (payloadSize > encodedBytesCount) {
 			return 0;
 		}
 

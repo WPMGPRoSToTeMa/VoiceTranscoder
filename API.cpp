@@ -53,3 +53,11 @@ void VoiceTranscoderAPI::UnmuteClient(size_t clientIndex) {
 
 	g_clientData[clientIndex - 1].m_isMuted = false;
 }
+
+bool VoiceTranscoderAPI::IsClientMuted(size_t clientIndex) {
+	if (clientIndex < 1 || clientIndex > gpGlobals->maxClients) {
+		return false;
+	}
+
+	return g_clientData[clientIndex - 1].m_isMuted;
+}

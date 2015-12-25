@@ -19,10 +19,6 @@
 #error "Unknown platform"
 #endif
 
-#ifdef _WIN32
-	#pragma comment(linker, "/EXPORT:GiveFnptrsToDll=_GiveFnptrsToDll@8,@1")
-#endif
-
 // Variables
 clientData_t g_clientData[MAX_CLIENTS];
 char g_execConfigCmd[300];
@@ -59,9 +55,37 @@ cvar_t *g_pcvarVoiceEnable;
 enginefuncs_t g_engfuncs;
 globalvars_t *gpGlobals;
 
-C_DLLEXPORT void WINAPI GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
+C_DLLEXPORT
+#ifdef _WIN32
+__declspec(naked)
+#endif
+void GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
+#ifdef _WIN32
+	__asm
+	{
+		push ebp
+		mov  ebp, esp
+		sub  esp, __LOCAL_SIZE
+		push ebx
+		push esi
+		push edi
+	}
+#endif
+
 	memcpy(&g_engfuncs, pEngFuncs, sizeof(g_engfuncs));
 	gpGlobals = pGlobalVars;
+
+#ifdef _WIN32
+	__asm
+	{
+		pop edi
+		pop esi
+		pop ebx
+		mov esp, ebp
+		pop ebp
+		ret 8
+	}
+#endif
 }
 
 C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion) {

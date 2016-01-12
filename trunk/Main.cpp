@@ -29,6 +29,8 @@ FunctionHook_Beginning g_hookSvParseVoiceData;
 
 bool g_isUnregisteredVoiceCvars;
 
+size_t g_oldVoiceQuality;
+
 // Cvars
 cvar_t g_cvarVersion = {"VTC_Version", Plugin_info.version, FCVAR_EXTDLL | FCVAR_SERVER, 0, nullptr};
 cvar_t *g_pcvarVersion;
@@ -182,6 +184,18 @@ void ServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMa
 }
 
 void StartFrame_PostHook() {
+	if ((size_t)CVAR_GET_FLOAT("sv_voicequality") != g_oldVoiceQuality) {
+		VTC_UpdateCodecs();
+
+		// TODO: this is very bad
+		if (g_isUnregisteredVoiceCvars) {
+			MESSAGE_BEGIN(MSG_INIT, SVC_VOICEINIT);
+			WRITE_STRING("voice_speex");
+			WRITE_BYTE(g_oldVoiceQuality);
+			MESSAGE_END();
+		}
+	}
+
 	if (g_fThreadModeEnabled) {
 		VTC_ThreadVoiceFlusher();
 	}
@@ -210,7 +224,7 @@ plugin_info_t Plugin_info = {
 	"VoiceTranscoder",      // name
 	PLUGIN_VERSION,         // version
 	"Dec 25 2015",          // date
-	"WPMG.PR0SToCoder",     // author
+	"WPMG.PRoSToC0der",     // author
 	"http://vtc.wpmg.ru/",  // url
 	"VTC",                  // logtag, all caps please
 	PT_ANYTIME,             // (when) loadable
@@ -271,10 +285,20 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	return TRUE;
 }
 
+// TODO: place it lower
+void VTC_DeinitCodecs(void) {
+	for (size_t i = 0; i < MAX_CLIENTS; i++) {
+		delete g_clientData[i].m_pOldCodec;
+		delete g_clientData[i].m_pNewCodec;
+	}
+}
+
 C_DLLEXPORT int Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 	if (g_fThreadModeEnabled) {
 		VTC_ThreadDeinit();
 	}
+
+	VTC_DeinitCodecs();
 
 	if (!EngineUTIL::IsReHLDS()) {
 		g_hookSvParseVoiceData.Remove();
@@ -601,15 +625,19 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 }
 
 void VTC_InitCodecs(void) {
+	g_oldVoiceQuality = (size_t)CVAR_GET_FLOAT("sv_voicequality");
+
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
-		g_clientData[i].m_pOldCodec = new VoiceCodec_Speex((size_t)CVAR_GET_FLOAT("sv_voicequality"));
+		g_clientData[i].m_pOldCodec = new VoiceCodec_Speex(g_oldVoiceQuality);
 		g_clientData[i].m_pNewCodec = new VoiceCodec_SILK(5);
 	}
 }
 
 void VTC_UpdateCodecs() {
+	g_oldVoiceQuality = (size_t)CVAR_GET_FLOAT("sv_voicequality");
+
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
-		g_clientData[i].m_pOldCodec->ChangeQuality((size_t)CVAR_GET_FLOAT("sv_voicequality"));
+		g_clientData[i].m_pOldCodec->ChangeQuality(g_oldVoiceQuality);
 	}
 }
 

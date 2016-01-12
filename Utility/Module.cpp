@@ -24,7 +24,7 @@ Module::Module() {
 	m_pVData = nullptr;
 }
 
-Module::Module(AnyPointer insideAddress) {
+Module::Module(AnyPointer insideAddress) : Module() {
 	Open(insideAddress);
 }
 
@@ -40,7 +40,7 @@ void Module::Open(AnyPointer insideAddress) {
 	}
 
 #ifdef _WIN32
-	GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT | GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, insideAddress, &m_handle);
+	GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, insideAddress, &m_handle);
 	m_baseAddress = (uintptr_t)m_handle;
 #elif defined __linux__
 	Dl_info dlinfo;
@@ -61,7 +61,9 @@ void Module::Open(AnyPointer insideAddress) {
 }
 
 void Module::Close() {
-#ifdef __linux__
+#ifdef _WIN32
+	CloseHandle(m_handle);
+#elif defined __linux__
 	dlclose(m_handle);
 #endif
 	m_handle = INVALID_HANDLE;

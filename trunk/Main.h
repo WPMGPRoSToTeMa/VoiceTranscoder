@@ -29,7 +29,7 @@ enum : size_t {
 };
 
 // Constants
-const char PLUGIN_VERSION[] = "2.0RC1 Reloaded";
+const char PLUGIN_VERSION[] = "2.0RC2 Reloaded";
 const size_t MAX_VOICEPACKET_SIZE = 8192; // or 4096? or 8192?
 const size_t MAX_DECOMPRESSED_VOICEPACKET_SAMPLES = 32768; // or 8192?
 // uint64_t(steamid) + uint8_t(VPC_SETSAMPLERATE or VPC_VDATA_SILK or VPC_VDATA_SILENCE) + uint16_t(arg) + ... + uint32_t(CRC32 checksum)

@@ -129,7 +129,7 @@ void ClientCommand_PostHook(edict_t *pClient) {
 			pClientData->m_hasNewCodec = pClientData->m_isVguiRunScriptReceived ? true : false;
 			pClientData->m_isVguiRunScriptReceived = false;
 
-			LOG_MESSAGE(PLID, "Client with %s codec connected", pClientData->m_hasNewCodec ? "new" : "old");
+			LOG_MESSAGE(PLID, "Client %s with %s codec connected", pClient->v.netname, pClientData->m_hasNewCodec ? "new" : "old");
 		}
 	}
 
@@ -223,7 +223,7 @@ plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION, // ifvers
 	"VoiceTranscoder",      // name
 	PLUGIN_VERSION,         // version
-	"Dec 25 2015",          // date
+	"2016.01.15",           // date
 	"WPMG.PRoSToC0der",     // author
 	"http://vtc.wpmg.ru/",  // url
 	"VTC",                  // logtag, all caps please

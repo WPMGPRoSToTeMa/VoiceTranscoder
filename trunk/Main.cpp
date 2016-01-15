@@ -129,7 +129,7 @@ void ClientCommand_PostHook(edict_t *pClient) {
 			pClientData->m_hasNewCodec = pClientData->m_isVguiRunScriptReceived ? true : false;
 			pClientData->m_isVguiRunScriptReceived = false;
 
-			LOG_MESSAGE(PLID, "Client %s with %s codec connected", pClient->v.netname, pClientData->m_hasNewCodec ? "new" : "old");
+			LOG_MESSAGE(PLID, "Client %s with %s codec connected", STRING(pClient->v.netname), pClientData->m_hasNewCodec ? "new" : "old");
 		}
 	}
 

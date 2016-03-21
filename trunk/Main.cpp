@@ -94,7 +94,7 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersi
 	// Clear
 	memset(pFunctionTable, 0, sizeof(*pFunctionTable));
 
-	pFunctionTable->pfnClientCommand = &ClientCommand_PostHook;
+	pFunctionTable->pfnClientCommand = &OnClientCommand_PreHook;
 
 	return TRUE;
 }
@@ -103,15 +103,15 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 	// Clear
 	memset(pFunctionTable, 0, sizeof(*pFunctionTable));
 
-	pFunctionTable->pfnClientConnect = &ClientConnect_PostHook;
-	pFunctionTable->pfnServerActivate = &ServerActivate_PostHook;
-	pFunctionTable->pfnStartFrame = &StartFrame_PostHook;
+	pFunctionTable->pfnClientConnect = &OnClientConnect_PostHook;
+	pFunctionTable->pfnServerActivate = &OnServerActivate_PostHook;
+	pFunctionTable->pfnStartFrame = &OnStartFrame_PostHook;
 
 	return TRUE;
 }
 
 // Entity API
-void ClientCommand_PostHook(edict_t *pClient) {
+void OnClientCommand_PreHook(edict_t *pClient) {
 	const char *pszCmd = CMD_ARGV(0);
 
 	int nClientIndex = ENTINDEX(pClient);
@@ -137,7 +137,7 @@ void ClientCommand_PostHook(edict_t *pClient) {
 }
 
 // TODO: bool32_t
-qboolean ClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason) {
+qboolean OnClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason) {
 	int nClientIndex = ENTINDEX(pClient);
 	clientData_t *pClientData = &g_clientData[nClientIndex-1];
 
@@ -158,7 +158,7 @@ qboolean ClientConnect_PostHook(edict_t *pClient, const char *pszName, const cha
 	RETURN_META_VALUE(MRES_IGNORED, META_RESULT_ORIG_RET(bool32_t));
 }
 
-void ServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMax) {
+void OnServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMax) {
 	// It is bad because it sends to hltv
 	MESSAGE_BEGIN(MSG_INIT, SVC_STUFFTEXT);
 	WRITE_STRING("VTC_CheckStart\n");
@@ -183,7 +183,7 @@ void ServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMa
 	RETURN_META(MRES_IGNORED);
 }
 
-void StartFrame_PostHook() {
+void OnStartFrame_PostHook() {
 	if ((size_t)CVAR_GET_FLOAT("sv_voicequality") != g_oldVoiceQuality) {
 		VTC_UpdateCodecs();
 

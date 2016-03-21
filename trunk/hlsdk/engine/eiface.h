@@ -299,7 +299,7 @@ typedef struct enginefuncs_s
 	void(*pfnQueryClientCvarValue2)		(const edict_t *player, const char *cvarName, int requestID);
 
 	// Added 2009/06/19 (no SDK update):
-	int(*pfnEngCheckParm)				(const char *pchCmdLineToken, char **ppnext);
+	//int(*pfnEngCheckParm)				(const char *pchCmdLineToken, char **ppnext);
 } enginefuncs_t;
 
 

@@ -45,10 +45,10 @@ extern cvar_t *g_pcvarForceSendHLTV;
 extern cvar_t *g_pcvarVolumeOldToNew;
 extern cvar_t *g_pcvarVolumeNewToOld;
 
-extern void ClientCommand_PostHook(edict_t *pClient);
-extern qboolean ClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason);
-extern void ServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMax);
-extern void StartFrame_PostHook();
+extern void OnClientCommand_PreHook(edict_t *pClient);
+extern qboolean OnClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason);
+extern void OnServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMax);
+extern void OnStartFrame_PostHook();
 
 extern void SV_ParseVoiceData_Hook(client_t *client);
 extern void HandleNetCommand_Hook(IRehldsHook_HandleNetCommand *chain, IGameClient *client, uint8_t netcmd);

@@ -324,6 +324,7 @@
     <ClInclude Include="VoiceCodecs\Speex\vq.h" />
     <ClInclude Include="VoiceCodec_SILK.h" />
     <ClInclude Include="VoiceCodec_Speex.h" />
+    <ClInclude Include="VoiceTranscoderAPI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

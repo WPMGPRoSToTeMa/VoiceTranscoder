@@ -211,7 +211,7 @@ void OnStartFrame_PostHook() {
 		if (pClientData->m_isSpeaking && currentTimeMicroSeconds >= pClientData->m_nextPacketTimeMicroSeconds) {
 			pClientData->m_isSpeaking = false;
 
-			g_callback_ClientStopSpeak.Call(i+1);
+			g_OnClientStopSpeak(i+1);
 		}
 	}
 
@@ -355,6 +355,12 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 			return;
 		}
+	}
+
+	bool allowed = true;
+	g_OnShouldAllowVoicePacket(clientIndex, allowed);
+	if (!allowed) {
+		return;
 	}
 
 	int16_t rawSamples[MAX_DECOMPRESSED_VOICEPACKET_SAMPLES];
@@ -501,7 +507,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		if (!pClientData->m_isSpeaking) {
 			pClientData->m_isSpeaking = true;
 
-			g_callback_ClientStartSpeak.Call(clientIndex);
+			g_OnClientStartSpeak(clientIndex);
 		}
 	}
 

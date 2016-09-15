@@ -4,16 +4,17 @@
 #include "Main.h"
 #include <EngineUTIL.h>
 
-CallbackRegistry_ClientStartSpeak g_callback_ClientStartSpeak;
-CallbackRegistry_ClientStopSpeak g_callback_ClientStopSpeak;
+Event<size_t> g_OnClientStartSpeak;
+Event<size_t> g_OnClientStopSpeak;
+Event<size_t, bool&> g_OnShouldAllowVoicePacket;
 
 VoiceTranscoderAPI g_voiceTranscoderAPI;
 
-size_t VoiceTranscoderAPI::GetMajorVersion() {
+size_t VoiceTranscoderAPI::MajorVersion() {
 	return VOICETRANSCODER_API_VERSION_MAJOR;
 }
 
-size_t VoiceTranscoderAPI::GetMinorVersion() {
+size_t VoiceTranscoderAPI::MinorVersion() {
 	return VOICETRANSCODER_API_VERSION_MINOR;
 }
 
@@ -30,12 +31,12 @@ bool VoiceTranscoderAPI::IsClientSpeaking(size_t clientIndex) {
 	return g_clientData[clientIndex - 1].m_isSpeaking;
 }
 
-ICallbackRegistry_ClientStartSpeak *VoiceTranscoderAPI::ClientStartSpeak() {
-	return &g_callback_ClientStartSpeak;
+IEvent<size_t> &VoiceTranscoderAPI::OnClientStartSpeak() {
+	return g_OnClientStartSpeak;
 }
 
-ICallbackRegistry_ClientStopSpeak *VoiceTranscoderAPI::ClientStopSpeak() {
-	return &g_callback_ClientStopSpeak;
+IEvent<size_t> &VoiceTranscoderAPI::OnClientStopSpeak() {
+	return g_OnClientStopSpeak;
 }
 
 void VoiceTranscoderAPI::MuteClient(size_t clientIndex) {
@@ -60,4 +61,8 @@ bool VoiceTranscoderAPI::IsClientMuted(size_t clientIndex) {
 	}
 
 	return g_clientData[clientIndex - 1].m_isMuted;
+}
+
+IEvent<size_t, bool &> &VoiceTranscoderAPI::OnShouldAllowVoicePacket() {
+	return g_OnShouldAllowVoicePacket;
 }

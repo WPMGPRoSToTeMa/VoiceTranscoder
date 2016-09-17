@@ -350,7 +350,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	uint64_t currentMicroSeconds = GetCurrentTimeInMicroSeconds();
 
 	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
-		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0 > g_pcvarMaxDelta->value + SPEAKING_TIMEOUT) {
+		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0 > g_pcvarMaxDelta->value + SPEAKING_TIMEOUT/1000.0) {
 			//LOG_MESSAGE(PLID, "Delta is %g", (pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0);
 
 			return;

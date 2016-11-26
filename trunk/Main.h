@@ -29,7 +29,6 @@ enum : size_t {
 };
 
 // Constants
-const char PLUGIN_VERSION[] = "2.0RC2 Reloaded";
 const size_t MAX_VOICEPACKET_SIZE = 8192; // or 4096? or 8192?
 const size_t MAX_DECOMPRESSED_VOICEPACKET_SAMPLES = 32768; // or 8192?
 // uint64_t(steamid) + uint8_t(VPC_SETSAMPLERATE or VPC_VDATA_SILK or VPC_VDATA_SILENCE) + uint16_t(arg) + ... + uint32_t(CRC32 checksum)
@@ -45,10 +44,11 @@ extern cvar_t *g_pcvarForceSendHLTV;
 extern cvar_t *g_pcvarVolumeOldToNew;
 extern cvar_t *g_pcvarVolumeNewToOld;
 
-extern void OnClientCommand_PreHook(edict_t *pClient);
-extern qboolean OnClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason);
-extern void OnServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMax);
-extern void OnStartFrame_PostHook();
+extern void OnClientCommandReceiving(edict_t *pClient);
+extern qboolean OnClientConnected(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason);
+extern void OnClientDisconnected(edict_t *pClient);
+extern void OnServerActivated(edict_t *pEdictList, int nEdictCount, int nClientMax);
+extern void OnFrameStarted();
 
 extern void SV_ParseVoiceData_Hook(client_t *client);
 extern void HandleNetCommand_Hook(IRehldsHook_HandleNetCommand *chain, IGameClient *client, uint8_t netcmd);

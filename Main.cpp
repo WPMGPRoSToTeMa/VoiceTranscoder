@@ -94,7 +94,7 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersi
 	// Clear
 	memset(pFunctionTable, 0, sizeof(*pFunctionTable));
 
-	pFunctionTable->pfnClientCommand = &OnClientCommand_PreHook;
+	pFunctionTable->pfnClientCommand = &OnClientCommandReceiving;
 
 	return TRUE;
 }
@@ -103,15 +103,16 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 	// Clear
 	memset(pFunctionTable, 0, sizeof(*pFunctionTable));
 
-	pFunctionTable->pfnClientConnect = &OnClientConnect_PostHook;
-	pFunctionTable->pfnServerActivate = &OnServerActivate_PostHook;
-	pFunctionTable->pfnStartFrame = &OnStartFrame_PostHook;
+	pFunctionTable->pfnClientConnect = &OnClientConnected;
+	pFunctionTable->pfnClientDisconnect = &OnClientDisconnected;
+	pFunctionTable->pfnServerActivate = &OnServerActivated;
+	pFunctionTable->pfnStartFrame = &OnFrameStarted;
 
 	return TRUE;
 }
 
 // Entity API
-void OnClientCommand_PreHook(edict_t *pClient) {
+void OnClientCommandReceiving(edict_t *pClient) {
 	const char *pszCmd = CMD_ARGV(0);
 
 	int nClientIndex = ENTINDEX(pClient);
@@ -137,7 +138,7 @@ void OnClientCommand_PreHook(edict_t *pClient) {
 }
 
 // TODO: bool32_t
-qboolean OnClientConnect_PostHook(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason) {
+qboolean OnClientConnected(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason) {
 	int nClientIndex = ENTINDEX(pClient);
 	clientData_t *pClientData = &g_clientData[nClientIndex-1];
 
@@ -158,7 +159,20 @@ qboolean OnClientConnect_PostHook(edict_t *pClient, const char *pszName, const c
 	RETURN_META_VALUE(MRES_IGNORED, META_RESULT_ORIG_RET(bool32_t));
 }
 
-void OnServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClientMax) {
+void OnClientDisconnected(edict_t *pClient) {
+	int playerSlot = ENTINDEX(pClient);
+	clientData_t &clientData = g_clientData[playerSlot - 1];
+
+	if (clientData.m_isSpeaking) {
+		clientData.m_isSpeaking = false;
+
+		g_OnClientStopSpeak(playerSlot);
+	}
+
+	RETURN_META(MRES_IGNORED);
+}
+
+void OnServerActivated(edict_t *pEdictList, int nEdictCount, int nClientMax) {
 	// It is bad because it sends to hltv
 	MESSAGE_BEGIN(MSG_INIT, SVC_STUFFTEXT);
 	WRITE_STRING("VTC_CheckStart\n");
@@ -183,7 +197,7 @@ void OnServerActivate_PostHook(edict_t *pEdictList, int nEdictCount, int nClient
 	RETURN_META(MRES_IGNORED);
 }
 
-void OnStartFrame_PostHook() {
+void OnFrameStarted() {
 	if ((size_t)CVAR_GET_FLOAT("sv_voicequality") != g_oldVoiceQuality) {
 		VTC_UpdateCodecs();
 
@@ -222,7 +236,7 @@ void OnStartFrame_PostHook() {
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION, // ifvers
 	"VoiceTranscoder",      // name
-	PLUGIN_VERSION,         // version
+	VOICETRANSCODER_VERSION,         // version
 	"2016.01.15",           // date
 	"WPMG.PRoSToC0der",     // author
 	"http://vtc.wpmg.ru/",  // url
@@ -355,12 +369,6 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 			return;
 		}
-	}
-
-	bool allowed = true;
-	g_OnShouldAllowVoicePacket(clientIndex, allowed);
-	if (!allowed) {
-		return;
 	}
 
 	int16_t rawSamples[MAX_DECOMPRESSED_VOICEPACKET_SAMPLES];

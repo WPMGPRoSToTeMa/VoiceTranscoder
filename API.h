@@ -53,23 +53,20 @@ class VoiceTranscoderAPI : public IVoiceTranscoderAPI {
 public:
 	virtual ~VoiceTranscoderAPI() {}
 
-	virtual size_t MajorVersion() override final;
-	virtual size_t MinorVersion() override final;
+	size_t MajorVersion() override final;
+	size_t MinorVersion() override final;
 
-	virtual bool IsClientSpeaking(size_t clientIndex) override final;
+	bool IsClientSpeaking(size_t clientIndex) override final;
 
-	virtual IEvent<size_t>& OnClientStartSpeak() override final;
-	virtual IEvent<size_t>& OnClientStopSpeak() override final;
+	IEvent<size_t>& OnClientStartSpeak() override final;
+	IEvent<size_t>& OnClientStopSpeak() override final;
 
-	virtual void MuteClient(size_t clientIndex) override final;
-	virtual void UnmuteClient(size_t clientIndex) override final;
-	virtual bool IsClientMuted(size_t clientIndex) override final;
-
-	virtual IEvent<size_t, bool&>& OnShouldAllowVoicePacket() override final;
+	void MuteClient(size_t clientIndex) override final;
+	void UnmuteClient(size_t clientIndex) override final;
+	bool IsClientMuted(size_t clientIndex) override final;
 };
 
 extern Event<size_t> g_OnClientStartSpeak;
 extern Event<size_t> g_OnClientStopSpeak;
-extern Event<size_t, bool&> g_OnShouldAllowVoicePacket;
 
 extern VoiceTranscoderAPI g_voiceTranscoderAPI;

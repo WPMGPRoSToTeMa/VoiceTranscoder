@@ -6,7 +6,6 @@
 
 Event<size_t> g_OnClientStartSpeak;
 Event<size_t> g_OnClientStopSpeak;
-Event<size_t, bool&> g_OnShouldAllowVoicePacket;
 
 VoiceTranscoderAPI g_voiceTranscoderAPI;
 
@@ -61,8 +60,4 @@ bool VoiceTranscoderAPI::IsClientMuted(size_t clientIndex) {
 	}
 
 	return g_clientData[clientIndex - 1].m_isMuted;
-}
-
-IEvent<size_t, bool &> &VoiceTranscoderAPI::OnShouldAllowVoicePacket() {
-	return g_OnShouldAllowVoicePacket;
 }

@@ -8,17 +8,17 @@ copy invoker\linux\*.so Publish\addons\VoiceTranscoder\
 copy invoker\win32\*.dll Publish\addons\VoiceTranscoder\
 copy *.cfg Publish\addons\VoiceTranscoder\
 
-for /F "eol=/ tokens=3,4*" %%i in (Main.h) do (
-	if "%%i" == "PLUGIN_VERSION[]" (
-		set pluginVersion=%%k
-		set pluginVersion=!pluginVersion:"=!
-		set pluginVersion=!pluginVersion:;=!
-		set pluginVersion=!pluginVersion: =_!
+for /F "eol=/ tokens=3,5* delims=;[]	 " %%i in (VoiceTranscoderAPI.h) do (
+	if "%%i" == "VOICETRANSCODER_VERSION" (
+		set version=%%~j %%k
+		set version=!version:;=!
+		set version=!version:"=!
+		set version=!version: =_!
 	)
 )
 
 cd Publish
-!zip! ..\Invoker\VoiceTranscoder_!pluginVersion!.zip addons
+!zip! ..\Invoker\VoiceTranscoder_!version!.zip addons
 cd ..
 
 for /F "eol=/ tokens=3,5 delims=;	 " %%i in (VoiceTranscoderAPI.h) do (

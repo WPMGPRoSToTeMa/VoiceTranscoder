@@ -168,6 +168,8 @@ void OnClientDisconnected(edict_t *pClient) {
 
 		g_OnClientStopSpeak(playerSlot);
 	}
+
+	RETURN_META(MRES_IGNORED);
 }
 
 void OnServerActivated(edict_t *pEdictList, int nEdictCount, int nClientMax) {

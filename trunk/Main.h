@@ -4,6 +4,12 @@
 #include "VoiceCodec_SILK.h"
 #include <EngineUTIL.h>
 #include <rehlds_api.h>
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
 #include <vector>
 #include <memory>
 

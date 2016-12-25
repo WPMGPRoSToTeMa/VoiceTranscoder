@@ -79,9 +79,9 @@ client_t *GetFirstClientPtr() {
 	return (AnyPointer)((size_t)GET_INFOKEYBUFFER(INDEXENT(1)) - offsetof(client_t, m_szUserInfo));
 }
 
-size_t EngineUTIL::GetClientIndex(client_t *pClient) {
+size_t EngineUTIL::GetClientIndex(const client_t *pClient) {
 	if (g_isUsingRehldsAPI) {
-		return g_pRehldsAPI->GetServerStatic()->GetIndexOfClient_t(pClient) + 1;
+		return g_pRehldsAPI->GetServerStatic()->GetIndexOfClient_t((client_t *)pClient) + 1;
 	}
 	return ((size_t)pClient - (size_t)GetFirstClientPtr()) / GetSizeOfClientStruct() + 1;
 }

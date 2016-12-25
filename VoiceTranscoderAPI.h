@@ -33,4 +33,6 @@ public:
 	virtual void MuteClient(size_t clientIndex) = 0;
 	virtual void UnmuteClient(size_t clientIndex) = 0;
 	virtual bool IsClientMuted(size_t clientIndex) = 0;
+
+	virtual void PlaySound(size_t receiverClientIndex, const char *soundFilePath) = 0;
 };

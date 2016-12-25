@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Main.h"
 #include <extdll.h>
 #include <meta_api.h>
@@ -14,12 +15,22 @@
 #include <CRC32.h>
 #include <SteamID.h>
 #include "API.h"
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+#include <memory>
+#include <algorithm>
+#include <array>
 
 #if !defined(_WIN32) && !defined(__linux__)
 #error "Unknown platform"
 #endif
 
 // Variables
+std::vector<playSound_t> g_playSounds;
 clientData_t g_clientData[MAX_CLIENTS];
 char g_execConfigCmd[300];
 bool g_fThreadModeEnabled;
@@ -113,24 +124,24 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 
 // Entity API
 void OnClientCommandReceiving(edict_t *pClient) {
-	const char *pszCmd = CMD_ARGV(0);
+	auto command = CMD_ARGV(0);
 
-	int nClientIndex = ENTINDEX(pClient);
-	clientData_t *pClientData = &g_clientData[nClientIndex-1];
+	auto playerSlot = ENTINDEX(pClient);
+	auto &clientData = g_clientData[playerSlot-1];
 
-	if (FStrEq(pszCmd, "VTC_CheckStart")) {
-		pClientData->m_isChecking = true;
-		pClientData->m_hasNewCodec = false;
-		pClientData->m_isVguiRunScriptReceived = false;
-	} else if (pClientData->m_isChecking) {
-		if (FStrEq(pszCmd, "vgui_runscript")) {
-			pClientData->m_isVguiRunScriptReceived = true;
-		} else if (FStrEq(pszCmd, "VTC_CheckEnd")) {
-			pClientData->m_isChecking = false;
-			pClientData->m_hasNewCodec = pClientData->m_isVguiRunScriptReceived ? true : false;
-			pClientData->m_isVguiRunScriptReceived = false;
+	if (FStrEq(command, "VTC_CheckStart")) {
+		clientData.m_isChecking = true;
+		clientData.m_hasNewCodec = false;
+		clientData.m_isVguiRunScriptReceived = false;
+	} else if (clientData.m_isChecking) {
+		if (FStrEq(command, "vgui_runscript")) {
+			clientData.m_isVguiRunScriptReceived = true;
+		} else if (FStrEq(command, "VTC_CheckEnd")) {
+			clientData.m_isChecking = false;
+			clientData.m_hasNewCodec = clientData.m_isVguiRunScriptReceived ? true : false;
+			clientData.m_isVguiRunScriptReceived = false;
 
-			LOG_MESSAGE(PLID, "Client %s with %s codec connected", STRING(pClient->v.netname), pClientData->m_hasNewCodec ? "new" : "old");
+			LOG_MESSAGE(PLID, "Client %s with %s codec connected", STRING(pClient->v.netname), clientData.m_hasNewCodec ? "new" : "old");
 		}
 	}
 
@@ -139,22 +150,22 @@ void OnClientCommandReceiving(edict_t *pClient) {
 
 // TODO: bool32_t
 qboolean OnClientConnected(edict_t *pClient, const char *pszName, const char *pszAddress, char *pszRejectReason) {
-	int nClientIndex = ENTINDEX(pClient);
-	clientData_t *pClientData = &g_clientData[nClientIndex-1];
+	int playerSlot = ENTINDEX(pClient);
+	auto &clientData = g_clientData[playerSlot-1];
 
 	// Default client codec
 	if (FStrEq(GETPLAYERAUTHID(pClient), "HLTV")) {
-		pClientData->m_hasNewCodec = FStrEq(g_pcvarHltvCodec->string, "old") ? false : true;
+		clientData.m_hasNewCodec = FStrEq(g_pcvarHltvCodec->string, "old") ? false : true;
 		// Add print?
 	} else {
-		pClientData->m_hasNewCodec = FStrEq(g_pcvarDefaultCodec->string, "old") ? false : true;
+		clientData.m_hasNewCodec = FStrEq(g_pcvarDefaultCodec->string, "old") ? false : true;
 	}
-	pClientData->m_isChecking = false;
-	pClientData->m_nextPacketTimeMicroSeconds = 0;
-	pClientData->m_isSpeaking = false;
-	pClientData->m_isMuted = false;
-	pClientData->m_pNewCodec->ResetState();
-	pClientData->m_pOldCodec->ResetState();
+	clientData.m_isChecking = false;
+	clientData.m_nextPacketTimeMicroSeconds = 0;
+	clientData.m_isSpeaking = false;
+	clientData.m_isMuted = false;
+	clientData.m_pNewCodec->ResetState();
+	clientData.m_pOldCodec->ResetState();
 
 	RETURN_META_VALUE(MRES_IGNORED, META_RESULT_ORIG_RET(bool32_t));
 }
@@ -169,10 +180,20 @@ void OnClientDisconnected(edict_t *pClient) {
 		g_OnClientStopSpeak(playerSlot);
 	}
 
+	// TODO: delete with swap in for-loop
+	g_playSounds.erase(
+		std::remove_if(
+			g_playSounds.begin(),
+			g_playSounds.end(),
+			[client = EngineUTIL::GetClientByIndex(playerSlot)](const playSound_t &playSound) { return playSound.receiver == client; }),
+		g_playSounds.end());
+
 	RETURN_META(MRES_IGNORED);
 }
 
 void OnServerActivated(edict_t *pEdictList, int nEdictCount, int nClientMax) {
+	g_playSounds.clear();
+
 	// It is bad because it sends to hltv
 	MESSAGE_BEGIN(MSG_INIT, SVC_STUFFTEXT);
 	WRITE_STRING("VTC_CheckStart\n");
@@ -197,6 +218,43 @@ void OnServerActivated(edict_t *pEdictList, int nEdictCount, int nClientMax) {
 	RETURN_META(MRES_IGNORED);
 }
 
+auto FullyConnectedClients() {
+	class {
+		class Iterator {
+			size_t _clientIndex;
+		public:
+			Iterator(size_t clientIndex) : _clientIndex(clientIndex) {
+				CheckAndMakeValid();
+			}
+
+			void CheckAndMakeValid() {
+				while (_clientIndex != MAX_CLIENTS && !operator*().m_fZombie) {
+					_clientIndex++;
+				}
+			}
+
+			bool operator!=(const Iterator &other) const {
+				return _clientIndex != other._clientIndex;
+			}
+			void operator++() {
+				_clientIndex++;
+				CheckAndMakeValid();
+			}
+			const client_t &operator*() const {
+				return *EngineUTIL::GetClientByIndex(_clientIndex + 1);
+			}
+		};
+	public:
+		auto begin() const {
+			return Iterator(0);
+		}
+		auto end() const {
+			return Iterator(MAX_CLIENTS);
+		}
+	} enumerator;
+	return enumerator;
+}
+
 void OnFrameStarted() {
 	if ((size_t)CVAR_GET_FLOAT("sv_voicequality") != g_oldVoiceQuality) {
 		VTC_UpdateCodecs();
@@ -214,20 +272,108 @@ void OnFrameStarted() {
 		VTC_ThreadVoiceFlusher();
 	}
 
-	for (size_t i = 0; i < gpGlobals->maxClients; i++) {
-		client_t *pClient = EngineUTIL::GetClientByIndex(i + 1);
-		if (!pClient->m_fActive) {
-			continue;
-		}
+	for (const auto &client : FullyConnectedClients()) {
+		auto clientIndex = EngineUTIL::GetClientIndex(&client) - 1;
 
-		clientData_t *pClientData = &g_clientData[i];
+		//LOG_MESSAGE(PLID, "%d", clientIndex);
+
+		clientData_t &clientData = g_clientData[clientIndex];
 		uint64_t currentTimeMicroSeconds = GetCurrentTimeInMicroSeconds();
-		if (pClientData->m_isSpeaking && currentTimeMicroSeconds >= pClientData->m_nextPacketTimeMicroSeconds) {
-			pClientData->m_isSpeaking = false;
+		if (clientData.m_isSpeaking && currentTimeMicroSeconds >= clientData.m_nextPacketTimeMicroSeconds) {
+			clientData.m_isSpeaking = false;
 
-			g_OnClientStopSpeak(i+1);
+			g_OnClientStopSpeak(clientIndex + 1);
 		}
 	}
+
+	for (auto &playSound : g_playSounds) {
+		if (gpGlobals->time < playSound.nextTime)
+			continue;
+
+		int16_t *samplesSlice8k = &playSound.samples8k[playSound.currentSample];
+		int16_t *samplesSlice16k = &playSound.samples16k[playSound.currentSample * 2];
+		size_t sampleCount = std::min(playSound.samples8k.size() - playSound.currentSample, (size_t)160);
+		playSound.currentSample += sampleCount;
+		playSound.nextTime += 0.02;
+
+		if (sampleCount != 0) {
+			std::array<byte, 1024> oldEncodedData;
+			size_t oldEncodedDataSize;
+			{
+				std::array<int16_t, 160> samples;
+				memcpy(samples.data(), samplesSlice8k, sampleCount * sizeof(samplesSlice8k[0]));
+				memset(&samples.data()[sampleCount], 0, (samples.size() - sampleCount) * sizeof(decltype(samples)::value_type));
+
+				oldEncodedDataSize = playSound.oldCodec->Encode(samples.data(), samples.size(), oldEncodedData.data(), oldEncodedData.size());
+			}
+			std::array<byte, 1024> newEncodedData;
+			size_t newEncodedDataSize;
+			{
+				std::array<int16_t, 320> samples;
+				memcpy(samples.data(), samplesSlice16k, sampleCount * 2 * sizeof(samplesSlice16k[0]));
+				memset(&samples.data()[sampleCount * 2], 0, (samples.size() - sampleCount * 2) * sizeof(decltype(samples)::value_type));
+
+				newEncodedDataSize = playSound.newCodec->Encode(samples.data(), samples.size(), &newEncodedData.data()[14], newEncodedData.size() - 18);
+			}
+
+			SteamID steamid;
+			steamid.SetUniverse(UNIVERSE_PUBLIC);
+			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
+			steamid.SetAccountId(0xFFFFFFFF);
+			*(uint64_t *)newEncodedData.data() = steamid.ToUInt64();
+			*(uint8_t *)&newEncodedData.data()[8] = VPC_SETSAMPLERATE;
+			*(uint16_t *)&newEncodedData.data()[9] = 8000;
+			*(uint8_t *)&newEncodedData.data()[11] = VPC_VDATA_SILK;
+			*(uint16_t *)&newEncodedData.data()[12] = (uint16_t)newEncodedDataSize;
+
+			CRC32 checksum;
+			checksum.Init();
+			checksum.Update(newEncodedData.data(), newEncodedDataSize + 14);
+			checksum.Final();
+
+			*(uint32_t *)&newEncodedData.data()[14 + newEncodedDataSize] = checksum.ToUInt32();
+
+			newEncodedDataSize += 18;
+
+			for (size_t i = 0; i < gpGlobals->maxClients; i++) {
+				client_t *pDestClient = EngineUTIL::GetClientByIndex(i + 1);
+
+				if (!pDestClient->m_fZombie) {
+					continue;
+				}
+				if (!(pDestClient->m_fHltv && g_pcvarForceSendHLTV->value != 0)) {
+					if (playSound.receiver != nullptr && playSound.receiver != pDestClient) {
+						continue;
+					}
+				}
+
+				void *buf;
+				size_t byteCount;
+				if (g_clientData[i].m_hasNewCodec) {
+					buf = newEncodedData.data();
+					byteCount = newEncodedDataSize;
+				} else {
+					buf = oldEncodedData.data();
+					byteCount = oldEncodedDataSize;
+				}
+
+				if (EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) {
+					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, SVC_VOICEDATA);
+					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, MAX_CLIENTS);
+					EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);
+					EngineUTIL::MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, buf, byteCount);
+				}
+			}
+		}
+	}
+
+	// TODO: delete with swap in for-loop
+	g_playSounds.erase(
+		std::remove_if(
+			g_playSounds.begin(),
+			g_playSounds.end(),
+			[](const playSound_t &playSound) { return playSound.currentSample == playSound.samples8k.size(); }),
+		g_playSounds.end());
 
 	RETURN_META(MRES_IGNORED);
 }
@@ -357,7 +503,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	if (g_pcvarVoiceEnable->value == 0.0f) {
 		return;
 	}
-	if (!pClient->m_fActive) {
+	if (!pClient->m_fZombie) {
 		return;
 	}
 
@@ -526,7 +672,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		if (pDestClient == pClient) {
 			continue;
 		} else {
-			if (!pDestClient->m_fActive) {
+			if (!pDestClient->m_fZombie) {
 				continue;
 			}
 			if (!pDestClient->m_fHltv || g_pcvarForceSendHLTV->value == 0) {
@@ -602,7 +748,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 				continue;
 			}
 		} else {
-			if (!pDestClient->m_fActive) {
+			if (!pDestClient->m_fZombie) {
 				continue;
 			}
 			if (!pDestClient->m_fHltv || g_pcvarForceSendHLTV->value == 0) {
@@ -679,7 +825,7 @@ void VTC_InitCvars(void) {
 	}
 	g_pcvarVoiceEnable = CVAR_GET_POINTER("sv_voiceenable");
 
-	if (CVAR_GET_POINTER("sv_voicequality") == nullptr) {
+	if (CVAR_GET_POINTER("sv_voicecodec") == nullptr) {
 		CVAR_REGISTER(&g_cvarVoiceQuality);
 
 		g_isUnregisteredVoiceCvars = true;

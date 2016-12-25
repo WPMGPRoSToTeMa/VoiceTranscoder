@@ -10,13 +10,11 @@ const size_t SVC_VOICEDATA = 53;
 
 const size_t CLC_VOICEDATA = 8;
 
-const size_t MAX_CLIENTS = 32;
-
 namespace EngineUTIL {
 	void Init(Module &engineModule);
 	bool IsReHLDS();
 	IRehldsApi *GetRehldsAPI();
-	size_t GetClientIndex(client_t *pClient);
+	size_t GetClientIndex(const client_t *pClient);
 	client_t *GetClientByIndex(size_t clientIndex);
 	void DropClient(client_t *client, bool breakConnection, const char *reasonFormat, ...);
 	uint16_t MSG_ReadUInt16();

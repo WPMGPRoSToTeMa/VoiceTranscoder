@@ -4,6 +4,14 @@
 #include "VoiceCodec_SILK.h"
 #include <EngineUTIL.h>
 #include <rehlds_api.h>
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
+#include <vector>
+#include <memory>
 
 // Structs and classes
 struct clientData_t {
@@ -15,6 +23,17 @@ struct clientData_t {
 	uint64_t m_nextPacketTimeMicroSeconds;
 	VoiceCodec_SILK *m_pNewCodec;
 	VoiceCodec_Speex *m_pOldCodec;
+};
+
+// TODO: samples16k
+struct playSound_t {
+	std::vector<int16_t> samples8k;
+	std::vector<int16_t> samples16k;
+	size_t currentSample;
+	client_t *receiver;
+	float nextTime;
+	std::unique_ptr<VoiceCodec_Speex> oldCodec;
+	std::unique_ptr<VoiceCodec_SILK> newCodec;
 };
 
 // VoicePacketCommand
@@ -38,6 +57,7 @@ const size_t NEWCODEC_WANTED_SAMPLERATE = 16000;
 const uint64_t SPEAKING_TIMEOUT = 200000;
 
 // Externs
+extern std::vector<playSound_t> g_playSounds;
 extern clientData_t g_clientData[MAX_CLIENTS];
 
 extern cvar_t *g_pcvarForceSendHLTV;

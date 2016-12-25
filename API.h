@@ -64,6 +64,7 @@ public:
 	void MuteClient(size_t clientIndex) override final;
 	void UnmuteClient(size_t clientIndex) override final;
 	bool IsClientMuted(size_t clientIndex) override final;
+	void PlaySound(size_t receiverClientIndex, const char *soundFilePath) override final;
 };
 
 extern Event<size_t> g_OnClientStartSpeak;

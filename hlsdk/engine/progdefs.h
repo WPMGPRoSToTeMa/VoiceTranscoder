@@ -46,7 +46,7 @@ typedef struct globalvars_s
 	int			trace_flags;
 	int			msg_entity;
 	int			cdAudioTrack;
-	size_t		maxClients;
+	int			maxClients;
 	int			maxEntities;
 	const char	*pStringBase;
 

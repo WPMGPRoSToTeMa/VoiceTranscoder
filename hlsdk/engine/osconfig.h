@@ -51,6 +51,7 @@
 	#include <windows.h>
 	#include <winsock.h>
 	#include <wsipx.h> // for support IPX
+	#define PSAPI_VERSION 1
 	#include <psapi.h>
 	#include <nmmintrin.h>
 	#include <fcntl.h>
@@ -78,7 +79,6 @@
 	#include <sys/types.h>
 	#include <sys/sysinfo.h>
 	#include <unistd.h>
-	#include <cpuid.h>
 
 	// Deail with stupid macro in kernel.h
 	#undef __FUNCTION__
@@ -103,6 +103,8 @@
 	#define HIDDEN
 	#define NOINLINE __declspec(noinline)
 	#define ALIGN16 __declspec(align(16))
+	#define NORETURN __declspec(noreturn)
+	#define FORCE_STACK_ALIGN
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctlsocket(s, FIONBIO, (u_long*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctlsocket(s, FIONREAD, (u_long*)&r); }
@@ -117,7 +119,16 @@
 	inline void* sys_allocmem(unsigned int size) {
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
 	}
+
+	inline void sys_freemem(void* ptr, unsigned int size) {
+		VirtualFree(ptr, 0, MEM_RELEASE);
+	}
 #else // _WIN32
+	#ifdef __FUNCTION__
+		#undef __FUNCTION__
+	#endif
+	#define __FUNCTION__ __func__
+
 	#ifndef PAGESIZE
 		#define PAGESIZE 4096
 	#endif
@@ -138,6 +149,8 @@
 	#define HIDDEN __attribute__((visibility("hidden")))
 	#define NOINLINE __attribute__((noinline))
 	#define ALIGN16 __attribute__((aligned(16)))
+	#define NORETURN __attribute__((noreturn))
+	#define FORCE_STACK_ALIGN __attribute__((force_align_arg_pointer))
 
 	//inline bool SOCKET_FIONBIO(SOCKET s, int m) { return (ioctl(s, FIONBIO, (int*)&m) == 0); }
 	//inline int SOCKET_MSGLEN(SOCKET s, u_long& r) { return ioctl(s, FIONREAD, (int*)&r); }
@@ -154,10 +167,11 @@
 	inline void* sys_allocmem(unsigned int size) {
 		return mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	}
+	inline void sys_freemem(void* ptr, unsigned int size) {
+		munmap(ptr, size);
+	}
 
 	#define WSAENOPROTOOPT ENOPROTOOPT
-
-	inline unsigned long _byteswap_ulong(unsigned long val) { return _bswap(val); }
 
 	#ifndef FALSE
 	#define FALSE	0
@@ -175,6 +189,6 @@
 	static const bool __isLinux = true;
 #endif
 
-extern void rehlds_syserror(const char* fmt, ...);
+#define EXT_FUNC FORCE_STACK_ALIGN
 
 #endif // _OSCONFIG_H

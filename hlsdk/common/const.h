@@ -19,6 +19,18 @@
 #pragma once
 #endif
 
+// Max # of clients allowed in a server.
+#define MAX_CLIENTS				32
+
+// How many bits to use to encode an edict.
+#define MAX_EDICT_BITS				11			// # of bits needed to represent max edicts
+// Max # of edicts in a level (2048)
+#define MAX_EDICTS					(1<<MAX_EDICT_BITS)
+
+// How many data slots to use when in multiplayer (must be power of 2)
+#define MULTIPLAYER_BACKUP			64
+// Same for single player
+#define SINGLEPLAYER_BACKUP			8
 //
 // Constants shared by the engine and dlls
 // This header file included by engine files and DLL files.
@@ -59,6 +71,9 @@
 #define FL_KILLME				(1<<30)	// This entity is marked for death -- This allows the engine to kill ents at the appropriate time
 #define FL_DORMANT				(1<<31)	// Entity is dormant, no updates to client
 
+// SV_EmitSound2 flags
+#define SND_EMIT2_NOPAS			(1<<0)	// never to do check PAS
+#define SND_EMIT2_INVOKER		(1<<1)	// do not send to the client invoker
 
 // Engine edict->spawnflags
 #define SF_NOTINDEATHMATCH		0x0800	// Do not spawn when deathmatch and loading entities from a file

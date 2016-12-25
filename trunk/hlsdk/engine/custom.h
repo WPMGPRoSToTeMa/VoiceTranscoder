@@ -18,6 +18,7 @@
 #include "const.h"
 
 #define MAX_QPATH 64    // Must match value in quakedefs.h
+#define MAX_RESOURCE_LIST	1280
 
 /////////////////
 // Customization
@@ -32,6 +33,9 @@ typedef enum
 	t_generic,
 	t_eventscript,
 	t_world,		// Fake type for world, is really t_model
+	rt_unk,
+
+	rt_max
 } resourcetype_t;
 
 
@@ -42,7 +46,7 @@ typedef struct
 
 typedef struct resourceinfo_s
 {
-	_resourceinfo_t info[ 8 ];
+	_resourceinfo_t info[ rt_max ];
 } resourceinfo_t;
 
 #define RES_FATALIFMISSING (1<<0)   // Disconnect if we can't get this file.

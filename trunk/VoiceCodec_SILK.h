@@ -7,7 +7,6 @@ class VoiceCodec_SILK final : public VoiceCodec {
 public:
 	static const size_t MAX_INPUTFRAMES = 5;
 	static const size_t FRAMELENGTHMS = 20;
-	static const size_t MIN_SAMPLES = 8000 * FRAMELENGTHMS / 1000;
 
 	VoiceCodec_SILK(size_t quality);
 	virtual ~VoiceCodec_SILK() final;
@@ -22,4 +21,6 @@ private:
 	SKP_SILK_SDK_EncControlStruct m_encControl;
 	void *m_decState;
 	SKP_SILK_SDK_DecControlStruct m_decControl;
+	size_t m_minSamples;
+	size_t m_sampleRate;
 };

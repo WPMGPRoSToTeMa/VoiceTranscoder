@@ -15,6 +15,12 @@
 #include <CRC32.h>
 #include <SteamID.h>
 #include "API.h"
+#ifdef min
+#undef min
+#endif
+#ifdef max
+#undef max
+#endif
 #include <memory>
 #include <algorithm>
 #include <array>

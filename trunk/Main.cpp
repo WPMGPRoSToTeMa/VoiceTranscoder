@@ -228,7 +228,7 @@ auto FullyConnectedClients() {
 			}
 
 			void CheckAndMakeValid() {
-				while (_clientIndex != MAX_CLIENTS && !operator*().m_fZombie) {
+				while (_clientIndex != gpGlobals->maxClients && !operator*().m_fZombie) {
 					_clientIndex++;
 				}
 			}
@@ -249,7 +249,7 @@ auto FullyConnectedClients() {
 			return Iterator(0);
 		}
 		auto end() const {
-			return Iterator(MAX_CLIENTS);
+			return Iterator(gpGlobals->maxClients);
 		}
 	} enumerator;
 	return enumerator;

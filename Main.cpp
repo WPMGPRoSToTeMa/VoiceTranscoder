@@ -383,7 +383,7 @@ plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION, // ifvers
 	"VoiceTranscoder",      // name
 	VOICETRANSCODER_VERSION,         // version
-	"2016.01.15",           // date
+	"2016.12.26",           // date
 	"WPMG.PRoSToC0der",     // author
 	"http://vtc.wpmg.ru/",  // url
 	"VTC",                  // logtag, all caps please

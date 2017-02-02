@@ -2,10 +2,10 @@
 
 #include <cstddef>
 
-const char VOICETRANSCODER_VERSION[] = "2017 RC";
+const char VOICETRANSCODER_VERSION[] = "2017 RC2";
 
 const size_t VOICETRANSCODER_API_VERSION_MAJOR = 3;
-const size_t VOICETRANSCODER_API_VERSION_MINOR = 0;
+const size_t VOICETRANSCODER_API_VERSION_MINOR = 1;
 
 template <typename ...T_ARGS>
 class IEvent {
@@ -35,4 +35,8 @@ public:
 	virtual bool IsClientMuted(size_t clientIndex) = 0;
 
 	virtual void PlaySound(size_t receiverClientIndex, const char *soundFilePath) = 0;
+
+	virtual void BlockClient(size_t clientIndex) = 0;
+	virtual void UnblockClient(size_t clientIndex) = 0;
+	virtual bool IsClientBlocked(size_t clientIndex) = 0;
 };

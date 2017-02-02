@@ -133,15 +133,21 @@ void OnClientCommandReceiving(edict_t *pClient) {
 		clientData.m_isChecking = true;
 		clientData.m_hasNewCodec = false;
 		clientData.m_isVguiRunScriptReceived = false;
+
+		RETURN_META(MRES_SUPERCEDE);
 	} else if (clientData.m_isChecking) {
 		if (FStrEq(command, "vgui_runscript")) {
 			clientData.m_isVguiRunScriptReceived = true;
+
+			RETURN_META(MRES_SUPERCEDE);
 		} else if (FStrEq(command, "VTC_CheckEnd")) {
 			clientData.m_isChecking = false;
 			clientData.m_hasNewCodec = clientData.m_isVguiRunScriptReceived ? true : false;
 			clientData.m_isVguiRunScriptReceived = false;
 
 			LOG_MESSAGE(PLID, "Client %s with %s codec connected", STRING(pClient->v.netname), clientData.m_hasNewCodec ? "new" : "old");
+
+			RETURN_META(MRES_SUPERCEDE);
 		}
 	}
 
@@ -164,7 +170,9 @@ qboolean OnClientConnected(edict_t *pClient, const char *pszName, const char *ps
 	clientData.m_nextPacketTimeMicroSeconds = 0;
 	clientData.m_isSpeaking = false;
 	clientData.m_isMuted = false;
+	clientData.isBlocked = false;
 	clientData.m_pNewCodec->ResetState();
+	clientData.isSampleRateSet = false;
 	clientData.m_pOldCodec->ResetState();
 
 	RETURN_META_VALUE(MRES_IGNORED, META_RESULT_ORIG_RET(bool32_t));
@@ -380,15 +388,15 @@ void OnFrameStarted() {
 
 // MetaMod API
 plugin_info_t Plugin_info = {
-	META_INTERFACE_VERSION, // ifvers
-	"VoiceTranscoder",      // name
-	VOICETRANSCODER_VERSION,         // version
-	"2016.12.26",           // date
-	"WPMG.PRoSToC0der",     // author
-	"http://vtc.wpmg.ru/",  // url
-	"VTC",                  // logtag, all caps please
-	PT_ANYTIME,             // (when) loadable
-	PT_ANYTIME,             // (when) unloadable
+	META_INTERFACE_VERSION,  // ifvers
+	"VoiceTranscoder",       // name
+	VOICETRANSCODER_VERSION, // version
+	"2017.02.03",            // date
+	"WPMG.PRoSToC0der",      // author
+	"http://vtc.wpmg.ru/",   // url
+	"VTC",                   // logtag, all caps please
+	PT_ANYTIME,              // (when) loadable
+	PT_ANYTIME,              // (when) unloadable
 };
 
 meta_globals_t *gpMetaGlobals;
@@ -497,7 +505,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	uint8_t receivedBytes[MAX_VOICEPACKET_SIZE];
 	EngineUTIL::MSG_ReadBuf(receivedBytes, receivedBytesCount);
 
-	if (pClientData->m_isMuted) {
+	if (pClientData->isBlocked) {
 		return;
 	}
 	if (g_pcvarVoiceEnable->value == 0.0f) {
@@ -567,18 +575,26 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 			switch (vpc) {
 				case VPC_SETSAMPLERATE: {
-					uint16_t sampleRate = buf.ReadUInt16();
+					pClientData->sampleRate = buf.ReadUInt16();
+					pClientData->isSampleRateSet = true;
 
-					if (sampleRate != NEWCODEC_WANTED_SAMPLERATE) {
-						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u) from %s", sampleRate, NEWCODEC_WANTED_SAMPLERATE, pClient->m_szPlayerName);
-						EngineUTIL::DropClient(pClient, false, "Voice packet unwanted samplerate (cur = %u, want = %u)", sampleRate, NEWCODEC_WANTED_SAMPLERATE);
+					if (pClientData->sampleRate != NEWCODEC_WANTED_SAMPLERATE && pClientData->sampleRate != NEWCODEC_WANTED_SAMPLERATE2) {
+						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u or %u) from %s", pClientData->sampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2, pClient->m_szPlayerName);
+						EngineUTIL::DropClient(pClient, false, "Voice packet unwanted samplerate (cur = %u, want = %u or %u)", pClientData->sampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2);
 
 						return;
 					}
 				}
 				break;
 				case VPC_VDATA_SILENCE: {
-					size_t silenceSampleCount = buf.ReadUInt16();
+					if (!pClientData->isSampleRateSet) {
+						LOG_MESSAGE(PLID, "Received silence samples when samplerate is not received from %s", pClient->m_szPlayerName);
+						EngineUTIL::DropClient(pClient, false, "Received silence samples when samplerate is not received");
+
+						return;
+					}
+
+					size_t silenceSampleCount = buf.ReadUInt16() / (pClientData->sampleRate / 8000);
 
 					if (silenceSampleCount > ARRAYSIZE(rawSamples) - rawSampleCount) {
 						LOG_MESSAGE(PLID, "Too many silence samples (cur %u, max %u) from %s", rawSampleCount, ARRAYSIZE(rawSamples), pClient->m_szPlayerName);
@@ -663,6 +679,10 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 			g_OnClientStartSpeak(clientIndex);
 		}
+	}
+
+	if (pClientData->m_isMuted) {
+		return;
 	}
 
 	bool needTranscode = false;

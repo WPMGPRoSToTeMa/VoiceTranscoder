@@ -49,22 +49,27 @@ public:
 	};
 };
 
-class VoiceTranscoderAPI : public IVoiceTranscoderAPI {
+class VoiceTranscoderAPI final : public IVoiceTranscoderAPI {
 public:
 	virtual ~VoiceTranscoderAPI() {}
 
-	size_t MajorVersion() override final;
-	size_t MinorVersion() override final;
+	size_t MajorVersion() override;
+	size_t MinorVersion() override;
 
-	bool IsClientSpeaking(size_t clientIndex) override final;
+	bool IsClientSpeaking(size_t clientIndex) override;
 
-	IEvent<size_t>& OnClientStartSpeak() override final;
-	IEvent<size_t>& OnClientStopSpeak() override final;
+	IEvent<size_t>& OnClientStartSpeak() override;
+	IEvent<size_t>& OnClientStopSpeak() override;
 
-	void MuteClient(size_t clientIndex) override final;
-	void UnmuteClient(size_t clientIndex) override final;
-	bool IsClientMuted(size_t clientIndex) override final;
-	void PlaySound(size_t receiverClientIndex, const char *soundFilePath) override final;
+	void MuteClient(size_t clientIndex) override;
+	void UnmuteClient(size_t clientIndex) override;
+	bool IsClientMuted(size_t clientIndex) override;
+
+	void PlaySound(size_t receiverClientIndex, const char *soundFilePath) override;
+
+	void BlockClient(size_t clientIndex) override;
+	void UnblockClient(size_t clientIndex) override;
+	bool IsClientBlocked(size_t clientIndex) override;
 };
 
 extern Event<size_t> g_OnClientStartSpeak;

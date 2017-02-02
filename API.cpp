@@ -166,3 +166,27 @@ void VoiceTranscoderAPI::PlaySound(size_t receiverClientIndex, const char *sound
 
 	g_playSounds.push_back(std::move(playSound));
 }
+
+void VoiceTranscoderAPI::BlockClient(size_t clientIndex) {
+	if (clientIndex < 1 || clientIndex > gpGlobals->maxClients) {
+		return;
+	}
+
+	g_clientData[clientIndex - 1].isBlocked = true;
+}
+
+void VoiceTranscoderAPI::UnblockClient(size_t clientIndex) {
+	if (clientIndex < 1 || clientIndex > gpGlobals->maxClients) {
+		return;
+	}
+
+	g_clientData[clientIndex - 1].isBlocked = false;
+}
+
+bool VoiceTranscoderAPI::IsClientBlocked(size_t clientIndex) {
+	if (clientIndex < 1 || clientIndex > gpGlobals->maxClients) {
+		return false;
+	}
+
+	return g_clientData[clientIndex - 1].isBlocked;
+}

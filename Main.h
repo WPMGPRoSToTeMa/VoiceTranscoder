@@ -20,8 +20,11 @@ struct clientData_t {
 	bool m_isVguiRunScriptReceived;
 	bool m_isSpeaking;
 	bool m_isMuted;
+	bool isBlocked;
 	uint64_t m_nextPacketTimeMicroSeconds;
 	VoiceCodec_SILK *m_pNewCodec;
+	int sampleRate;
+	bool isSampleRateSet;
 	VoiceCodec_Speex *m_pOldCodec;
 };
 
@@ -54,6 +57,7 @@ const size_t MAX_DECOMPRESSED_VOICEPACKET_SAMPLES = 32768; // or 8192?
 const size_t MIN_VOICEPACKET_SIZE = sizeof(uint64_t) + sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint32_t);
 const char VTC_CONFIGNAME[] = "VoiceTranscoder.cfg";
 const size_t NEWCODEC_WANTED_SAMPLERATE = 16000;
+const size_t NEWCODEC_WANTED_SAMPLERATE2 = 24000;
 const uint64_t SPEAKING_TIMEOUT = 200000;
 
 // Externs

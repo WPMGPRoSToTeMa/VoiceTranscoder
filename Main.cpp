@@ -122,6 +122,34 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 	return TRUE;
 }
 
+template <typename ...TArgs>
+std::string Format(const char *format, TArgs&&... args) {
+	size_t neededSize = snprintf(nullptr, 0, format, args...) + 1;
+	auto formatted = std::make_unique<char[]>(neededSize);
+	snprintf(formatted.get(), neededSize, format, args...);
+	return {formatted.get(), neededSize - 1};
+}
+
+template <typename ...TArgs>
+void PrintToConsole(edict_t* client, const char *format, TArgs&&... args) {
+	CLIENT_PRINTF(client, print_console, (Format(format, args...) + '\n').c_str());
+}
+
+std::string MicrosecondsToString(uint64_t us) {
+	constexpr uint64_t microsecondsInSecond = 1e6;
+	constexpr uint64_t secondsInHour = 3600;
+	constexpr uint64_t microsecondsInHour = secondsInHour * microsecondsInSecond;
+	constexpr uint64_t secondsInMinute = 60;
+	constexpr uint64_t microsecondsInMinute = secondsInMinute * microsecondsInSecond;
+	auto hours = us / microsecondsInHour;
+	us %= microsecondsInHour;
+	auto minutes = us / microsecondsInMinute;
+	us %= microsecondsInMinute;
+	auto seconds = us / microsecondsInSecond;
+	us %= microsecondsInSecond;
+	return Format("%02i:%02i:%02i.%06i", (int)hours, (int)minutes, (int)seconds, (int)us);
+}
+
 // Entity API
 void OnClientCommandReceiving(edict_t *pClient) {
 	auto command = CMD_ARGV(0);
@@ -149,6 +177,15 @@ void OnClientCommandReceiving(edict_t *pClient) {
 
 			RETURN_META(MRES_SUPERCEDE);
 		}
+	}
+
+	if (FStrEq(command, "VTC_PrintTimings")) {
+		auto currentTime = GetCurrentTimeInMicroSeconds();
+		PrintToConsole(pClient, "Current time is %s", MicrosecondsToString(currentTime).c_str());
+		PrintToConsole(pClient, "Voice end time is %s", MicrosecondsToString(clientData.m_nextPacketTimeMicroSeconds).c_str());
+		PrintToConsole(pClient, "Difference is %s", MicrosecondsToString(currentTime > clientData.m_nextPacketTimeMicroSeconds ? 0 : (clientData.m_nextPacketTimeMicroSeconds - currentTime)).c_str());
+
+		RETURN_META(MRES_SUPERCEDE);
 	}
 
 	RETURN_META(MRES_IGNORED);
@@ -577,6 +614,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 				case VPC_SETSAMPLERATE: {
 					pClientData->sampleRate = buf.ReadUInt16();
 					pClientData->isSampleRateSet = true;
+					//LOG_MESSAGE(PLID, "%s %d", pClient->m_szPlayerName, pClientData->sampleRate);
 
 					if (pClientData->sampleRate != NEWCODEC_WANTED_SAMPLERATE && pClientData->sampleRate != NEWCODEC_WANTED_SAMPLERATE2) {
 						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u or %u) from %s", pClientData->sampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2, pClient->m_szPlayerName);
@@ -595,6 +633,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 					}
 
 					size_t silenceSampleCount = buf.ReadUInt16() / (pClientData->sampleRate / 8000);
+					//LOG_MESSAGE(PLID, "%s S %d", pClient->m_szPlayerName, silenceSampleCount);
 
 					if (silenceSampleCount > ARRAYSIZE(rawSamples) - rawSampleCount) {
 						LOG_MESSAGE(PLID, "Too many silence samples (cur %u, max %u) from %s", rawSampleCount, ARRAYSIZE(rawSamples), pClient->m_szPlayerName);

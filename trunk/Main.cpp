@@ -194,6 +194,7 @@ void OnClientCommandReceiving(edict_t *pClient) {
 		PrintToConsole(pClient, "Current time is %s", MicrosecondsToString(currentTime));
 		PrintToConsole(pClient, "Voice end time is %s", MicrosecondsToString(clientData.m_nextPacketTimeMicroSeconds));
 		PrintToConsole(pClient, "Difference is %s", MicrosecondsToString(currentTime > clientData.m_nextPacketTimeMicroSeconds ? 0 : (clientData.m_nextPacketTimeMicroSeconds - currentTime)));
+		PrintToConsole(pClient, "Current time by engine is %s", MicrosecondsToString((uint64_t)((double)g_engfuncs.pfnTime() * 1e6)));
 
 		RETURN_META(MRES_SUPERCEDE);
 	}

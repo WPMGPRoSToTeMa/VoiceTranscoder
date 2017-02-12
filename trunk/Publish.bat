@@ -8,9 +8,9 @@ copy invoker\linux\*.so Publish\addons\VoiceTranscoder\
 copy invoker\win32\*.dll Publish\addons\VoiceTranscoder\
 copy *.cfg Publish\addons\VoiceTranscoder\
 
-for /F "eol=/ tokens=3,5* delims=;[]	 " %%i in (VoiceTranscoderAPI.h) do (
+for /F "eol=/ tokens=3,4* delims=;[]	 " %%i in (VoiceTranscoderAPI.h) do (
 	if "%%i" == "VOICETRANSCODER_VERSION" (
-		set version=%%~j %%k
+		set version=%%k
 		set version=!version:;=!
 		set version=!version:"=!
 		set version=!version: =_!

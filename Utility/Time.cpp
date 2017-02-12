@@ -1,35 +1,16 @@
 #include "Time.h"
-#ifdef WIN32
-	#include <Windows.h>
-#else
-	#include <time.h>
-#endif
+#include <chrono>
 
 uint64_t GetCurrentTimeInMicroSeconds(void) {
+	using namespace std::chrono;
+
 	static bool isBaseSet = false;
-#ifdef __linux__
-	static uint64_t baseMicroSeconds = 0;
-	timespec timePoint;
-	clock_gettime(CLOCK_MONOTONIC, &timePoint);
+	static steady_clock::time_point base;
+
+	auto currentTimePoint = steady_clock::now();
 	if (!isBaseSet) {
-		baseMicroSeconds = (uint64_t)timePoint.tv_sec * 1000000 + (uint64_t)timePoint.tv_nsec / 1000;
+		base = currentTimePoint;
 		isBaseSet = true;
 	}
-
-	return (uint64_t)timePoint.tv_sec * 1000000 + (uint64_t)timePoint.tv_nsec / 1000 - baseMicroSeconds;
-#elif defined _WIN32
-	static LARGE_INTEGER tickFrequency;
-	static LARGE_INTEGER tickCountBase;
-	LARGE_INTEGER tickCount;
-
-	if (!isBaseSet) {
-		QueryPerformanceFrequency(&tickFrequency);
-		QueryPerformanceCounter(&tickCountBase);
-		isBaseSet = true;
-	}
-
-	QueryPerformanceCounter(&tickCount);
-
-	return (tickCount.QuadPart - tickCountBase.QuadPart) * 1000000 / tickFrequency.QuadPart;
-#endif
+	return duration_cast<microseconds>(currentTimePoint - base).count();
 }

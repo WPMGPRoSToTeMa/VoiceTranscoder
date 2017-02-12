@@ -6,23 +6,26 @@
 #endif
 
 uint64_t GetCurrentTimeInMicroSeconds(void) {
+	static bool isBaseSet = false;
 #ifdef __linux__
 	static uint64_t baseMicroSeconds = 0;
-	timeval tv;
-	gettimeofday(&tv, NULL);
-	if (!baseMicroSeconds) {
-		baseMicroSeconds = (uint64_t)tv.tv_sec * 1000000 + (uint64_t)tv.tv_usec;
+	timespec timePoint;
+	clock_gettime(CLOCK_MONOTONIC, &timePoint);
+	if (!isBaseSet) {
+		baseMicroSeconds = (uint64_t)timePoint.tv_sec * 1000000 + (uint64_t)timePoint.tv_nsec / 1000;
+		isBaseSet = true;
 	}
 
-	return (uint64_t)tv.tv_sec * 1000000 + (uint64_t)tv.tv_usec - baseMicroSeconds;
+	return (uint64_t)timePoint.tv_sec * 1000000 + (uint64_t)timePoint.tv_nsec / 1000 - baseMicroSeconds;
 #elif defined _WIN32
 	static LARGE_INTEGER tickFrequency;
 	static LARGE_INTEGER tickCountBase;
 	LARGE_INTEGER tickCount;
 
-	if (!tickFrequency.QuadPart) {
+	if (!isBaseSet) {
 		QueryPerformanceFrequency(&tickFrequency);
 		QueryPerformanceCounter(&tickCountBase);
+		isBaseSet = true;
 	}
 
 	QueryPerformanceCounter(&tickCount);

@@ -122,11 +122,21 @@ C_DLLEXPORT int GetEntityAPI2_Post(DLL_FUNCTIONS *pFunctionTable, int *interface
 	return TRUE;
 }
 
+template <typename T, typename = std::enable_if_t<!std::is_same<std::remove_reference_t<T>, std::string>::value>>
+T NormalizeArg(T&& value) {
+	return value;
+}
+
+template <typename T, typename = std::enable_if_t<std::is_same<std::remove_reference_t<T>, std::string>::value>>
+const char *NormalizeArg(T &&value) {
+	return value.c_str();
+}
+
 template <typename ...TArgs>
 std::string Format(const char *format, TArgs&&... args) {
-	size_t neededSize = snprintf(nullptr, 0, format, args...) + 1;
+	size_t neededSize = snprintf(nullptr, 0, format, NormalizeArg(args)...) + 1;
 	auto formatted = std::make_unique<char[]>(neededSize);
-	snprintf(formatted.get(), neededSize, format, args...);
+	snprintf(formatted.get(), neededSize, format, NormalizeArg(args)...);
 	return {formatted.get(), neededSize - 1};
 }
 
@@ -181,9 +191,9 @@ void OnClientCommandReceiving(edict_t *pClient) {
 
 	if (FStrEq(command, "VTC_PrintTimings")) {
 		auto currentTime = GetCurrentTimeInMicroSeconds();
-		PrintToConsole(pClient, "Current time is %s", MicrosecondsToString(currentTime).c_str());
-		PrintToConsole(pClient, "Voice end time is %s", MicrosecondsToString(clientData.m_nextPacketTimeMicroSeconds).c_str());
-		PrintToConsole(pClient, "Difference is %s", MicrosecondsToString(currentTime > clientData.m_nextPacketTimeMicroSeconds ? 0 : (clientData.m_nextPacketTimeMicroSeconds - currentTime)).c_str());
+		PrintToConsole(pClient, "Current time is %s", MicrosecondsToString(currentTime));
+		PrintToConsole(pClient, "Voice end time is %s", MicrosecondsToString(clientData.m_nextPacketTimeMicroSeconds));
+		PrintToConsole(pClient, "Difference is %s", MicrosecondsToString(currentTime > clientData.m_nextPacketTimeMicroSeconds ? 0 : (clientData.m_nextPacketTimeMicroSeconds - currentTime)));
 
 		RETURN_META(MRES_SUPERCEDE);
 	}
@@ -428,7 +438,7 @@ plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,  // ifvers
 	"VoiceTranscoder",       // name
 	VOICETRANSCODER_VERSION, // version
-	"2017.02.03",            // date
+	"2017.02.12",            // date
 	"WPMG.PRoSToC0der",      // author
 	"http://vtc.wpmg.ru/",   // url
 	"VTC",                   // logtag, all caps please

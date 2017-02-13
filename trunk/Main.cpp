@@ -24,6 +24,7 @@
 #include <memory>
 #include <algorithm>
 #include <array>
+#include <cinttypes>
 
 #if !defined(_WIN32) && !defined(__linux__)
 #error "Unknown platform"
@@ -195,6 +196,13 @@ void OnClientCommandReceiving(edict_t *pClient) {
 		PrintToConsole(pClient, "Voice end time is %s", MicrosecondsToString(clientData.m_nextPacketTimeMicroSeconds));
 		PrintToConsole(pClient, "Difference is %s", MicrosecondsToString(currentTime > clientData.m_nextPacketTimeMicroSeconds ? 0 : (clientData.m_nextPacketTimeMicroSeconds - currentTime)));
 		PrintToConsole(pClient, "Current time by engine is %s", MicrosecondsToString((uint64_t)((double)g_engfuncs.pfnTime() * 1e6)));
+
+#ifdef _WIN32
+		LARGE_INTEGER tickCount, tickFreq;
+		QueryPerformanceCounter(&tickCount);
+		QueryPerformanceFrequency(&tickFreq);
+		PrintToConsole(pClient, "Time from PC start %" PRIi64 " %" PRIi64 " %" PRIi64, tickCount.QuadPart, tickFreq.QuadPart, tickCount.QuadPart / tickFreq.QuadPart);
+#endif
 
 		RETURN_META(MRES_SUPERCEDE);
 	}
@@ -636,14 +644,16 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 				}
 				break;
 				case VPC_VDATA_SILENCE: {
-					if (!pClientData->isSampleRateSet) {
-						LOG_MESSAGE(PLID, "Received silence samples when samplerate is not received from %s", pClient->m_szPlayerName);
-						EngineUTIL::DropClient(pClient, false, "Received silence samples when samplerate is not received");
+					size_t silenceSampleCount = buf.ReadUInt16();
 
-						return;
+					if (!pClientData->isSampleRateSet) {
+						//LOG_MESSAGE(PLID, "Received silence samples when samplerate is not received from %s", pClient->m_szPlayerName);
+						//EngineUTIL::DropClient(pClient, false, "Received silence samples when samplerate is not received");
+
+						break;
 					}
 
-					size_t silenceSampleCount = buf.ReadUInt16() / (pClientData->sampleRate / 8000);
+					silenceSampleCount /= (pClientData->sampleRate / 8000);
 					//LOG_MESSAGE(PLID, "%s S %d", pClient->m_szPlayerName, silenceSampleCount);
 
 					if (silenceSampleCount > ARRAYSIZE(rawSamples) - rawSampleCount) {

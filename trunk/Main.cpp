@@ -322,12 +322,12 @@ auto FullyConnectedClients() {
 	return enumerator;
 }
 
+using namespace std::chrono;
+
+bool isBaseSet = false;
+steady_clock::time_point base;
+
 uint64_t GetCurrentTimeInMicroSeconds(void) {
-	using namespace std::chrono;
-
-	static bool isBaseSet = false;
-	static steady_clock::time_point base;
-
 	auto currentTimePoint = steady_clock::now();
 	if (!isBaseSet) {
 		base = currentTimePoint;

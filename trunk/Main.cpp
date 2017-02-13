@@ -158,7 +158,7 @@ std::string MicrosecondsToString(uint64_t us) {
 	us %= microsecondsInMinute;
 	auto seconds = us / microsecondsInSecond;
 	us %= microsecondsInSecond;
-	return Format("%02i:%02i:%02i.%06i", (int)hours, (int)minutes, (int)seconds, (int)us);
+	return Format("%02" PRIi64 ":%02i:%02i.%06i", hours, (int)minutes, (int)seconds, (int)us);
 }
 
 // Entity API
@@ -201,8 +201,10 @@ void OnClientCommandReceiving(edict_t *pClient) {
 		LARGE_INTEGER tickCount, tickFreq;
 		QueryPerformanceCounter(&tickCount);
 		QueryPerformanceFrequency(&tickFreq);
-		PrintToConsole(pClient, "Time from PC start %" PRIi64 " %" PRIi64 " %" PRIi64, tickCount.QuadPart, tickFreq.QuadPart, tickCount.QuadPart / tickFreq.QuadPart);
+		PrintToConsole(pClient, "Time from PC start %" PRIi64 " %" PRIi64 " %s", tickCount.QuadPart, tickFreq.QuadPart, MicrosecondsToString(tickCount.QuadPart / tickFreq.QuadPart * int64_t(1e6) + tickCount.QuadPart % tickFreq.QuadPart * int64_t(1e6) / tickFreq.QuadPart));
 #endif
+
+		PrintToConsole(pClient, "Raw values %" PRIX64 " %" PRIX64, currentTime, clientData.m_nextPacketTimeMicroSeconds);
 
 		RETURN_META(MRES_SUPERCEDE);
 	}

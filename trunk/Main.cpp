@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <array>
 #include <cinttypes>
+#include <chrono>
 
 #if !defined(_WIN32) && !defined(__linux__)
 #error "Unknown platform"
@@ -319,6 +320,20 @@ auto FullyConnectedClients() {
 		}
 	} enumerator;
 	return enumerator;
+}
+
+uint64_t GetCurrentTimeInMicroSeconds(void) {
+	using namespace std::chrono;
+
+	static bool isBaseSet = false;
+	static steady_clock::time_point base;
+
+	auto currentTimePoint = steady_clock::now();
+	if (!isBaseSet) {
+		base = currentTimePoint;
+		isBaseSet = true;
+	}
+	return duration_cast<microseconds>(currentTimePoint - base).count();
 }
 
 void OnFrameStarted() {

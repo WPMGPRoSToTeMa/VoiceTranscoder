@@ -75,7 +75,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Users\Artem\Documents\ReHLDS\cstri
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;VOICETRANSCODER_EXPORTS;_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>hlsdk\common;hlsdk\dlls;hlsdk\engine;hlsdk\pm_shared;metamod;speex;silk;MultiThreading;Utility;Hashers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Precise</FloatingPointModel>
     </ClCompile>
     <Link>

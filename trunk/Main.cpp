@@ -322,20 +322,6 @@ auto FullyConnectedClients() {
 	return enumerator;
 }
 
-using namespace std::chrono;
-
-bool isBaseSet = false;
-steady_clock::time_point base;
-
-uint64_t GetCurrentTimeInMicroSeconds(void) {
-	auto currentTimePoint = steady_clock::now();
-	if (!isBaseSet) {
-		base = currentTimePoint;
-		isBaseSet = true;
-	}
-	return duration_cast<microseconds>(currentTimePoint - base).count();
-}
-
 void OnFrameStarted() {
 	if ((size_t)CVAR_GET_FLOAT("sv_voicequality") != g_oldVoiceQuality) {
 		VTC_UpdateCodecs();

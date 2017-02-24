@@ -25,7 +25,6 @@
 #include <algorithm>
 #include <array>
 #include <cinttypes>
-#include <chrono>
 
 #if !defined(_WIN32) && !defined(__linux__)
 #error "Unknown platform"
@@ -170,44 +169,25 @@ void OnClientCommandReceiving(edict_t *pClient) {
 	auto &clientData = g_clientData[playerSlot-1];
 
 	if (FStrEq(command, "VTC_CheckStart")) {
-		clientData.m_isChecking = true;
-		clientData.m_hasNewCodec = false;
-		clientData.m_isVguiRunScriptReceived = false;
+		clientData.IsChecking = true;
+		clientData.HasNewCodec = false;
+		clientData.IsVguiRunScriptReceived = false;
 
 		RETURN_META(MRES_SUPERCEDE);
-	} else if (clientData.m_isChecking) {
+	} else if (clientData.IsChecking) {
 		if (FStrEq(command, "vgui_runscript")) {
-			clientData.m_isVguiRunScriptReceived = true;
+			clientData.IsVguiRunScriptReceived = true;
 
 			RETURN_META(MRES_SUPERCEDE);
 		} else if (FStrEq(command, "VTC_CheckEnd")) {
-			clientData.m_isChecking = false;
-			clientData.m_hasNewCodec = clientData.m_isVguiRunScriptReceived ? true : false;
-			clientData.m_isVguiRunScriptReceived = false;
+			clientData.IsChecking = false;
+			clientData.HasNewCodec = clientData.IsVguiRunScriptReceived ? true : false;
+			clientData.IsVguiRunScriptReceived = false;
 
-			LOG_MESSAGE(PLID, "Client %s with %s codec connected", STRING(pClient->v.netname), clientData.m_hasNewCodec ? "new" : "old");
+			LOG_MESSAGE(PLID, "Client %s with %s codec connected", STRING(pClient->v.netname), clientData.HasNewCodec ? "new" : "old");
 
 			RETURN_META(MRES_SUPERCEDE);
 		}
-	}
-
-	if (FStrEq(command, "VTC_PrintTimings")) {
-		auto currentTime = GetCurrentTimeInMicroSeconds();
-		PrintToConsole(pClient, "Current time is %s", MicrosecondsToString(currentTime));
-		PrintToConsole(pClient, "Voice end time is %s", MicrosecondsToString(clientData.m_nextPacketTimeMicroSeconds));
-		PrintToConsole(pClient, "Difference is %s", MicrosecondsToString(currentTime > clientData.m_nextPacketTimeMicroSeconds ? 0 : (clientData.m_nextPacketTimeMicroSeconds - currentTime)));
-		PrintToConsole(pClient, "Current time by engine is %s", MicrosecondsToString((uint64_t)((double)g_engfuncs.pfnTime() * 1e6)));
-
-#ifdef _WIN32
-		LARGE_INTEGER tickCount, tickFreq;
-		QueryPerformanceCounter(&tickCount);
-		QueryPerformanceFrequency(&tickFreq);
-		PrintToConsole(pClient, "Time from PC start %" PRIi64 " %" PRIi64 " %s", tickCount.QuadPart, tickFreq.QuadPart, MicrosecondsToString(tickCount.QuadPart / tickFreq.QuadPart * int64_t(1e6) + tickCount.QuadPart % tickFreq.QuadPart * int64_t(1e6) / tickFreq.QuadPart));
-#endif
-
-		PrintToConsole(pClient, "Raw values %" PRIX64 " %" PRIX64, currentTime, clientData.m_nextPacketTimeMicroSeconds);
-
-		RETURN_META(MRES_SUPERCEDE);
 	}
 
 	RETURN_META(MRES_IGNORED);
@@ -220,19 +200,20 @@ qboolean OnClientConnected(edict_t *pClient, const char *pszName, const char *ps
 
 	// Default client codec
 	if (FStrEq(GETPLAYERAUTHID(pClient), "HLTV")) {
-		clientData.m_hasNewCodec = FStrEq(g_pcvarHltvCodec->string, "old") ? false : true;
+		clientData.HasNewCodec = FStrEq(g_pcvarHltvCodec->string, "old") ? false : true;
 		// Add print?
 	} else {
-		clientData.m_hasNewCodec = FStrEq(g_pcvarDefaultCodec->string, "old") ? false : true;
+		clientData.HasNewCodec = FStrEq(g_pcvarDefaultCodec->string, "old") ? false : true;
 	}
-	clientData.m_isChecking = false;
-	clientData.m_nextPacketTimeMicroSeconds = 0;
-	clientData.m_isSpeaking = false;
-	clientData.m_isMuted = false;
-	clientData.isBlocked = false;
-	clientData.m_pNewCodec->ResetState();
-	clientData.isSampleRateSet = false;
-	clientData.m_pOldCodec->ResetState();
+	clientData.IsChecking = false;
+	clientData.NextVoicePacketExpectedTime = nullptr;
+	clientData.VoiceEndTime = nullptr;
+	clientData.IsSpeaking = false;
+	clientData.IsMuted = false;
+	clientData.IsBlocked = false;
+	clientData.NewCodec->ResetState();
+	clientData.SampleRate = nullptr;
+	clientData.OldCodec->ResetState();
 
 	RETURN_META_VALUE(MRES_IGNORED, META_RESULT_ORIG_RET(bool32_t));
 }
@@ -241,8 +222,8 @@ void OnClientDisconnected(edict_t *pClient) {
 	int playerSlot = ENTINDEX(pClient);
 	clientData_t &clientData = g_clientData[playerSlot - 1];
 
-	if (clientData.m_isSpeaking) {
-		clientData.m_isSpeaking = false;
+	if (clientData.IsSpeaking) {
+		clientData.IsSpeaking = false;
 
 		g_OnClientStopSpeak(playerSlot);
 	}
@@ -345,90 +326,111 @@ void OnFrameStarted() {
 		//LOG_MESSAGE(PLID, "%d", clientIndex);
 
 		clientData_t &clientData = g_clientData[clientIndex];
-		uint64_t currentTimeMicroSeconds = GetCurrentTimeInMicroSeconds();
-		if (clientData.m_isSpeaking && currentTimeMicroSeconds >= clientData.m_nextPacketTimeMicroSeconds) {
-			clientData.m_isSpeaking = false;
+		if (clientData.IsSpeaking && steady_clock::now() >= clientData.VoiceEndTime) {
+			clientData.IsSpeaking = false;
 
 			g_OnClientStopSpeak(clientIndex + 1);
 		}
 	}
 
+	auto now = steady_clock::now();
 	for (auto &playSound : g_playSounds) {
-		if (gpGlobals->time < playSound.nextTime)
-			continue;
+		if (now >= playSound.OldEncodedDataSendTime && playSound.currentSample != playSound.samples8k.size()) {
+			int16_t *samplesSlice8k = &playSound.samples8k[playSound.currentSample];
+			size_t sampleCount = min(playSound.samples8k.size() - playSound.currentSample, (size_t)160);
+			playSound.currentSample += sampleCount;
+			playSound.OldEncodedDataSendTime += 20ms - 125us; // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
 
-		int16_t *samplesSlice8k = &playSound.samples8k[playSound.currentSample];
-		int16_t *samplesSlice16k = &playSound.samples16k[playSound.currentSample * 2];
-		size_t sampleCount = std::min(playSound.samples8k.size() - playSound.currentSample, (size_t)160);
-		playSound.currentSample += sampleCount;
-		playSound.nextTime += 0.02;
-
-		if (sampleCount != 0) {
-			std::array<byte, 1024> oldEncodedData;
-			size_t oldEncodedDataSize;
-			{
-				std::array<int16_t, 160> samples;
+			if (sampleCount != 0) {
+				array<uint8_t, 1024> oldEncodedData;
+				size_t oldEncodedDataSize;
+				array<int16_t, 160> samples;
 				memcpy(samples.data(), samplesSlice8k, sampleCount * sizeof(samplesSlice8k[0]));
 				memset(&samples.data()[sampleCount], 0, (samples.size() - sampleCount) * sizeof(decltype(samples)::value_type));
 
 				oldEncodedDataSize = playSound.oldCodec->Encode(samples.data(), samples.size(), oldEncodedData.data(), oldEncodedData.size());
-			}
-			std::array<byte, 1024> newEncodedData;
-			size_t newEncodedDataSize;
-			{
-				std::array<int16_t, 320> samples;
-				memcpy(samples.data(), samplesSlice16k, sampleCount * 2 * sizeof(samplesSlice16k[0]));
-				memset(&samples.data()[sampleCount * 2], 0, (samples.size() - sampleCount * 2) * sizeof(decltype(samples)::value_type));
 
-				newEncodedDataSize = playSound.newCodec->Encode(samples.data(), samples.size(), &newEncodedData.data()[14], newEncodedData.size() - 18);
-			}
+				for (size_t i = 0; i < gpGlobals->maxClients; i++) {
+					client_t *pDestClient = EngineUTIL::GetClientByIndex(i + 1);
 
-			SteamID steamid;
-			steamid.SetUniverse(UNIVERSE_PUBLIC);
-			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
-			steamid.SetAccountId(0xFFFFFFFF);
-			*(uint64_t *)newEncodedData.data() = steamid.ToUInt64();
-			*(uint8_t *)&newEncodedData.data()[8] = VPC_SETSAMPLERATE;
-			*(uint16_t *)&newEncodedData.data()[9] = 8000;
-			*(uint8_t *)&newEncodedData.data()[11] = VPC_VDATA_SILK;
-			*(uint16_t *)&newEncodedData.data()[12] = (uint16_t)newEncodedDataSize;
-
-			CRC32 checksum;
-			checksum.Init();
-			checksum.Update(newEncodedData.data(), newEncodedDataSize + 14);
-			checksum.Final();
-
-			*(uint32_t *)&newEncodedData.data()[14 + newEncodedDataSize] = checksum.ToUInt32();
-
-			newEncodedDataSize += 18;
-
-			for (size_t i = 0; i < gpGlobals->maxClients; i++) {
-				client_t *pDestClient = EngineUTIL::GetClientByIndex(i + 1);
-
-				if (!pDestClient->m_fZombie) {
-					continue;
-				}
-				if (!(pDestClient->m_fHltv && g_pcvarForceSendHLTV->value != 0)) {
-					if (playSound.receiver != nullptr && playSound.receiver != pDestClient) {
+					if (g_clientData[i].HasNewCodec) {
 						continue;
 					}
-				}
+					if (!pDestClient->m_fZombie) {
+						continue;
+					}
+					if (!(pDestClient->m_fHltv && g_pcvarForceSendHLTV->value != 0)) {
+						if (playSound.receiver != nullptr && playSound.receiver != pDestClient) {
+							continue;
+						}
+					}
 
-				void *buf;
-				size_t byteCount;
-				if (g_clientData[i].m_hasNewCodec) {
-					buf = newEncodedData.data();
-					byteCount = newEncodedDataSize;
-				} else {
-					buf = oldEncodedData.data();
-					byteCount = oldEncodedDataSize;
+					if (EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + oldEncodedDataSize) {
+						EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, SVC_VOICEDATA);
+						EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, MAX_CLIENTS);
+						EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, oldEncodedDataSize);
+						EngineUTIL::MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, oldEncodedData.data(), oldEncodedDataSize);
+					}
 				}
+			}
+		}
+		if (now >= playSound.NewEncodedDataSendTime && playSound.PlayedNewEncodedSampleCount != playSound.samples16k.size()) {
+			int16_t *samplesSlice16k = &playSound.samples16k[playSound.PlayedNewEncodedSampleCount];
+			size_t sampleCount = min(playSound.samples16k.size() - playSound.PlayedNewEncodedSampleCount, (size_t)320);
+			playSound.PlayedNewEncodedSampleCount += sampleCount;
+			playSound.NewEncodedDataSendTime += 20ms - 137us; // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
+			// chut chut rastet
+			// vector vilet v konce!!
 
-				if (EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) {
-					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, SVC_VOICEDATA);
-					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, MAX_CLIENTS);
-					EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);
-					EngineUTIL::MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, buf, byteCount);
+			if (sampleCount != 0) {
+				array<byte, 1024> newEncodedData;
+				size_t newEncodedDataSize;
+				array<int16_t, 320> samples;
+				memcpy(samples.data(), samplesSlice16k, sampleCount * sizeof(samplesSlice16k[0]));
+				memset(&samples.data()[sampleCount], 0, (samples.size() - sampleCount) * sizeof(decltype(samples)::value_type));
+
+				newEncodedDataSize = playSound.newCodec->Encode(samples.data(), samples.size(), &newEncodedData.data()[14], newEncodedData.size() - 18);
+
+				SteamID steamid;
+				steamid.SetUniverse(UNIVERSE_PUBLIC);
+				steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
+				steamid.SetAccountId(0xFFFFFFFE);
+				*(uint64_t *)newEncodedData.data() = steamid.ToUInt64();
+				*(uint8_t *)&newEncodedData.data()[8] = VPC_SETSAMPLERATE;
+				*(uint16_t *)&newEncodedData.data()[9] = 16000; // TODO: sent to steam with original samplerate, but samplerate should be % 4000 == 0
+				*(uint8_t *)&newEncodedData.data()[11] = VPC_VDATA_SILK;
+				*(uint16_t *)&newEncodedData.data()[12] = (uint16_t)newEncodedDataSize;
+
+				CRC32 checksum;
+				checksum.Init();
+				checksum.Update(newEncodedData.data(), newEncodedDataSize + 14);
+				checksum.Final();
+
+				*(uint32_t *)&newEncodedData.data()[14 + newEncodedDataSize] = checksum.ToUInt32();
+
+				newEncodedDataSize += 18;
+
+				for (size_t i = 0; i < gpGlobals->maxClients; i++) {
+					client_t *pDestClient = EngineUTIL::GetClientByIndex(i + 1);
+
+					if (!g_clientData[i].HasNewCodec) {
+						continue;
+					}
+					if (!pDestClient->m_fZombie) {
+						continue;
+					}
+					if (!(pDestClient->m_fHltv && g_pcvarForceSendHLTV->value != 0)) {
+						if (playSound.receiver != nullptr && playSound.receiver != pDestClient) {
+							continue;
+						}
+					}
+
+					if (EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + newEncodedDataSize) {
+						EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, SVC_VOICEDATA);
+						EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, MAX_CLIENTS);
+						EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, newEncodedDataSize);
+						EngineUTIL::MSG_WriteBuf_UnSafe(&pDestClient->m_Datagram, newEncodedData.data(), newEncodedDataSize);
+					}
 				}
 			}
 		}
@@ -439,7 +441,7 @@ void OnFrameStarted() {
 		std::remove_if(
 			g_playSounds.begin(),
 			g_playSounds.end(),
-			[](const playSound_t &playSound) { return playSound.currentSample == playSound.samples8k.size(); }),
+			[](const playSound_t &playSound) { return playSound.currentSample == playSound.samples8k.size() && playSound.PlayedNewEncodedSampleCount == playSound.samples16k.size(); }),
 		g_playSounds.end());
 
 	RETURN_META(MRES_IGNORED);
@@ -515,8 +517,8 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 // TODO: place it lower
 void VTC_DeinitCodecs(void) {
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
-		delete g_clientData[i].m_pOldCodec;
-		delete g_clientData[i].m_pNewCodec;
+		delete g_clientData[i].OldCodec;
+		delete g_clientData[i].NewCodec;
 	}
 }
 
@@ -564,7 +566,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	uint8_t receivedBytes[MAX_VOICEPACKET_SIZE];
 	EngineUTIL::MSG_ReadBuf(receivedBytes, receivedBytesCount);
 
-	if (pClientData->isBlocked) {
+	if (pClientData->IsBlocked) {
 		return;
 	}
 	if (g_pcvarVoiceEnable->value == 0.0f) {
@@ -574,10 +576,10 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		return;
 	}
 
-	uint64_t currentMicroSeconds = GetCurrentTimeInMicroSeconds();
+	auto now = steady_clock::now();
 
-	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
-		if ((pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0 > g_pcvarMaxDelta->value + SPEAKING_TIMEOUT/1000.0) {
+	if (pClientData->NextVoicePacketExpectedTime > now) {
+		if (*pClientData->NextVoicePacketExpectedTime - now > milliseconds((int)g_pcvarMaxDelta->value)) {
 			//LOG_MESSAGE(PLID, "Delta is %g", (pClientData->m_nextPacketTimeMicroSeconds - currentMicroSeconds)/1000.0);
 
 			return;
@@ -588,7 +590,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	size_t rawSampleCount;
 
 	// Validate new codec packet
-	if (pClientData->m_hasNewCodec) {
+	if (pClientData->HasNewCodec) {
 		if (receivedBytesCount < MIN_VOICEPACKET_SIZE) {
 			LOG_MESSAGE(PLID, "Too small voice packet (real = %u, min = %u) from %s", receivedBytesCount, MIN_VOICEPACKET_SIZE, pClient->m_szPlayerName);
 			EngineUTIL::DropClient(pClient, false, "Too small voice packet (real = %u, min = %u)", receivedBytesCount, MIN_VOICEPACKET_SIZE);
@@ -634,13 +636,12 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 			switch (vpc) {
 				case VPC_SETSAMPLERATE: {
-					pClientData->sampleRate = buf.ReadUInt16();
-					pClientData->isSampleRateSet = true;
+					pClientData->SampleRate = buf.ReadUInt16();
 					//LOG_MESSAGE(PLID, "%s %d", pClient->m_szPlayerName, pClientData->sampleRate);
 
-					if (pClientData->sampleRate != NEWCODEC_WANTED_SAMPLERATE && pClientData->sampleRate != NEWCODEC_WANTED_SAMPLERATE2) {
-						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u or %u) from %s", pClientData->sampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2, pClient->m_szPlayerName);
-						EngineUTIL::DropClient(pClient, false, "Voice packet unwanted samplerate (cur = %u, want = %u or %u)", pClientData->sampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2);
+					if (*pClientData->SampleRate != NEWCODEC_WANTED_SAMPLERATE && *pClientData->SampleRate != NEWCODEC_WANTED_SAMPLERATE2) {
+						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u or %u) from %s", pClientData->SampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2, pClient->m_szPlayerName);
+						EngineUTIL::DropClient(pClient, false, "Voice packet unwanted samplerate (cur = %u, want = %u or %u)", pClientData->SampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2);
 
 						return;
 					}
@@ -649,14 +650,14 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 				case VPC_VDATA_SILENCE: {
 					size_t silenceSampleCount = buf.ReadUInt16();
 
-					if (!pClientData->isSampleRateSet) {
+					if (!pClientData->SampleRate.HasValue()) {
 						//LOG_MESSAGE(PLID, "Received silence samples when samplerate is not received from %s", pClient->m_szPlayerName);
 						//EngineUTIL::DropClient(pClient, false, "Received silence samples when samplerate is not received");
 
 						break;
 					}
 
-					silenceSampleCount /= (pClientData->sampleRate / 8000);
+					silenceSampleCount /= (*pClientData->SampleRate / 8000);
 					//LOG_MESSAGE(PLID, "%s S %d", pClient->m_szPlayerName, silenceSampleCount);
 
 					if (silenceSampleCount > ARRAYSIZE(rawSamples) - rawSampleCount) {
@@ -684,7 +685,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 							return;
 						}
 
-						rawSampleCount += pClientData->m_pNewCodec->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						rawSampleCount += pClientData->NewCodec->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
 						buf.SkipBytes(bytesCount);
 					} else {
 						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);
@@ -716,7 +717,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			return;
 		}
 	} else {
-		rawSampleCount = pClientData->m_pOldCodec->Decode((const uint8_t *)receivedBytes, receivedBytesCount, rawSamples, ARRAYSIZE(rawSamples));
+		rawSampleCount = pClientData->OldCodec->Decode((const uint8_t *)receivedBytes, receivedBytesCount, rawSamples, ARRAYSIZE(rawSamples));
 	}
 
 	//LOG_CONSOLE(PLID, "%f %d %d", currentMicroSeconds / 1000000.0, receivedBytesCount, rawSampleCount);
@@ -728,23 +729,30 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 		fclose(pFile);
 	}*/
 
-	uint64_t frameTimeLength = rawSampleCount * 1000000 / 8000;
+	typedef duration<int64_t, ratio<1, 8000>> sample8k;
+	auto frameTimeLength = sample8k(rawSampleCount);
 
 	//LOG_MESSAGE(PLID, "Frame time: %f %f %d %d", currentMicroSeconds / 1000000.0, frameTimeLength / 1000.0, receivedBytesCount, needTranscode);
 
-	if (pClientData->m_nextPacketTimeMicroSeconds > currentMicroSeconds) {
-		pClientData->m_nextPacketTimeMicroSeconds += frameTimeLength;
+	if (pClientData->NextVoicePacketExpectedTime > now) {
+		*pClientData->NextVoicePacketExpectedTime += frameTimeLength;
 	} else {
-		pClientData->m_nextPacketTimeMicroSeconds = currentMicroSeconds + frameTimeLength + SPEAKING_TIMEOUT;
+		pClientData->NextVoicePacketExpectedTime = now + frameTimeLength;
+	}
 
-		if (!pClientData->m_isSpeaking) {
-			pClientData->m_isSpeaking = true;
+	if (pClientData->VoiceEndTime > now) {
+		*pClientData->VoiceEndTime += frameTimeLength;
+	} else {
+		pClientData->VoiceEndTime = now + frameTimeLength + SPEAKING_TIMEOUT;
+
+		if (!pClientData->IsSpeaking) {
+			pClientData->IsSpeaking = true;
 
 			g_OnClientStartSpeak(clientIndex);
 		}
 	}
 
-	if (pClientData->m_isMuted) {
+	if (pClientData->IsMuted) {
 		return;
 	}
 
@@ -765,7 +773,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			}
 		}
 
-		if (g_clientData[i].m_hasNewCodec != g_clientData[clientIndex - 1].m_hasNewCodec) {
+		if (g_clientData[i].HasNewCodec != g_clientData[clientIndex - 1].HasNewCodec) {
 			needTranscode = true;
 
 			break;
@@ -787,14 +795,14 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	uint8_t recompressed[MAX_VOICEPACKET_SIZE];
 	size_t recompressedSize;
 	if (!g_fThreadModeEnabled && needTranscode) {
-		if (pClientData->m_hasNewCodec) {
+		if (pClientData->HasNewCodec) {
 			ChangeSamplesVolume(rawSamples, rawSampleCount, g_pcvarVolumeNewToOld->value);
 
-			recompressedSize = pClientData->m_pOldCodec->Encode(rawSamples, rawSampleCount, recompressed, ARRAYSIZE(recompressed));
+			recompressedSize = pClientData->OldCodec->Encode(rawSamples, rawSampleCount, recompressed, ARRAYSIZE(recompressed));
 		} else {
 			ChangeSamplesVolume(rawSamples, rawSampleCount, g_pcvarVolumeOldToNew->value);
 
-			recompressedSize = pClientData->m_pNewCodec->Encode(rawSamples, rawSampleCount, &recompressed[14], ARRAYSIZE(recompressed) - 18);
+			recompressedSize = pClientData->NewCodec->Encode(rawSamples, rawSampleCount, &recompressed[14], ARRAYSIZE(recompressed) - 18);
 
 			SteamID steamid;
 			steamid.SetUniverse(UNIVERSE_PUBLIC);
@@ -843,7 +851,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 		void *buf;
 		size_t byteCount;
-		if (g_clientData[i].m_hasNewCodec == g_clientData[clientIndex-1].m_hasNewCodec) {
+		if (g_clientData[i].HasNewCodec == g_clientData[clientIndex-1].HasNewCodec) {
 			buf = receivedBytes;
 			byteCount = receivedBytesCount;
 		} else {
@@ -871,8 +879,8 @@ void VTC_InitCodecs(void) {
 	g_oldVoiceQuality = (size_t)CVAR_GET_FLOAT("sv_voicequality");
 
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
-		g_clientData[i].m_pOldCodec = new VoiceCodec_Speex(g_oldVoiceQuality);
-		g_clientData[i].m_pNewCodec = new VoiceCodec_SILK(5);
+		g_clientData[i].OldCodec = new VoiceCodec_Speex(g_oldVoiceQuality);
+		g_clientData[i].NewCodec = new VoiceCodec_SILK(5);
 	}
 }
 
@@ -880,7 +888,7 @@ void VTC_UpdateCodecs() {
 	g_oldVoiceQuality = (size_t)CVAR_GET_FLOAT("sv_voicequality");
 
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
-		g_clientData[i].m_pOldCodec->ChangeQuality(g_oldVoiceQuality);
+		g_clientData[i].OldCodec->ChangeQuality(g_oldVoiceQuality);
 	}
 }
 

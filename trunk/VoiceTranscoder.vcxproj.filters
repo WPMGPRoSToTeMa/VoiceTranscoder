@@ -516,9 +516,6 @@
     <ClCompile Include="Hashers\CRC32.cpp">
       <Filter>Source Files\Hashers</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\Time.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="Utility\JmpOpcode.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -707,9 +704,6 @@
     <ClInclude Include="Utility\AnyPointer.h">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Time.h">
-      <Filter>Source Files\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Utility\FunctionHook_Beginning.h">
       <Filter>Source Files\Utility</Filter>
     </ClInclude>
@@ -757,6 +751,9 @@
     </ClInclude>
     <ClInclude Include="VoiceTranscoderAPI.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Optional.h">
+      <Filter>Source Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

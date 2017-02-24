@@ -103,7 +103,6 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Users\Artem\Documents\ReHLDS\cstri
     <ClCompile Include="Utility\Module.cpp" />
     <ClCompile Include="Utility\Section.cpp" />
     <ClCompile Include="Utility\SteamID.cpp" />
-    <ClCompile Include="Utility\Time.cpp" />
     <ClCompile Include="Utility\UtilFunctions.cpp" />
     <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_A2NLSF.c" />
     <ClCompile Include="VoiceCodecs\SILK\SKP_Silk_allpass_int.c" />
@@ -279,9 +278,9 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Users\Artem\Documents\ReHLDS\cstri
     <ClInclude Include="Utility\MemoryUnlocker.h" />
     <ClInclude Include="Utility\MetaUTIL.h" />
     <ClInclude Include="Utility\Module.h" />
+    <ClInclude Include="Utility\Optional.h" />
     <ClInclude Include="Utility\Section.h" />
     <ClInclude Include="Utility\SteamID.h" />
-    <ClInclude Include="Utility\Time.h" />
     <ClInclude Include="Utility\GoldSrcEngineStructs.h" />
     <ClInclude Include="Utility\UtilFunctions.h" />
     <ClInclude Include="Utility\UtilTypes.h" />

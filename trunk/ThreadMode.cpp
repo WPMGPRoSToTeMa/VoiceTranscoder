@@ -40,7 +40,7 @@ void VTC_ThreadAddVoicePacket(client_t *pClient, size_t nClientIndex, clientData
 	VoiceBuf *pVoiceBuf = new VoiceBuf;
 	pVoiceBuf->m_nPlayerIndex = nClientIndex;
 	pVoiceBuf->m_nUserID = pClient->m_iUserID; // Check for player disconnect
-	pVoiceBuf->m_fIsNewCodec = pClientData->m_hasNewCodec;
+	pVoiceBuf->m_fIsNewCodec = pClientData->HasNewCodec;
 	pVoiceBuf->m_pBuf = new uint16_t[nDataSize];
 	pVoiceBuf->m_nSize = nDataSize;
 	memcpy(pVoiceBuf->m_pBuf, pData, nDataSize*sizeof(uint16_t));
@@ -74,11 +74,11 @@ void VTC_ThreadHandler(void) {
 		if (pVoiceBuf->m_fIsNewCodec) {
 			ChangeSamplesVolume((int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, g_pcvarVolumeNewToOld->value);
 
-			pVoiceBuf->m_nOutBufSize = g_clientData->m_pOldCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, pVoiceBuf->m_pOutBuf, 2048);
+			pVoiceBuf->m_nOutBufSize = g_clientData->OldCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, pVoiceBuf->m_pOutBuf, 2048);
 		} else {
 			ChangeSamplesVolume((int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, g_pcvarVolumeOldToNew->value);
 
-			pVoiceBuf->m_nOutBufSize = g_clientData->m_pNewCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, &pVoiceBuf->m_pOutBuf[14], 2048 - 18);
+			pVoiceBuf->m_nOutBufSize = g_clientData->NewCodec->Encode((const int16_t *)pVoiceBuf->m_pBuf, pVoiceBuf->m_nSize, &pVoiceBuf->m_pOutBuf[14], 2048 - 18);
 
 			SteamID steamid;
 			steamid.SetUniverse(UNIVERSE_PUBLIC);
@@ -140,7 +140,7 @@ void VTC_ThreadVoiceFlusher(void) {
 				void *buf = pVoiceBuf->m_pOutBuf;
 				size_t byteCount = pVoiceBuf->m_nOutBufSize;
 
-				if (g_clientData[i].m_hasNewCodec != g_clientData[pVoiceBuf->m_nPlayerIndex-1].m_hasNewCodec && EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
+				if (g_clientData[i].HasNewCodec != g_clientData[pVoiceBuf->m_nPlayerIndex-1].HasNewCodec && EngineUTIL::MSG_GetRemainBytesCount(&pDestClient->m_Datagram) >= sizeof(uint8_t) + sizeof(uint8_t) + sizeof(uint16_t) + byteCount) { // zachem tam eshe 2 byte v originale?
 					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, 53);
 					EngineUTIL::MSG_WriteUInt8_UnSafe(&pDestClient->m_Datagram, pVoiceBuf->m_nPlayerIndex - 1);
 					EngineUTIL::MSG_WriteUInt16_UnSafe(&pDestClient->m_Datagram, byteCount);

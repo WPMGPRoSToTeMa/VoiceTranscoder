@@ -639,8 +639,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 					//LOG_MESSAGE(PLID, "%s %d", pClient->m_szPlayerName, pClientData->sampleRate);
 
 					if (*pClientData->SampleRate != NEWCODEC_WANTED_SAMPLERATE && *pClientData->SampleRate != NEWCODEC_WANTED_SAMPLERATE2) {
-						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u or %u) from %s", pClientData->SampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2, pClient->m_szPlayerName);
-						EngineUTIL::DropClient(pClient, false, "Voice packet unwanted samplerate (cur = %u, want = %u or %u)", pClientData->SampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2);
+						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u or %u) from %s", *pClientData->SampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2, pClient->m_szPlayerName);
+						EngineUTIL::DropClient(pClient, false, "Voice packet unwanted samplerate (cur = %u, want = %u or %u)", *pClientData->SampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2);
 
 						return;
 					}

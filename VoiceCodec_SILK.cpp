@@ -46,7 +46,7 @@ void VoiceCodec_SILK::ResetState() {
 		m_encControl.packetLossPercentage = 0;
 		m_encControl.complexity = 2; // or use 1 for average CPU usage?
 		m_encControl.useInBandFEC = 0;
-		m_encControl.useDTX = 0;
+		m_encControl.useDTX = 0; // TODO: what about sound transmittion?
 	}
 	if (m_decState) {
 		SKP_Silk_SDK_InitDecoder(m_decState);

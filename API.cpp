@@ -29,7 +29,7 @@ bool VoiceTranscoderAPI::IsClientSpeaking(size_t clientIndex) {
 		return false;
 	}
 
-	return g_clientData[clientIndex - 1].m_isSpeaking;
+	return g_clientData[clientIndex - 1].IsSpeaking;
 }
 
 IEvent<size_t> &VoiceTranscoderAPI::OnClientStartSpeak() {
@@ -45,7 +45,7 @@ void VoiceTranscoderAPI::MuteClient(size_t clientIndex) {
 		return;
 	}
 
-	g_clientData[clientIndex - 1].m_isMuted = true;
+	g_clientData[clientIndex - 1].IsMuted = true;
 }
 
 void VoiceTranscoderAPI::UnmuteClient(size_t clientIndex) {
@@ -53,7 +53,7 @@ void VoiceTranscoderAPI::UnmuteClient(size_t clientIndex) {
 		return;
 	}
 
-	g_clientData[clientIndex - 1].m_isMuted = false;
+	g_clientData[clientIndex - 1].IsMuted = false;
 }
 
 bool VoiceTranscoderAPI::IsClientMuted(size_t clientIndex) {
@@ -61,7 +61,7 @@ bool VoiceTranscoderAPI::IsClientMuted(size_t clientIndex) {
 		return false;
 	}
 
-	return g_clientData[clientIndex - 1].m_isMuted;
+	return g_clientData[clientIndex - 1].IsMuted;
 }
 
 void VoiceTranscoderAPI::PlaySound(size_t receiverClientIndex, const char *soundFilePath) {
@@ -141,7 +141,8 @@ void VoiceTranscoderAPI::PlaySound(size_t receiverClientIndex, const char *sound
 	playSound_t playSound;
 	playSound.receiver = client;
 	playSound.currentSample = 0;
-	playSound.nextTime = gpGlobals->time;
+	playSound.PlayedNewEncodedSampleCount = 0;
+	playSound.NewEncodedDataSendTime = (playSound.OldEncodedDataSendTime = steady_clock::now());
 	playSound.oldCodec = std::make_unique<VoiceCodec_Speex>(CVAR_GET_FLOAT("sv_voicequality"));
 	playSound.newCodec = std::make_unique<VoiceCodec_SILK>(10);
 
@@ -155,6 +156,7 @@ void VoiceTranscoderAPI::PlaySound(size_t receiverClientIndex, const char *sound
 		SKP_Silk_resampler(&resamplerState, playSound.samples8k.data(), inSamples.get(), inSampleCount);
 	}
 	{
+		// TODO: we need to choose optimal samplerate for steam
 		size_t outSampleRate = 16000;
 		size_t outSampleCount = size_t(ceil(double(inSampleCount) * (double(outSampleRate) / double(inSampleRate))));
 		playSound.samples16k.resize(outSampleCount);
@@ -172,7 +174,7 @@ void VoiceTranscoderAPI::BlockClient(size_t clientIndex) {
 		return;
 	}
 
-	g_clientData[clientIndex - 1].isBlocked = true;
+	g_clientData[clientIndex - 1].IsBlocked = true;
 }
 
 void VoiceTranscoderAPI::UnblockClient(size_t clientIndex) {
@@ -180,7 +182,7 @@ void VoiceTranscoderAPI::UnblockClient(size_t clientIndex) {
 		return;
 	}
 
-	g_clientData[clientIndex - 1].isBlocked = false;
+	g_clientData[clientIndex - 1].IsBlocked = false;
 }
 
 bool VoiceTranscoderAPI::IsClientBlocked(size_t clientIndex) {
@@ -188,5 +190,5 @@ bool VoiceTranscoderAPI::IsClientBlocked(size_t clientIndex) {
 		return false;
 	}
 
-	return g_clientData[clientIndex - 1].isBlocked;
+	return g_clientData[clientIndex - 1].IsBlocked;
 }

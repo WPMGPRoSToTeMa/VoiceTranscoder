@@ -24,7 +24,6 @@
 	Utility/Module.cpp \
 	Utility/Section.cpp \
 	Utility/SteamID.cpp \
-	Utility/Time.cpp \
 	Utility/UtilFunctions.cpp \
 	VoiceCodecs/Speex/speex_callbacks.c \
 	VoiceCodecs/Speex/speex_header.c \

@@ -12,20 +12,26 @@
 #endif
 #include <vector>
 #include <memory>
+#include <chrono>
+#include <Optional.h>
+
+using namespace std;
+using namespace chrono_literals;
+using namespace chrono;
 
 // Structs and classes
 struct clientData_t {
-	bool m_hasNewCodec;
-	bool m_isChecking;
-	bool m_isVguiRunScriptReceived;
-	bool m_isSpeaking;
-	bool m_isMuted;
-	bool isBlocked;
-	uint64_t m_nextPacketTimeMicroSeconds;
-	VoiceCodec_SILK *m_pNewCodec;
-	int sampleRate;
-	bool isSampleRateSet;
-	VoiceCodec_Speex *m_pOldCodec;
+	bool HasNewCodec;
+	bool IsChecking;
+	bool IsVguiRunScriptReceived;
+	bool IsSpeaking;
+	Optional<time_point<steady_clock>> VoiceEndTime;
+	bool IsMuted;
+	bool IsBlocked;
+	Optional<time_point<steady_clock>> NextVoicePacketExpectedTime;
+	VoiceCodec_SILK *NewCodec;
+	Optional<int> SampleRate;
+	VoiceCodec_Speex *OldCodec;
 };
 
 // TODO: samples16k
@@ -33,8 +39,10 @@ struct playSound_t {
 	std::vector<int16_t> samples8k;
 	std::vector<int16_t> samples16k;
 	size_t currentSample;
+	size_t PlayedNewEncodedSampleCount;
 	client_t *receiver;
-	float nextTime;
+	time_point<steady_clock> OldEncodedDataSendTime;
+	time_point<steady_clock> NewEncodedDataSendTime;
 	std::unique_ptr<VoiceCodec_Speex> oldCodec;
 	std::unique_ptr<VoiceCodec_SILK> newCodec;
 };
@@ -54,11 +62,11 @@ enum : size_t {
 const size_t MAX_VOICEPACKET_SIZE = 8192; // or 4096? or 8192?
 const size_t MAX_DECOMPRESSED_VOICEPACKET_SAMPLES = 32768; // or 8192?
 // uint64_t(steamid) + uint8_t(VPC_SETSAMPLERATE or VPC_VDATA_SILK or VPC_VDATA_SILENCE) + uint16_t(arg) + ... + uint32_t(CRC32 checksum)
-const size_t MIN_VOICEPACKET_SIZE = sizeof(uint64_t) + sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint32_t);
+constexpr auto MIN_VOICEPACKET_SIZE = sizeof(uint64_t) + sizeof(uint8_t) + sizeof(uint16_t) + sizeof(uint32_t);
 const char VTC_CONFIGNAME[] = "VoiceTranscoder.cfg";
 const size_t NEWCODEC_WANTED_SAMPLERATE = 16000;
 const size_t NEWCODEC_WANTED_SAMPLERATE2 = 24000;
-const uint64_t SPEAKING_TIMEOUT = 200000;
+constexpr auto SPEAKING_TIMEOUT = 200ms;
 
 // Externs
 extern std::vector<playSound_t> g_playSounds;

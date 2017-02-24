@@ -338,9 +338,7 @@ void OnFrameStarted() {
 			int16_t *samplesSlice8k = &playSound.samples8k[playSound.currentSample];
 			size_t sampleCount = min(playSound.samples8k.size() - playSound.currentSample, (size_t)160);
 			playSound.currentSample += sampleCount;
-			//playSound.OldEncodedDataSendTime += 20ms - 125us; // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
-			playSound.OldEncodedDataSendTime += 20ms;
-			playSound.OldEncodedDataSendTime -= microseconds(125);
+			playSound.OldEncodedDataSendTime += 20ms - microseconds(125); // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
 
 			if (sampleCount != 0) {
 				array<uint8_t, 1024> oldEncodedData;
@@ -379,11 +377,7 @@ void OnFrameStarted() {
 			int16_t *samplesSlice16k = &playSound.samples16k[playSound.PlayedNewEncodedSampleCount];
 			size_t sampleCount = min(playSound.samples16k.size() - playSound.PlayedNewEncodedSampleCount, (size_t)320);
 			playSound.PlayedNewEncodedSampleCount += sampleCount;
-			//playSound.NewEncodedDataSendTime += 20ms - 137us; // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
-			playSound.OldEncodedDataSendTime += 20ms;
-			playSound.OldEncodedDataSendTime -= microseconds(137);
-			using namespace std::chrono_literals;
-			microseconds uses = 137us;
+			playSound.NewEncodedDataSendTime += 20ms - microseconds(137); // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
 			// chut chut rastet
 			// vector vilet v konce!!
 

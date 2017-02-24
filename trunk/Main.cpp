@@ -3,7 +3,6 @@
 #include <extdll.h>
 #include <meta_api.h>
 #include <GoldSrcEngineStructs.h>
-#include <Time.h>
 #include <Buffer.h>
 #include "ThreadMode.h"
 #include <MetaUTIL.h>

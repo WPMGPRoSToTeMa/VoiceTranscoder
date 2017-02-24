@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cstddef>
 #include <utility>
+
+using namespace std;
 
 template <typename T>
 class Optional {

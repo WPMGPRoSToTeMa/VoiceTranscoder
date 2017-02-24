@@ -340,7 +340,7 @@ void OnFrameStarted() {
 			playSound.currentSample += sampleCount;
 			//playSound.OldEncodedDataSendTime += 20ms - 125us; // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
 			playSound.OldEncodedDataSendTime += 20ms;
-			playSound.OldEncodedDataSendTime -= 125us;
+			playSound.OldEncodedDataSendTime -= microseconds(125);
 
 			if (sampleCount != 0) {
 				array<uint8_t, 1024> oldEncodedData;
@@ -381,7 +381,7 @@ void OnFrameStarted() {
 			playSound.PlayedNewEncodedSampleCount += sampleCount;
 			//playSound.NewEncodedDataSendTime += 20ms - 137us; // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
 			playSound.OldEncodedDataSendTime += 20ms;
-			playSound.OldEncodedDataSendTime -= 137us;
+			playSound.OldEncodedDataSendTime -= microseconds(137);
 			// chut chut rastet
 			// vector vilet v konce!!
 

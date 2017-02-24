@@ -382,6 +382,8 @@ void OnFrameStarted() {
 			//playSound.NewEncodedDataSendTime += 20ms - 137us; // TODO: ..., 1/8000 for 8k NS good! for 16k S bad, for 8k S very bad!!!
 			playSound.OldEncodedDataSendTime += 20ms;
 			playSound.OldEncodedDataSendTime -= microseconds(137);
+			using namespace std::chrono_literals;
+			microseconds uses = 137us;
 			// chut chut rastet
 			// vector vilet v konce!!
 

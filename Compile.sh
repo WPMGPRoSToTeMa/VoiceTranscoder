@@ -1,10 +1,12 @@
-/opt/intel/bin/icpc \
+/opt/intel/bin/icc \
 		-O3 -m32 -shared \
 		-fno-builtin -fno-rtti -Qoption,cpp,--treat_func_as_string_literal_cpp -no-intel-extensions -fno-stack-protector -std=c++14 \
 		-ipo -s -static-libgcc -static-intel -static-libstdc++ \
 		-msse2 -fp-model strict -fomit-frame-pointer -g0 \
 		-fvisibility=hidden \
+-D HAVE_CONFIG_H \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
+-Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
 	Main.cpp \
 	API.cpp \
 	ThreadMode.cpp \
@@ -29,7 +31,7 @@
 	VoiceCodecs/Speex/speex_header.c \
 	VoiceCodecs/Speex/stereo.c \
 	VoiceCodecs/Speex/vbr.c \
-	VoiceCodecs/Speex/vq.c \
+	VoiceCodecs/Speex/vq_.c \
 	VoiceCodecs/Speex/bits.c \
 	VoiceCodecs/Speex/cb_search.c \
 	VoiceCodecs/Speex/exc_5_64_table.c \
@@ -50,7 +52,7 @@
 	VoiceCodecs/Speex/ltp.c \
 	VoiceCodecs/Speex/math_approx.c \
 	VoiceCodecs/Speex/misc.c \
-	VoiceCodecs/Speex/modes.c \
+	VoiceCodecs/Speex/modes_.c \
 	VoiceCodecs/Speex/nb_celp.c \
 	VoiceCodecs/Speex/quant_lsp.c \
 	VoiceCodecs/Speex/sb_celp.c \
@@ -178,5 +180,150 @@
 	VoiceCodecs/SILK/SKP_Silk_tables_pitch_lag.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_pulses_per_block.c \
 	VoiceCodecs/SILK/SKP_Silk_tables_sign.c \
+	VoiceCodecs/Opus/celt/bands.c \
+	VoiceCodecs/Opus/celt/celt.c \
+	VoiceCodecs/Opus/celt/celt_decoder.c \
+	VoiceCodecs/Opus/celt/celt_encoder.c \
+	VoiceCodecs/Opus/celt/celt_lpc.c \
+	VoiceCodecs/Opus/celt/cwrs.c \
+	VoiceCodecs/Opus/celt/entcode.c \
+	VoiceCodecs/Opus/celt/entdec.c \
+	VoiceCodecs/Opus/celt/entenc.c \
+	VoiceCodecs/Opus/celt/kiss_fft.c \
+	VoiceCodecs/Opus/celt/laplace.c \
+	VoiceCodecs/Opus/celt/mathops.c \
+	VoiceCodecs/Opus/celt/mdct.c \
+	VoiceCodecs/Opus/celt/modes.c \
+	VoiceCodecs/Opus/celt/pitch.c \
+	VoiceCodecs/Opus/celt/quant_bands.c \
+	VoiceCodecs/Opus/celt/rate.c \
+	VoiceCodecs/Opus/celt/vq.c \
+	VoiceCodecs/Opus/celt/x86/celt_lpc_sse.c \
+	VoiceCodecs/Opus/celt/x86/pitch_sse.c \
+	VoiceCodecs/Opus/celt/x86/pitch_sse2.c \
+	VoiceCodecs/Opus/celt/x86/pitch_sse4_1.c \
+	VoiceCodecs/Opus/celt/x86/vq_sse2.c \
+	VoiceCodecs/Opus/celt/x86/x86cpu.c \
+	VoiceCodecs/Opus/celt/x86/x86_celt_map.c \
+	VoiceCodecs/Opus/silk/A2NLSF.c \
+	VoiceCodecs/Opus/silk/ana_filt_bank_1.c \
+	VoiceCodecs/Opus/silk/biquad_alt.c \
+	VoiceCodecs/Opus/silk/bwexpander.c \
+	VoiceCodecs/Opus/silk/bwexpander_32.c \
+	VoiceCodecs/Opus/silk/check_control_input.c \
+	VoiceCodecs/Opus/silk/CNG.c \
+	VoiceCodecs/Opus/silk/code_signs.c \
+	VoiceCodecs/Opus/silk/control_audio_bandwidth.c \
+	VoiceCodecs/Opus/silk/control_codec.c \
+	VoiceCodecs/Opus/silk/control_SNR.c \
+	VoiceCodecs/Opus/silk/debug.c \
+	VoiceCodecs/Opus/silk/decoder_set_fs.c \
+	VoiceCodecs/Opus/silk/decode_core.c \
+	VoiceCodecs/Opus/silk/decode_frame.c \
+	VoiceCodecs/Opus/silk/decode_indices.c \
+	VoiceCodecs/Opus/silk/decode_parameters.c \
+	VoiceCodecs/Opus/silk/decode_pitch.c \
+	VoiceCodecs/Opus/silk/decode_pulses.c \
+	VoiceCodecs/Opus/silk/dec_API.c \
+	VoiceCodecs/Opus/silk/encode_indices.c \
+	VoiceCodecs/Opus/silk/encode_pulses.c \
+	VoiceCodecs/Opus/silk/enc_API.c \
+	VoiceCodecs/Opus/silk/float/apply_sine_window_FLP.c \
+	VoiceCodecs/Opus/silk/float/autocorrelation_FLP.c \
+	VoiceCodecs/Opus/silk/float/burg_modified_FLP.c \
+	VoiceCodecs/Opus/silk/float/bwexpander_FLP.c \
+	VoiceCodecs/Opus/silk/float/corrMatrix_FLP.c \
+	VoiceCodecs/Opus/silk/float/encode_frame_FLP.c \
+	VoiceCodecs/Opus/silk/float/energy_FLP.c \
+	VoiceCodecs/Opus/silk/float/find_LPC_FLP.c \
+	VoiceCodecs/Opus/silk/float/find_LTP_FLP.c \
+	VoiceCodecs/Opus/silk/float/find_pitch_lags_FLP.c \
+	VoiceCodecs/Opus/silk/float/find_pred_coefs_FLP.c \
+	VoiceCodecs/Opus/silk/float/inner_product_FLP.c \
+	VoiceCodecs/Opus/silk/float/k2a_FLP.c \
+	VoiceCodecs/Opus/silk/float/LPC_analysis_filter_FLP.c \
+	VoiceCodecs/Opus/silk/float/LPC_inv_pred_gain_FLP.c \
+	VoiceCodecs/Opus/silk/float/LTP_analysis_filter_FLP.c \
+	VoiceCodecs/Opus/silk/float/LTP_scale_ctrl_FLP.c \
+	VoiceCodecs/Opus/silk/float/noise_shape_analysis_FLP.c \
+	VoiceCodecs/Opus/silk/float/pitch_analysis_core_FLP.c \
+	VoiceCodecs/Opus/silk/float/process_gains_FLP.c \
+	VoiceCodecs/Opus/silk/float/regularize_correlations_FLP.c \
+	VoiceCodecs/Opus/silk/float/residual_energy_FLP.c \
+	VoiceCodecs/Opus/silk/float/scale_copy_vector_FLP.c \
+	VoiceCodecs/Opus/silk/float/scale_vector_FLP.c \
+	VoiceCodecs/Opus/silk/float/schur_FLP.c \
+	VoiceCodecs/Opus/silk/float/sort_FLP.c \
+	VoiceCodecs/Opus/silk/float/warped_autocorrelation_FLP.c \
+	VoiceCodecs/Opus/silk/float/wrappers_FLP.c \
+	VoiceCodecs/Opus/silk/gain_quant.c \
+	VoiceCodecs/Opus/silk/HP_variable_cutoff.c \
+	VoiceCodecs/Opus/silk/init_decoder.c \
+	VoiceCodecs/Opus/silk/init_encoder.c \
+	VoiceCodecs/Opus/silk/inner_prod_aligned.c \
+	VoiceCodecs/Opus/silk/interpolate.c \
+	VoiceCodecs/Opus/silk/lin2log.c \
+	VoiceCodecs/Opus/silk/log2lin.c \
+	VoiceCodecs/Opus/silk/LPC_analysis_filter.c \
+	VoiceCodecs/Opus/silk/LPC_fit.c \
+	VoiceCodecs/Opus/silk/LPC_inv_pred_gain.c \
+	VoiceCodecs/Opus/silk/LP_variable_cutoff.c \
+	VoiceCodecs/Opus/silk/NLSF2A.c \
+	VoiceCodecs/Opus/silk/NLSF_decode.c \
+	VoiceCodecs/Opus/silk/NLSF_del_dec_quant.c \
+	VoiceCodecs/Opus/silk/NLSF_encode.c \
+	VoiceCodecs/Opus/silk/NLSF_stabilize.c \
+	VoiceCodecs/Opus/silk/NLSF_unpack.c \
+	VoiceCodecs/Opus/silk/NLSF_VQ.c \
+	VoiceCodecs/Opus/silk/NLSF_VQ_weights_laroia.c \
+	VoiceCodecs/Opus/silk/NSQ.c \
+	VoiceCodecs/Opus/silk/NSQ_del_dec.c \
+	VoiceCodecs/Opus/silk/pitch_est_tables.c \
+	VoiceCodecs/Opus/silk/PLC.c \
+	VoiceCodecs/Opus/silk/process_NLSFs.c \
+	VoiceCodecs/Opus/silk/quant_LTP_gains.c \
+	VoiceCodecs/Opus/silk/resampler.c \
+	VoiceCodecs/Opus/silk/resampler_down2.c \
+	VoiceCodecs/Opus/silk/resampler_down2_3.c \
+	VoiceCodecs/Opus/silk/resampler_private_AR2.c \
+	VoiceCodecs/Opus/silk/resampler_private_down_FIR.c \
+	VoiceCodecs/Opus/silk/resampler_private_IIR_FIR.c \
+	VoiceCodecs/Opus/silk/resampler_private_up2_HQ.c \
+	VoiceCodecs/Opus/silk/resampler_rom.c \
+	VoiceCodecs/Opus/silk/shell_coder.c \
+	VoiceCodecs/Opus/silk/sigm_Q15.c \
+	VoiceCodecs/Opus/silk/sort.c \
+	VoiceCodecs/Opus/silk/stereo_decode_pred.c \
+	VoiceCodecs/Opus/silk/stereo_encode_pred.c \
+	VoiceCodecs/Opus/silk/stereo_find_predictor.c \
+	VoiceCodecs/Opus/silk/stereo_LR_to_MS.c \
+	VoiceCodecs/Opus/silk/stereo_MS_to_LR.c \
+	VoiceCodecs/Opus/silk/stereo_quant_pred.c \
+	VoiceCodecs/Opus/silk/sum_sqr_shift.c \
+	VoiceCodecs/Opus/silk/tables_gain.c \
+	VoiceCodecs/Opus/silk/tables_LTP.c \
+	VoiceCodecs/Opus/silk/tables_NLSF_CB_NB_MB.c \
+	VoiceCodecs/Opus/silk/tables_NLSF_CB_WB.c \
+	VoiceCodecs/Opus/silk/tables_other.c \
+	VoiceCodecs/Opus/silk/tables_pitch_lag.c \
+	VoiceCodecs/Opus/silk/tables_pulses_per_block.c \
+	VoiceCodecs/Opus/silk/table_LSF_cos.c \
+	VoiceCodecs/Opus/silk/VAD.c \
+	VoiceCodecs/Opus/silk/VQ_WMat_EC.c \
+	VoiceCodecs/Opus/silk/x86/NSQ_del_dec_sse.c \
+	VoiceCodecs/Opus/silk/x86/NSQ_sse.c \
+	VoiceCodecs/Opus/silk/x86/VAD_sse.c \
+	VoiceCodecs/Opus/silk/x86/VQ_WMat_EC_sse.c \
+	VoiceCodecs/Opus/silk/x86/x86_silk_map.c \
+	VoiceCodecs/Opus/src/analysis.c \
+	VoiceCodecs/Opus/src/mlp.c \
+	VoiceCodecs/Opus/src/mlp_data.c \
+	VoiceCodecs/Opus/src/opus.c \
+	VoiceCodecs/Opus/src/opus_decoder.c \
+	VoiceCodecs/Opus/src/opus_encoder.c \
+	VoiceCodecs/Opus/src/opus_multistream.c \
+	VoiceCodecs/Opus/src/opus_multistream_decoder.c \
+	VoiceCodecs/Opus/src/opus_multistream_encoder.c \
+	VoiceCodecs/Opus/src/repacketizer.c \
 -lrt -ldl -lm -lpthread \
 -o VoiceTranscoder.so

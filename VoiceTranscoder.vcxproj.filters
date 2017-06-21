@@ -31,6 +31,27 @@
     <Filter Include="Source Files\Hashers">
       <UniqueIdentifier>{b9a285e8-15db-4b1e-8dd5-e4b6d6800ed0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Opus">
+      <UniqueIdentifier>{43d321cc-789d-46fa-aaa8-b03f53c83f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Opus\silk">
+      <UniqueIdentifier>{e1c39083-52d3-435b-9d94-8d10c9fe58d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Opus\celt">
+      <UniqueIdentifier>{fe50bdf2-45a3-4412-9a07-3ebf280414a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Opus\celt\x86">
+      <UniqueIdentifier>{1ae0a2a4-25a7-4c3f-9304-99e3316d4d29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Opus\src">
+      <UniqueIdentifier>{695655e3-c39d-4958-989d-f570c4f55b15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Opus\silk\x86">
+      <UniqueIdentifier>{120b5556-9057-45d3-aa23-176ee12abae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VoiceCodecs\Opus\silk\float">
+      <UniqueIdentifier>{c5264d58-1e28-4cc4-990e-4621b35c0140}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -52,9 +73,6 @@
       <Filter>Source Files\VoiceCodecs\Speex</Filter>
     </ClCompile>
     <ClCompile Include="VoiceCodecs\Speex\vbr.c">
-      <Filter>Source Files\VoiceCodecs\Speex</Filter>
-    </ClCompile>
-    <ClCompile Include="VoiceCodecs\Speex\vq.c">
       <Filter>Source Files\VoiceCodecs\Speex</Filter>
     </ClCompile>
     <ClCompile Include="VoiceCodecs\Speex\bits.c">
@@ -115,9 +133,6 @@
       <Filter>Source Files\VoiceCodecs\Speex</Filter>
     </ClCompile>
     <ClCompile Include="VoiceCodecs\Speex\misc.c">
-      <Filter>Source Files\VoiceCodecs\Speex</Filter>
-    </ClCompile>
-    <ClCompile Include="VoiceCodecs\Speex\modes.c">
       <Filter>Source Files\VoiceCodecs\Speex</Filter>
     </ClCompile>
     <ClCompile Include="VoiceCodecs\Speex\nb_celp.c">
@@ -552,6 +567,447 @@
     <ClCompile Include="API.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\tables_NLSF_CB_NB_MB.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\tables_NLSF_CB_WB.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\tables_other.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\tables_pitch_lag.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\tables_pulses_per_block.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\VAD.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\VQ_WMat_EC.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\A2NLSF.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\ana_filt_bank_1.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\biquad_alt.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\bwexpander.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\bwexpander_32.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\check_control_input.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\CNG.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\code_signs.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\control_audio_bandwidth.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\control_codec.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\control_SNR.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\debug.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\dec_API.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\decode_core.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\decode_frame.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\decode_indices.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\decode_parameters.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\decode_pitch.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\decode_pulses.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\decoder_set_fs.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\enc_API.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\encode_indices.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\encode_pulses.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\gain_quant.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\HP_variable_cutoff.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\init_decoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\init_encoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\inner_prod_aligned.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\interpolate.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\lin2log.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\log2lin.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\LP_variable_cutoff.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\LPC_analysis_filter.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\LPC_fit.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\LPC_inv_pred_gain.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF_decode.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF_del_dec_quant.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF_encode.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF_stabilize.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF_unpack.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF_VQ.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF_VQ_weights_laroia.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NLSF2A.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NSQ.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\NSQ_del_dec.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\pitch_est_tables.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\PLC.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\process_NLSFs.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\quant_LTP_gains.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler_down2.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler_down2_3.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler_private_AR2.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler_private_down_FIR.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler_private_IIR_FIR.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler_private_up2_HQ.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\resampler_rom.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\shell_coder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\sigm_Q15.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\sort.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\stereo_decode_pred.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\stereo_encode_pred.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\stereo_find_predictor.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\stereo_LR_to_MS.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\stereo_MS_to_LR.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\stereo_quant_pred.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\sum_sqr_shift.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\table_LSF_cos.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\tables_gain.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\tables_LTP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\encode_frame_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\energy_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\find_LPC_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\find_LTP_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\find_pitch_lags_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\find_pred_coefs_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\inner_product_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\k2a_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\LPC_analysis_filter_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\LPC_inv_pred_gain_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\LTP_analysis_filter_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\LTP_scale_ctrl_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\noise_shape_analysis_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\pitch_analysis_core_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\process_gains_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\regularize_correlations_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\residual_energy_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\scale_copy_vector_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\scale_vector_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\schur_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\sort_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\warped_autocorrelation_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\wrappers_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\apply_sine_window_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\autocorrelation_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\burg_modified_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\bwexpander_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\float\corrMatrix_FLP.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\x86\NSQ_sse.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\x86\VAD_sse.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\x86\VQ_WMat_EC_sse.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\x86\x86_silk_map.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\silk\x86\NSQ_del_dec_sse.c">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\x86\celt_lpc_sse.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\x86\pitch_sse.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\x86\pitch_sse2.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\x86\pitch_sse4_1.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\x86\vq_sse2.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\x86\x86_celt_map.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\x86\x86cpu.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\cwrs.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\entcode.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\entdec.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\entenc.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\kiss_fft.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\laplace.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\mathops.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\mdct.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\modes.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\pitch.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\quant_bands.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\rate.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\vq.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\bands.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\celt.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\celt_decoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\celt_encoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\celt\celt_lpc.c">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\mlp.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\mlp_data.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\opus.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\opus_decoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\opus_encoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\opus_multistream.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\opus_multistream_decoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\opus_multistream_encoder.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\repacketizer.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Opus\src\analysis.c">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\modes_.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceCodecs\Speex\vq_.c">
+      <Filter>Source Files\VoiceCodecs\Speex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ThreadMode.h">
@@ -754,6 +1210,201 @@
     </ClInclude>
     <ClInclude Include="Utility\Optional.h">
       <Filter>Source Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\tuning_parameters.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\typedef.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\API.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\control.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\debug.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\define.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\errors.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\Inlines.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\MacroCount.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\MacroDebug.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\macros.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\main.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\NSQ.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\pitch_est_defines.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\PLC.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\resampler_private.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\resampler_rom.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\resampler_structs.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\SigProc_FIX.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\structs.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\tables.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\float\main_FLP.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\float\SigProc_FLP.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\float\structs_FLP.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\float</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\x86\SigProc_FIX_sse.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\silk\x86\main_sse.h">
+      <Filter>Source Files\VoiceCodecs\Opus\silk\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\x86\celt_lpc_sse.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\x86\pitch_sse.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\x86\vq_sse.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\x86\x86cpu.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\cwrs.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\ecintrin.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\entcode.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\entdec.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\entenc.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\fixed_debug.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\fixed_generic.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\float_cast.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\kiss_fft.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\laplace.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\mathops.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\mdct.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\mfrngcod.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\modes.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\os_support.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\pitch.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\quant_bands.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\rate.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\stack_alloc.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\static_modes_fixed.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\static_modes_fixed_arm_ne10.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\static_modes_float.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\static_modes_float_arm_ne10.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\vq.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\_kiss_fft_guts.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\arch.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\bands.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\celt.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\celt_lpc.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\celt\cpu_support.h">
+      <Filter>Source Files\VoiceCodecs\Opus\celt</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\src\analysis.h">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\src\mlp.h">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\src\opus_private.h">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\src\tansig_table.h">
+      <Filter>Source Files\VoiceCodecs\Opus\src</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceCodecs\Opus\config.h">
+      <Filter>Source Files\VoiceCodecs\Opus</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

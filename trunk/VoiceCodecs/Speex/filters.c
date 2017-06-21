@@ -218,7 +218,7 @@ void comp_filter_mem_init (CombFilterMem *mem)
    mem->smooth_gain=1;
 }
 
-void comb_filter(
+void comb_filter_(
 float *exc,          /*decoded excitation*/
 float *new_exc,      /*enhanced excitation*/
 float *ak,           /*LPC filter coefs*/

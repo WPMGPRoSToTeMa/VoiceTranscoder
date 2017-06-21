@@ -63,7 +63,7 @@ void residue_percep_zero(float *xx, float *ak, float *awk1, float *awk2, float *
 
 void comp_filter_mem_init (CombFilterMem *mem);
 
-void comb_filter(
+void comb_filter_(
 float *exc,          /*decoded excitation*/
 float *new_exc,      /*enhanced excitation*/
 float *ak,           /*LPC filter coefs*/

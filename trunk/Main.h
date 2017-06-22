@@ -19,6 +19,8 @@ using namespace std;
 using namespace chrono_literals;
 using namespace chrono;
 
+class VoiceCodec_OPUS_PLC;
+
 // Structs and classes
 struct clientData_t {
 	bool HasNewCodec;
@@ -30,6 +32,7 @@ struct clientData_t {
 	bool IsBlocked;
 	Optional<time_point<steady_clock>> NextVoicePacketExpectedTime;
 	VoiceCodec_SILK *NewCodec;
+	VoiceCodec_OPUS_PLC *NewCodec2;
 	Optional<int> SampleRate;
 	VoiceCodec_Speex *OldCodec;
 };
@@ -54,6 +57,7 @@ enum : size_t {
 	VPC_VDATA_SPEEX = 2, // Deprecated
 	VPC_VDATA_RAW = 3,
 	VPC_VDATA_SILK = 4,
+	VPC_VDATA_OPUS_PLC = 6,
 	VPC_UNKNOWN = 10,
 	VPC_SETSAMPLERATE = 11
 };

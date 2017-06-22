@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <array>
 #include <cinttypes>
+#include <opus.h>
 
 #if !defined(_WIN32) && !defined(__linux__)
 #error "Unknown platform"
@@ -67,6 +68,78 @@ cvar_t *g_pcvarVoiceEnable;
 // Engine API
 enginefuncs_t g_engfuncs;
 globalvars_t *gpGlobals;
+
+class VoiceCodec_OPUS_PLC {
+	OpusDecoder* _opusDecoder;
+public:
+	VoiceCodec_OPUS_PLC() {
+		_opusDecoder = opus_decoder_create(8000, 1, nullptr);
+	}
+
+	~VoiceCodec_OPUS_PLC() {
+		opus_decoder_destroy(_opusDecoder);
+	}
+
+	void ResetState() {
+		opus_decoder_ctl(_opusDecoder, OPUS_RESET_STATE);
+	}
+
+	size_t Decode(const uint8_t *encodedBytes, size_t encodedBytesCount, int16_t *rawSamples, size_t maxRawSamples) {
+		if (encodedBytes == nullptr) {
+			return 0;
+		}
+		if (encodedBytesCount == 0) {
+			return 0;
+		}
+		if (rawSamples == nullptr) {
+			return 0;
+		}
+		if (maxRawSamples == 0) {
+			return 0;
+		}
+
+		size_t curEncodedBytePos = 0;
+		size_t decodedRawSamples = 0;
+
+		while (encodedBytesCount >= sizeof(uint16_t)) {
+			// TODO
+			if (decodedRawSamples + 160 > maxRawSamples) {
+				return 0;
+			}
+
+			uint16_t payloadSize = *(uint16_t *)&encodedBytes[curEncodedBytePos];
+			
+			curEncodedBytePos += sizeof(uint16_t);
+			curEncodedBytePos += sizeof(uint16_t);
+			encodedBytesCount -= sizeof(uint16_t);
+			encodedBytesCount -= sizeof(uint16_t);
+
+			if (payloadSize == 0) {
+				memset(&rawSamples[decodedRawSamples], 0, 160 * sizeof(uint16_t));
+				decodedRawSamples += 160;
+
+				continue;
+			}
+			if (payloadSize == 0xFFFF) {
+				ResetState();
+
+				return decodedRawSamples;
+			}
+			if (payloadSize > encodedBytesCount) {
+				return 0;
+			}
+
+			int16_t decodedSamples;
+			decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
+
+			decodedRawSamples += decodedSamples;
+			curEncodedBytePos += payloadSize;
+			encodedBytesCount -= payloadSize;
+		}
+
+		return decodedRawSamples;
+	}
+};
 
 C_DLLEXPORT
 #ifdef _WIN32
@@ -211,6 +284,7 @@ qboolean OnClientConnected(edict_t *pClient, const char *pszName, const char *ps
 	clientData.IsMuted = false;
 	clientData.IsBlocked = false;
 	clientData.NewCodec->ResetState();
+	clientData.NewCodec2->ResetState();
 	clientData.SampleRate = nullptr;
 	clientData.OldCodec->ResetState();
 
@@ -518,6 +592,7 @@ void VTC_DeinitCodecs(void) {
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
 		delete g_clientData[i].OldCodec;
 		delete g_clientData[i].NewCodec;
+		delete g_clientData[i].NewCodec2;
 	}
 }
 
@@ -685,6 +760,30 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 						}
 
 						rawSampleCount += pClientData->NewCodec->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						buf.SkipBytes(bytesCount);
+					} else {
+						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);
+						EngineUTIL::DropClient(pClient, false, "Voice packet invalid vdata size (cur = %u, need = %u)", remainBytes, bytesCount);
+
+						return;
+					}
+				}
+				break;
+				case VPC_VDATA_OPUS_PLC: {
+					uint16_t bytesCount = buf.ReadUInt16();
+
+					size_t remainBytes = buf.Size() - buf.TellRead() - sizeof(uint32_t);
+					if (remainBytes >= bytesCount) {
+						size_t remainSamples = ARRAYSIZE(rawSamples) - rawSampleCount;
+
+						if (remainSamples == 0) {
+							LOG_MESSAGE(PLID, "Voice packet not enough space for samples from %s", pClient->m_szPlayerName);
+							EngineUTIL::DropClient(pClient, false, "Voice packet not enough space for samples");
+
+							return;
+						}
+
+						rawSampleCount += pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
 						buf.SkipBytes(bytesCount);
 					} else {
 						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);
@@ -880,6 +979,7 @@ void VTC_InitCodecs(void) {
 	for (size_t i = 0; i < MAX_CLIENTS; i++) {
 		g_clientData[i].OldCodec = new VoiceCodec_Speex(g_oldVoiceQuality);
 		g_clientData[i].NewCodec = new VoiceCodec_SILK(5);
+		g_clientData[i].NewCodec2 = new VoiceCodec_OPUS_PLC{};
 	}
 }
 

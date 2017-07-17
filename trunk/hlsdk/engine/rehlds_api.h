@@ -32,6 +32,7 @@
 #include "hookchains.h"
 #include "FlightRecorder.h"
 #include "model.h"
+#include <maintypes.h>
 
 #define REHLDS_API_VERSION_MAJOR 3
 #define REHLDS_API_VERSION_MINOR 0

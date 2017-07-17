@@ -1,5 +1,5 @@
 /opt/intel/bin/icc \
-		-O3 -fdata-sections -ffunction-sections -m32 -shared \
+		-Os -fdata-sections -ffunction-sections -m32 -shared \
 		-fno-builtin -fno-rtti -Qoption,cpp,--treat_func_as_string_literal_cpp -no-intel-extensions -fno-stack-protector -std=c++14 \
 		-ipo -s -static-libgcc -static-intel -static-libstdc++ \
 		-msse2 -fp-model strict -fomit-frame-pointer -g0 \

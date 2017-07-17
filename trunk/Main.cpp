@@ -554,7 +554,7 @@ void VTC_Path() {
 	Dl_info dlinfo;
 	dladdr((void*)&VTC_Path, &dlinfo);
 	LOG_CONSOLE(PLID, "%s", dlinfo.dli_fname);
-	dladdr((void*)&g_engfuncs.pfnPrecacheModel, &dlinfo);
+	dladdr((void*)g_engfuncs.pfnPrecacheModel, &dlinfo);
 	LOG_CONSOLE(PLID, "%s", dlinfo.dli_fname);
 #endif
 }

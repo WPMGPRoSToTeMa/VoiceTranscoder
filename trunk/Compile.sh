@@ -1,7 +1,7 @@
 g++ \
 		-Os -fdata-sections -ffunction-sections -m32 -shared \
 		-fno-builtin -fno-rtti -fno-stack-protector -std=c++14 \
-		-flto -s -static-libgcc -static-libstdc++ \
+		-flto -s -static-libgcc -static-libstdc++ -Wno-narrowing \
 		-msse2 -fomit-frame-pointer -g0 \
 		-fvisibility=hidden -fPIC \
 -D HAVE_CONFIG_H \

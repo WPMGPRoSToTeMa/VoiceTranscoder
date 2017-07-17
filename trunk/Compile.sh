@@ -1,9 +1,9 @@
 /opt/intel/bin/icc \
-		-O3 -m32 -shared \
+		-O3 -fdata-sections -ffunction-sections -m32 -shared \
 		-fno-builtin -fno-rtti -Qoption,cpp,--treat_func_as_string_literal_cpp -no-intel-extensions -fno-stack-protector -std=c++14 \
 		-ipo -s -static-libgcc -static-intel -static-libstdc++ \
 		-msse2 -fp-model strict -fomit-frame-pointer -g0 \
-		-fvisibility=hidden -fdata-sections -ffunction-sections -Wl,--gc-sections \
+		-fvisibility=hidden \
 -D HAVE_CONFIG_H \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 -Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
@@ -325,5 +325,5 @@
 	VoiceCodecs/Opus/src/opus_multistream_decoder.c \
 	VoiceCodecs/Opus/src/opus_multistream_encoder.c \
 	VoiceCodecs/Opus/src/repacketizer.c \
--lrt -ldl -lm -lpthread \
+-lrt -ldl -lm -lpthread -Wl,--gc-sections \
 -o VoiceTranscoder.so

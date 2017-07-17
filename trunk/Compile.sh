@@ -1,5 +1,5 @@
 gcc \
-		-Os -fdata-sections -ffunction-sections \
+		-Os -fdata-sections -ffunction-sections -shared \
 		-std=c++14 \
 		-flto -s -Wno-narrowing \
 		-msse4.1 \

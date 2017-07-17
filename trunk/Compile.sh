@@ -1,7 +1,7 @@
 gcc \
 		-Os -fdata-sections -ffunction-sections -m32 -shared \
 		-fno-builtin -fno-rtti -fno-stack-protector -std=c++14 \
-		-flto -s -static-libgcc -static-libstdc++ -Wno-narrowing \
+		-flto -s -Wno-narrowing \
 		-msse4.1 -fomit-frame-pointer -g0 \
 		-fvisibility=hidden -fPIC \
 -D HAVE_CONFIG_H \
@@ -325,5 +325,5 @@ gcc \
 	VoiceCodecs/Opus/src/opus_multistream_decoder.c \
 	VoiceCodecs/Opus/src/opus_multistream_encoder.c \
 	VoiceCodecs/Opus/src/repacketizer.c \
--lrt -ldl -lm -lpthread -lstdc++ -Wl,--gc-sections \
+-lrt -ldl -lm -lpthread -lstdc++ -static-libgcc -static-libstdc++ -Wl,--gc-sections \
 -o VoiceTranscoder.so

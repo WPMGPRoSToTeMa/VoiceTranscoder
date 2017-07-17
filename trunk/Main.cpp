@@ -101,7 +101,7 @@ public:
 		size_t curEncodedBytePos = 0;
 		size_t decodedRawSamples = 0;
 
-		while (encodedBytesCount >= sizeof(uint16_t)) {
+		while (encodedBytesCount >= sizeof(uint16_t) + sizeof(uint16_t)) {
 			// TODO
 			if (decodedRawSamples + 160 > maxRawSamples) {
 				return 0;
@@ -115,12 +115,16 @@ public:
 			encodedBytesCount -= sizeof(uint16_t);
 
 			if (payloadSize == 0) {
+				//LOG_MESSAGE(PLID, "Silence frame");
+
 				memset(&rawSamples[decodedRawSamples], 0, 160 * sizeof(uint16_t));
 				decodedRawSamples += 160;
 
 				continue;
 			}
 			if (payloadSize == 0xFFFF) {
+				//LOG_MESSAGE(PLID, "Reset frame");
+
 				ResetState();
 
 				return decodedRawSamples;
@@ -128,6 +132,7 @@ public:
 			if (payloadSize > encodedBytesCount) {
 				return 0;
 			}
+			//LOG_MESSAGE(PLID, "Normal frame");
 
 			int16_t decodedSamples;
 			decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
@@ -467,7 +472,7 @@ void OnFrameStarted() {
 				SteamID steamid;
 				steamid.SetUniverse(UNIVERSE_PUBLIC);
 				steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
-				steamid.SetAccountId(0xFFFFFFFE);
+				steamid.SetAccountId(0xFFFFFFFE); // Use different for separate channels
 				*(uint64_t *)newEncodedData.data() = steamid.ToUInt64();
 				*(uint8_t *)&newEncodedData.data()[8] = VPC_SETSAMPLERATE;
 				*(uint16_t *)&newEncodedData.data()[9] = 16000; // TODO: sent to steam with original samplerate, but samplerate should be % 4000 == 0
@@ -525,7 +530,7 @@ plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,  // ifvers
 	"VoiceTranscoder",       // name
 	VOICETRANSCODER_VERSION, // version
-	"2017.02.12",            // date
+	"2017.06.22",            // date
 	"WPMG.PRoSToC0der",      // author
 	"http://vtc.wpmg.ru/",   // url
 	"VTC",                   // logtag, all caps please
@@ -542,6 +547,16 @@ C_DLLEXPORT int Meta_Query(char *pchInterfaceVersion, plugin_info_t **pPluginInf
 	gpMetaUtilFuncs = pMetaUtilFuncs;
 
 	return TRUE;
+}
+
+void VTC_Path() {
+#ifndef _WIN32
+	Dl_info dlinfo;
+	dladdr((void*)&VTC_Path, &dlinfo);
+	LOG_CONSOLE(PLID, "%s", dlinfo.dli_fname);
+	dladdr((void*)&g_engfuncs.pfnPrecacheModel, &dlinfo);
+	LOG_CONSOLE(PLID, "%s", dlinfo.dli_fname);
+#endif
 }
 
 C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, meta_globals_t *pMGlobals, gamedll_funcs_t *pGamedllFuncs) {
@@ -571,6 +586,8 @@ C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable, m
 	} else {
 		EngineUTIL::GetRehldsAPI()->GetHookchains()->HandleNetCommand()->registerHook((void(*)(IRehldsHook_HandleNetCommand *, IGameClient *, int8))&HandleNetCommand_Hook);
 	}
+
+	g_engfuncs.pfnAddServerCommand("VTC_Path", &VTC_Path);
 
 	VTC_InitCvars();
 	VTC_InitAPI();
@@ -711,7 +728,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			switch (vpc) {
 				case VPC_SETSAMPLERATE: {
 					pClientData->SampleRate = buf.ReadUInt16();
-					//LOG_MESSAGE(PLID, "%s %d", pClient->m_szPlayerName, pClientData->sampleRate);
+					//LOG_MESSAGE(PLID, "%s %d", pClient->m_szPlayerName, pClientData->SampleRate);
 
 					if (*pClientData->SampleRate != NEWCODEC_WANTED_SAMPLERATE && *pClientData->SampleRate != NEWCODEC_WANTED_SAMPLERATE2) {
 						LOG_MESSAGE(PLID, "Voice packet unwanted samplerate (cur = %u, want = %u or %u) from %s", *pClientData->SampleRate, NEWCODEC_WANTED_SAMPLERATE, NEWCODEC_WANTED_SAMPLERATE2, pClient->m_szPlayerName);
@@ -830,6 +847,9 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 	typedef duration<int64_t, ratio<1, 8000>> sample8k;
 	auto frameTimeLength = sample8k(rawSampleCount);
 
+	// There can be % 20ms != 0 packets
+	//LOG_MESSAGE(PLID, "%g", microseconds(frameTimeLength).count()/1000.0);
+
 	//LOG_MESSAGE(PLID, "Frame time: %f %f %d %d", currentMicroSeconds / 1000000.0, frameTimeLength / 1000.0, receivedBytesCount, needTranscode);
 
 	if (pClientData->NextVoicePacketExpectedTime > now) {
@@ -905,6 +925,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			SteamID steamid;
 			steamid.SetUniverse(UNIVERSE_PUBLIC);
 			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
+			// Use different for separate channels
 			steamid.SetAccountId(0xFFFFFFFF); // 0 is invalid, but maximum value valid, TODO: randomize or get non-steam user steamid?
 			*(uint64_t *)recompressed = steamid.ToUInt64();
 			*(uint8_t *)&recompressed[8] = VPC_SETSAMPLERATE;

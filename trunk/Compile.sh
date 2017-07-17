@@ -325,5 +325,5 @@ gcc \
 	VoiceCodecs/Opus/src/opus_multistream_decoder.c \
 	VoiceCodecs/Opus/src/opus_multistream_encoder.c \
 	VoiceCodecs/Opus/src/repacketizer.c \
--lrt -ldl -lm -lpthread -Wl,--gc-sections \
+-lrt -ldl -lm -lpthread -lstdc++ -Wl,--gc-sections \
 -o VoiceTranscoder.so

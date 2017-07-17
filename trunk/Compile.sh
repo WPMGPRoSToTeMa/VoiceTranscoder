@@ -1,4 +1,4 @@
-g++ \
+gcc \
 		-Os -fdata-sections -ffunction-sections -m32 -shared \
 		-fno-builtin -fno-rtti -fno-stack-protector -std=c++14 \
 		-flto -s -static-libgcc -static-libstdc++ -Wno-narrowing \

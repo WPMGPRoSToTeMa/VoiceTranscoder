@@ -1,8 +1,8 @@
 gcc \
-		-Os -fdata-sections -ffunction-sections -m32 -shared \
-		-fno-builtin -fno-rtti -fno-stack-protector -std=c++14 \
+		-Os -fdata-sections -ffunction-sections \
+		-std=c++14 \
 		-flto -s -Wno-narrowing \
-		-msse4.1 -fomit-frame-pointer -g0 \
+		-msse4.1 \
 		-fvisibility=hidden -fPIC \
 -D HAVE_CONFIG_H \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \

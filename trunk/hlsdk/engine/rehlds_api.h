@@ -32,7 +32,6 @@
 #include "hookchains.h"
 #include "FlightRecorder.h"
 #include "model.h"
-#include <maintypes.h>
 
 #define REHLDS_API_VERSION_MAJOR 3
 #define REHLDS_API_VERSION_MINOR 0
@@ -181,6 +180,12 @@ typedef IVoidHookChainRegistry<IGameClient *, struct usercmd_s *, int, int, int>
 typedef IVoidHookChain<> IRehldsHook_SV_Spawn_f;
 typedef IVoidHookChainRegistry<> IRehldsHookRegistry_SV_Spawn_f;
 
+// From engine/server.h
+typedef enum sv_delta_s
+{
+	sv_packet_nodelta,
+	sv_packet_delta,
+} sv_delta_t;
 //SV_CreatePacketEntities hook
 typedef IHookChain<int, enum sv_delta_s, IGameClient *, struct packet_entities_s *, struct sizebuf_s *> IRehldsHook_SV_CreatePacketEntities;
 typedef IHookChainRegistry<int, enum sv_delta_s, IGameClient *, struct packet_entities_s *, struct sizebuf_s *> IRehldsHookRegistry_SV_CreatePacketEntities;

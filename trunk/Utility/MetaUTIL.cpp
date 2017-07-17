@@ -3,6 +3,13 @@
 #include <meta_api.h>
 #include "UtilFunctions.h"
 
+#ifndef _WIN32
+#include <sys/mman.h>
+#ifndef PAGESIZE
+constexpr auto PAGESIZE = 0x1000;
+#endif
+#endif
+
 size_t MetaUTIL::GetPluginRelPath(char *path, size_t maxPathLength) {
 #ifdef _WIN32
 	const char *pluginAbsPath = GET_PLUGIN_PATH(PLID);

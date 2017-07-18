@@ -1,9 +1,9 @@
 g++-7.1 \
-		-O3 -fdata-sections -ffunction-sections -shared -m32 \
+		-Os -fdata-sections -ffunction-sections -shared -m32 \
 		-std=c++14 \
 		-flto -s -Wno-narrowing \
 		-msse4.1 \
-		-fvisibility=hidden -fPIC \
+		-fvisibility=hidden \
 		-static-libgcc -static-libstdc++ \
 -D HAVE_CONFIG_H \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \

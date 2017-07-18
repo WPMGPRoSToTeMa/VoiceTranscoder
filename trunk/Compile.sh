@@ -1,4 +1,4 @@
-g++ \
+g++-7.1 \
 		-Os -fdata-sections -ffunction-sections -shared \
 		-std=c++14 \
 		-flto -s -Wno-narrowing \

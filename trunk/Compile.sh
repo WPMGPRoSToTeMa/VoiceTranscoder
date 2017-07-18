@@ -1,5 +1,5 @@
 g++-7.1 \
-		-Os -fdata-sections -ffunction-sections -shared \
+		-Os -fdata-sections -ffunction-sections -shared -m32 \
 		-std=c++14 \
 		-flto -s -Wno-narrowing \
 		-msse4.1 \

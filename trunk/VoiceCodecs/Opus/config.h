@@ -50,7 +50,7 @@ POSSIBILITY OF SUCH DAMAGE.
 //#define OPUS_X86_PRESUME_SSE2 1
 //#endif
 //#if defined(__AVX__)
-//#define OPUS_X86_PRESUME_SSE4_1 1
+#define OPUS_X86_PRESUME_SSE4_1 1
 //#endif
 
 //#if !defined(OPUS_X86_PRESUME_SSE4_1) || !defined(OPUS_X86_PRESUME_SSE2) || !defined(OPUS_X86_PRESUME_SSE)

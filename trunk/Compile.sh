@@ -199,13 +199,13 @@ g++-7.1 \
 	-x c VoiceCodecs/Opus/celt/quant_bands.c \
 	-x c VoiceCodecs/Opus/celt/rate.c \
 	-x c VoiceCodecs/Opus/celt/vq.c \
-	-x c VoiceCodecs/Opus/celt/x86/celt_lpc_sse.c \
+	-x c -msse4.1 VoiceCodecs/Opus/celt/x86/celt_lpc_sse.c -msse2 \
 	-x c VoiceCodecs/Opus/celt/x86/pitch_sse.c \
 	-x c VoiceCodecs/Opus/celt/x86/pitch_sse2.c \
-	-x c VoiceCodecs/Opus/celt/x86/pitch_sse4_1.c \
+	-x c -msse4.1 VoiceCodecs/Opus/celt/x86/pitch_sse4_1.c -msse2 \
 	-x c VoiceCodecs/Opus/celt/x86/vq_sse2.c \
 	-x c VoiceCodecs/Opus/celt/x86/x86cpu.c \
-	-x c VoiceCodecs/Opus/celt/x86/x86_celt_map.c \
+	-x c -msse4.1 VoiceCodecs/Opus/celt/x86/x86_celt_map.c -msse2 \
 	-x c VoiceCodecs/Opus/silk/A2NLSF.c \
 	-x c VoiceCodecs/Opus/silk/ana_filt_bank_1.c \
 	-x c VoiceCodecs/Opus/silk/biquad_alt.c \

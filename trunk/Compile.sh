@@ -1,6 +1,6 @@
 gcc-7.1 \
 		-Os -fdata-sections -ffunction-sections -m32 \
-		-flto -s -Wno-narrowing \
+		-flto -Wno-narrowing \
 		-msse4.1 \
 		-fvisibility=hidden \
 -D HAVE_CONFIG_H \
@@ -11,7 +11,7 @@ gcc-7.1 \
 
 gcc-7.1 \
 		-Os -fdata-sections -ffunction-sections -m32 \
-		-flto -s -Wno-narrowing \
+		-flto -Wno-narrowing \
 		-msse4.1 \
 		-fvisibility=hidden \
 -D HAVE_CONFIG_H \
@@ -22,7 +22,7 @@ gcc-7.1 \
 
 gcc-7.1 \
 		-Os -fdata-sections -ffunction-sections -m32 \
-		-flto -s -Wno-narrowing \
+		-flto -Wno-narrowing \
 		-msse4.1 \
 		-fvisibility=hidden \
 -D HAVE_CONFIG_H \

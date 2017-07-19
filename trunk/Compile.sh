@@ -1,8 +1,7 @@
 gcc-7.1 \
-		-Os -fdata-sections -ffunction-sections -m32 \
-		-flto -Wno-narrowing \
+		-m32 \
+		-Wno-narrowing \
 		-msse4.1 \
-		-fvisibility=hidden \
 -D HAVE_CONFIG_H \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 -Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
@@ -10,10 +9,9 @@ gcc-7.1 \
 -o VoiceTranscoderSSE41_1.o
 
 gcc-7.1 \
-		-Os -fdata-sections -ffunction-sections -m32 \
-		-flto -Wno-narrowing \
+		-m32 \
+		-Wno-narrowing \
 		-msse4.1 \
-		-fvisibility=hidden \
 -D HAVE_CONFIG_H \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 -Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
@@ -21,10 +19,9 @@ gcc-7.1 \
 -o VoiceTranscoderSSE41_2.o
 
 gcc-7.1 \
-		-Os -fdata-sections -ffunction-sections -m32 \
-		-flto -Wno-narrowing \
+		-m32 \
+		-Wno-narrowing \
 		-msse4.1 \
-		-fvisibility=hidden \
 -D HAVE_CONFIG_H \
 -Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
 -Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \

@@ -2,7 +2,7 @@ g++-7.1 \
 		-Os -fdata-sections -ffunction-sections -shared -m32 \
 		-std=c++14 \
 		-flto -s -Wno-narrowing \
-		-msse4.1 \
+		-msse2 \
 		-fvisibility=hidden \
 		-static-libgcc -static-libstdc++ \
 -D HAVE_CONFIG_H \

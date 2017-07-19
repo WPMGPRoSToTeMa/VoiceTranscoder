@@ -1,3 +1,18 @@
+gcc-7.1 \
+		-Os -fdata-sections -ffunction-sections -m32 \
+		-flto -s -Wno-narrowing \
+		-msse4.1 \
+		-fvisibility=hidden \
+		-static-libgcc -static-libstdc++ \
+-D HAVE_CONFIG_H \
+-Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
+-Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
+	-c VoiceCodecs/Opus/silk/x86/NSQ_del_dec_sse.c \
+	-c VoiceCodecs/Opus/silk/x86/NSQ_sse.c \
+	-c VoiceCodecs/Opus/silk/x86/VQ_WMat_EC_sse.c \
+-Wl,--gc-sections \
+-o VoiceTranscoderSSE41.o
+
 g++-7.1 \
 		-Os -fdata-sections -ffunction-sections -shared -m32 \
 		-std=c++14 \
@@ -199,13 +214,13 @@ g++-7.1 \
 	-x c VoiceCodecs/Opus/celt/quant_bands.c \
 	-x c VoiceCodecs/Opus/celt/rate.c \
 	-x c VoiceCodecs/Opus/celt/vq.c \
-	-x c -msse4.1 VoiceCodecs/Opus/celt/x86/celt_lpc_sse.c -mno-sse4.1 \
+	-x c VoiceCodecs/Opus/celt/x86/celt_lpc_sse.c \
 	-x c VoiceCodecs/Opus/celt/x86/pitch_sse.c \
 	-x c VoiceCodecs/Opus/celt/x86/pitch_sse2.c \
-	-x c -msse4.1 VoiceCodecs/Opus/celt/x86/pitch_sse4_1.c -mno-sse4.1 \
+	-x c VoiceCodecs/Opus/celt/x86/pitch_sse4_1.c \
 	-x c VoiceCodecs/Opus/celt/x86/vq_sse2.c \
 	-x c VoiceCodecs/Opus/celt/x86/x86cpu.c \
-	-x c -msse4.1 VoiceCodecs/Opus/celt/x86/x86_celt_map.c -mno-sse4.1 \
+	-x c VoiceCodecs/Opus/celt/x86/x86_celt_map.c \
 	-x c VoiceCodecs/Opus/silk/A2NLSF.c \
 	-x c VoiceCodecs/Opus/silk/ana_filt_bank_1.c \
 	-x c VoiceCodecs/Opus/silk/biquad_alt.c \
@@ -311,10 +326,7 @@ g++-7.1 \
 	-x c VoiceCodecs/Opus/silk/table_LSF_cos.c \
 	-x c VoiceCodecs/Opus/silk/VAD.c \
 	-x c VoiceCodecs/Opus/silk/VQ_WMat_EC.c \
-	-x c -msse4.1 VoiceCodecs/Opus/silk/x86/NSQ_del_dec_sse.c -mno-sse4.1 \
-	-x c -msse4.1 VoiceCodecs/Opus/silk/x86/NSQ_sse.c -mno-sse4.1 \
-	-x c -msse4.1 VoiceCodecs/Opus/silk/x86/VAD_sse.c -mno-sse4.1 \
-	-x c -msse4.1 VoiceCodecs/Opus/silk/x86/VQ_WMat_EC_sse.c -mno-sse4.1 \
+	-x c VoiceCodecs/Opus/silk/x86/VAD_sse.c \
 	-x c VoiceCodecs/Opus/silk/x86/x86_silk_map.c \
 	-x c VoiceCodecs/Opus/src/analysis.c \
 	-x c VoiceCodecs/Opus/src/mlp.c \
@@ -326,5 +338,6 @@ g++-7.1 \
 	-x c VoiceCodecs/Opus/src/opus_multistream_decoder.c \
 	-x c VoiceCodecs/Opus/src/opus_multistream_encoder.c \
 	-x c VoiceCodecs/Opus/src/repacketizer.c \
+	VoiceTranscoderSSE41.o \
 -Wl,--gc-sections \
 -o VoiceTranscoder.so

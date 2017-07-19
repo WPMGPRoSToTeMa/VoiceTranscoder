@@ -41,7 +41,9 @@ size_t MetaUTIL::GetPluginRelPath(char *path, size_t maxPathLength) {
 	size_t oldOffs = *(size_t*)addr;
 	mprotect((void*)((uintptr_t)addr / PAGESIZE*PAGESIZE), 4 + (uintptr_t)addr%PAGESIZE, PROT_EXEC | PROT_READ | PROT_WRITE);
 	*(size_t*)addr = oldOffs - 0x1104;
+	mprotect((void*)((uintptr_t)addr / PAGESIZE*PAGESIZE), 4 + (uintptr_t)addr%PAGESIZE, PROT_EXEC | PROT_READ);
 	const char* pluginRelPath = GET_PLUGIN_PATH(PLID);
+	mprotect((void*)((uintptr_t)addr / PAGESIZE*PAGESIZE), 4 + (uintptr_t)addr%PAGESIZE, PROT_EXEC | PROT_READ | PROT_WRITE);
 	*(size_t*)addr = oldOffs;
 	mprotect((void*)((uintptr_t)addr / PAGESIZE*PAGESIZE), 4 + (uintptr_t)addr%PAGESIZE, PROT_EXEC | PROT_READ);
 

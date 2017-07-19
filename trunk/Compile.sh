@@ -1,4 +1,4 @@
-gcc-7.1 \
+g++-7.1 \
 		-m32 \
 		-Wno-narrowing \
 		-msse4.1 \
@@ -8,7 +8,7 @@ gcc-7.1 \
 	-c VoiceCodecs/Opus/silk/x86/NSQ_del_dec_sse.c \
 -o VoiceTranscoderSSE41_1.o
 
-gcc-7.1 \
+g++-7.1 \
 		-m32 \
 		-Wno-narrowing \
 		-msse4.1 \
@@ -18,7 +18,7 @@ gcc-7.1 \
 	-c VoiceCodecs/Opus/silk/x86/NSQ_sse.c \
 -o VoiceTranscoderSSE41_2.o
 
-gcc-7.1 \
+g++-7.1 \
 		-m32 \
 		-Wno-narrowing \
 		-msse4.1 \

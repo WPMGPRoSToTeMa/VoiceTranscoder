@@ -111,6 +111,9 @@ static OPUS_INLINE void silk_noise_shape_quantizer_del_dec_sse4_1(
     opus_int            decisionDelay           /* I                                        */
 );
 
+#ifndef _WIN32
+__attribute__((target("sse4.1")))
+#endif
 void silk_NSQ_del_dec_sse4_1(
     const silk_encoder_state    *psEncC,                                    /* I    Encoder State                   */
     silk_nsq_state              *NSQ,                                       /* I/O  NSQ state                       */
@@ -309,6 +312,9 @@ void silk_NSQ_del_dec_sse4_1(
 /******************************************/
 /* Noise shape quantizer for one subframe */
 /******************************************/
+#ifndef _WIN32
+__attribute__((target("sse4.1")))
+#endif
 static OPUS_INLINE void silk_noise_shape_quantizer_del_dec_sse4_1(
     silk_nsq_state      *NSQ,                   /* I/O  NSQ state                           */
     NSQ_del_dec_struct  psDelDec[],             /* I/O  Delayed decision states             */
@@ -724,6 +730,9 @@ static OPUS_INLINE void silk_noise_shape_quantizer_del_dec_sse4_1(
     RESTORE_STACK;
 }
 
+#ifndef _WIN32
+__attribute__((target("sse4.1")))
+#endif
 static OPUS_INLINE void silk_nsq_del_dec_scale_states_sse4_1(
     const silk_encoder_state *psEncC,               /* I    Encoder State                       */
     silk_nsq_state      *NSQ,                       /* I/O  NSQ state                           */

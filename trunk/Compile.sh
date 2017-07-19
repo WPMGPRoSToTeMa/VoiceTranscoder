@@ -1,34 +1,4 @@
 g++-7.1 \
-		-m32 \
-		-Wno-narrowing \
-		-msse4.1 \
--D HAVE_CONFIG_H \
--Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
--Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
-	-c VoiceCodecs/Opus/silk/x86/NSQ_del_dec_sse.c \
--o VoiceTranscoderSSE41_1.o
-
-g++-7.1 \
-		-m32 \
-		-Wno-narrowing \
-		-msse4.1 \
--D HAVE_CONFIG_H \
--Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
--Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
-	-c VoiceCodecs/Opus/silk/x86/NSQ_sse.c \
--o VoiceTranscoderSSE41_2.o
-
-g++-7.1 \
-		-m32 \
-		-Wno-narrowing \
-		-msse4.1 \
--D HAVE_CONFIG_H \
--Ihlsdk/common -Ihlsdk/dlls -Ihlsdk/engine -Ihlsdk/pm_shared -Imetamod -Ispeex -Isilk -IHashers -IMultiThreading -IUtility \
--Iopus -IVoiceCodecs/Opus -IVoiceCodecs/Opus/celt -IVoiceCodecs/Opus/celt/x86 -IVoiceCodecs/Opus/silk -IVoiceCodecs/Opus/silk/float -IVoiceCodecs/Opus/silk/x86 -IVoiceCodecs/Opus/src \
-	-c VoiceCodecs/Opus/silk/x86/VQ_WMat_EC_sse.c \
--o VoiceTranscoderSSE41_3.o
-
-g++-7.1 \
 		-Os -fdata-sections -ffunction-sections -shared -m32 \
 		-std=c++14 \
 		-flto -s -Wno-narrowing \
@@ -341,7 +311,10 @@ g++-7.1 \
 	-x c VoiceCodecs/Opus/silk/table_LSF_cos.c \
 	-x c VoiceCodecs/Opus/silk/VAD.c \
 	-x c VoiceCodecs/Opus/silk/VQ_WMat_EC.c \
+	-x c VoiceCodecs/Opus/silk/x86/NSQ_del_dec_sse.c \
+	-x c VoiceCodecs/Opus/silk/x86/NSQ_sse.c \
 	-x c VoiceCodecs/Opus/silk/x86/VAD_sse.c \
+	-x c VoiceCodecs/Opus/silk/x86/VQ_WMat_EC_sse.c \
 	-x c VoiceCodecs/Opus/silk/x86/x86_silk_map.c \
 	-x c VoiceCodecs/Opus/src/analysis.c \
 	-x c VoiceCodecs/Opus/src/mlp.c \
@@ -353,8 +326,5 @@ g++-7.1 \
 	-x c VoiceCodecs/Opus/src/opus_multistream_decoder.c \
 	-x c VoiceCodecs/Opus/src/opus_multistream_encoder.c \
 	-x c VoiceCodecs/Opus/src/repacketizer.c \
-	VoiceTranscoderSSE41_1.o \
-	VoiceTranscoderSSE41_2.o \
-	VoiceTranscoderSSE41_3.o \
 -Wl,--gc-sections \
 -o VoiceTranscoder.so

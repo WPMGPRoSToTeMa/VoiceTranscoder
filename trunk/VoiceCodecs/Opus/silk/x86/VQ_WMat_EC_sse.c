@@ -36,6 +36,9 @@
 #include "celt/x86/x86cpu.h"
 
 /* Entropy constrained matrix-weighted VQ, hard-coded to 5-element vectors, for a single input data vector */
+#ifndef _WIN32
+__attribute__((target("sse4.1")))
+#endif
 void silk_VQ_WMat_EC_sse4_1(
     opus_int8                   *ind,                           /* O    index of best codebook vector               */
     opus_int32                  *rate_dist_Q14,                 /* O    best weighted quant error + mu * rate       */

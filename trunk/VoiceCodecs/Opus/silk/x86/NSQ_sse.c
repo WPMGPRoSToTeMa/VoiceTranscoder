@@ -70,6 +70,9 @@ static OPUS_INLINE void silk_noise_shape_quantizer_10_16_sse4_1(
     opus_int32          table[][4]              /* I                                    */
 );
 
+#ifndef _WIN32
+__attribute__((target("sse4.1")))
+#endif
 void silk_NSQ_sse4_1(
     const silk_encoder_state    *psEncC,                                    /* I    Encoder State                   */
     silk_nsq_state              *NSQ,                                       /* I/O  NSQ state                       */
@@ -241,6 +244,9 @@ void silk_NSQ_sse4_1(
 /***********************************/
 /* silk_noise_shape_quantizer_10_16  */
 /***********************************/
+#ifndef _WIN32
+__attribute__((target("sse4.1")))
+#endif
 static OPUS_INLINE void silk_noise_shape_quantizer_10_16_sse4_1(
     silk_nsq_state      *NSQ,                   /* I/O  NSQ state                       */
     opus_int            signalType,             /* I    Signal type                     */
@@ -599,6 +605,9 @@ static OPUS_INLINE void silk_noise_shape_quantizer_10_16_sse4_1(
     silk_memcpy( NSQ->sLPC_Q14, &NSQ->sLPC_Q14[ length ], NSQ_LPC_BUF_LENGTH * sizeof( opus_int32 ) );
 }
 
+#ifndef _WIN32
+__attribute__((target("sse4.1")))
+#endif
 static OPUS_INLINE void silk_nsq_scale_states_sse4_1(
     const silk_encoder_state *psEncC,           /* I    Encoder State                   */
     silk_nsq_state      *NSQ,                   /* I/O  NSQ state                       */

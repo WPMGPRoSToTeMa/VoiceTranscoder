@@ -50,3 +50,7 @@ void SteamID::SetAccountType(accountType_t accountType) {
 void SteamID::SetAccountId(size_t accountId) {
 	m_steamid.m_comp.m_accountID = accountId;
 }
+
+void SteamID::SetAccountInstance(size_t instance) {
+	m_steamid.m_comp.m_accountInstance = instance;
+}

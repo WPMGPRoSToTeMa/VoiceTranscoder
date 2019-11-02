@@ -2,6 +2,7 @@
 
 #include "UtilTypes.h"
 
+const size_t STEAMUSER_DESKTOPINSTANCE = 1;
 const size_t STEAMUSER_WEBINSTANCE = 4;
 
 // Steam universes. Each universe is a self-contained Steam instance.
@@ -45,6 +46,7 @@ public:
 	void SetUniverse(universe_t universe);
 	void SetAccountType(accountType_t accountType);
 	void SetAccountId(size_t accountId);
+	void SetAccountInstance(size_t instance);
 private:
 	union steamID_t {
 		struct steamIDComponent_t {

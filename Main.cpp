@@ -473,6 +473,7 @@ void OnFrameStarted() {
 				steamid.SetUniverse(UNIVERSE_PUBLIC);
 				steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
 				steamid.SetAccountId(0xFFFFFFFE); // Use different for separate channels
+				steamid.SetAccountInstance(STEAMUSER_DESKTOPINSTANCE);
 				*(uint64_t *)newEncodedData.data() = steamid.ToUInt64();
 				*(uint8_t *)&newEncodedData.data()[8] = VPC_SETSAMPLERATE;
 				*(uint16_t *)&newEncodedData.data()[9] = 16000; // TODO: sent to steam with original samplerate, but samplerate should be % 4000 == 0
@@ -530,7 +531,7 @@ plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,  // ifvers
 	"VoiceTranscoder",       // name
 	VOICETRANSCODER_VERSION, // version
-	"2017.06.22",            // date
+	"2019.11.02",            // date
 	"WPMG.PRoSToC0der",      // author
 	"http://vtc.wpmg.ru/",   // url
 	"VTC",                   // logtag, all caps please
@@ -927,6 +928,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 			steamid.SetAccountType(ACCOUNT_TYPE_INDIVIDUAL);
 			// Use different for separate channels
 			steamid.SetAccountId(0xFFFFFFFF); // 0 is invalid, but maximum value valid, TODO: randomize or get non-steam user steamid?
+			steamid.SetAccountInstance(STEAMUSER_DESKTOPINSTANCE);
 			*(uint64_t *)recompressed = steamid.ToUInt64();
 			*(uint8_t *)&recompressed[8] = VPC_SETSAMPLERATE;
 			*(uint16_t *)&recompressed[9] = 8000;

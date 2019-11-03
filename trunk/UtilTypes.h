@@ -15,3 +15,4 @@ typedef unsigned long long	qword;
 
 typedef unsigned char		boolean;
 typedef int					qboolean;
+typedef long long			longlong;

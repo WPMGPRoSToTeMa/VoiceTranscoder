@@ -1,0 +1,32 @@
+image:
+  - Visual Studio 2017
+  - Ubuntu
+version: 2017RC4-{build}
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2017
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake -G "Visual Studio 15 2017" -DCMAKE_TOOLCHAIN_FILE=win32-msvc-xp-static-ipo.cmake ..
+    - cd ..
+    - cmake --build build --config Release --parallel -- /p:XPDeprecationWarning=false
+  artifacts:
+    - path: 'build\*.dll'
+-
+  matrix:
+    only:
+      - image: Ubuntu
+  install:
+    - sudo apt-get update
+    - sudo apt-get --assume-yes install gcc-multilib g++-multilib
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_TOOLCHAIN_FILE=linux-i686-gcc-noGNUunique-gold-static-excludeSTDexport-oldGLIBC-noPIC-hidden-ipo-sections.cmake -DCMAKE_BUILD_TYPE=Release ..
+    - cd ..
+    - cmake --build build --config Release --parallel
+  artifacts:
+    - path: 'build/*.so'

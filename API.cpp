@@ -5,6 +5,7 @@
 #include <EngineUTIL.h>
 #include <memory>
 #include "VoiceCodecs/SILK/SKP_Silk_SigProc_FIX.h"
+#include <string>
 
 Event<size_t> g_OnClientStartSpeak;
 Event<size_t> g_OnClientStopSpeak;

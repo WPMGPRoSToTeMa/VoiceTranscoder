@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SKP_Silk_main.h"
 
 /* uncomment to compile without SSE optimizations */
-//#undef SKP_USE_SSE
+#undef SKP_USE_SSE
 
 #ifdef __cplusplus
 extern "C"

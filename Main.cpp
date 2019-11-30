@@ -148,35 +148,16 @@ public:
 
 C_DLLEXPORT
 #ifdef _WIN32
-__declspec(naked)
+__stdcall
 #endif
 void GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
 #ifdef _WIN32
-	__asm
-	{
-		push ebp
-		mov  ebp, esp
-		sub  esp, __LOCAL_SIZE
-		push ebx
-		push esi
-		push edi
-	}
+	// Thanks to https://stackoverflow.com/a/41910450
+	#pragma comment(linker, "/EXPORT:" __FUNCTION__ "=" __FUNCDNAME__)
 #endif
 
 	memcpy(&g_engfuncs, pEngFuncs, sizeof(g_engfuncs));
 	gpGlobals = pGlobalVars;
-
-#ifdef _WIN32
-	__asm
-	{
-		pop edi
-		pop esi
-		pop ebx
-		mov esp, ebp
-		pop ebp
-		ret 8
-	}
-#endif
 }
 
 C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion) {

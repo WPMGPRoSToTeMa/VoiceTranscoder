@@ -146,7 +146,11 @@ public:
 	}
 };
 
-C_DLLEXPORT void
+extern "C"
+#ifdef __linux__
+[[gnu::visibility("default")]]
+#endif
+void
 #ifdef _WIN32
 __stdcall
 #endif

@@ -1,0 +1,14 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# C++ code
+# TODO: I hope we should not enforce any tab size, but this is more to fix GitHub's default size of 8 (it's too wide)
+[**.{cpp,h}]
+indent_style = tab
+indent_size = 4
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = false

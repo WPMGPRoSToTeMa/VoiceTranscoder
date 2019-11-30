@@ -146,11 +146,11 @@ public:
 	}
 };
 
-C_DLLEXPORT
+C_DLLEXPORT void
 #ifdef _WIN32
 __stdcall
 #endif
-void GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
+GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
 #ifdef _WIN32
 	// Thanks to https://stackoverflow.com/a/41910450
 	#pragma comment(linker, "/EXPORT:" __FUNCTION__ "=" __FUNCDNAME__)

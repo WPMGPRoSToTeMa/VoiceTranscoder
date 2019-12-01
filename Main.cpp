@@ -146,15 +146,10 @@ public:
 	}
 };
 
-extern "C"
 #ifdef __linux__
-[[gnu::visibility("default")]]
+C_DLLEXPORT
 #endif
-void
-#ifdef _WIN32
-__stdcall
-#endif
-GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
+void WINAPI GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
 #ifdef _WIN32
 	// Thanks to https://stackoverflow.com/a/41910450
 	#pragma comment(linker, "/EXPORT:" __FUNCTION__ "=" __FUNCDNAME__)

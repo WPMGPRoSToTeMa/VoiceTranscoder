@@ -146,7 +146,7 @@ public:
 	}
 };
 
-#ifdef __linux__
+#if !defined(_WIN32)
 C_DLLEXPORT
 #endif
 void WINAPI GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {

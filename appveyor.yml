@@ -1,12 +1,15 @@
-image:
-  - Visual Studio 2017
-  - Ubuntu
+environment:
+  matrix:
+  - job_name: Windows
+    appveyor_build_worker_image: Visual Studio 2017
+  - job_name: Linux
+    appveyor_build_worker_image: Ubuntu
 version: 2017RC4-{build}
 for:
 -
   matrix:
     only:
-      - image: Visual Studio 2017
+      - job_name: Windows
   build_script:
     - mkdir build
     - cd build
@@ -18,7 +21,7 @@ for:
 -
   matrix:
     only:
-      - image: Ubuntu
+      - job_name: Linux
   install:
     - sudo apt-get update
     - sudo apt-get --assume-yes install gcc-multilib g++-multilib

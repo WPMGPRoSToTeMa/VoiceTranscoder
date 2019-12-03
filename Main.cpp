@@ -147,7 +147,7 @@ public:
 };
 
 #if !defined(_WIN32)
-C_DLLEXPORT1
+C_DLLEXPORT
 #endif
 void WINAPI GiveFnptrsToDll(enginefuncs_t *pEngFuncs, globalvars_t *pGlobalVars) {
 #ifdef _WIN32

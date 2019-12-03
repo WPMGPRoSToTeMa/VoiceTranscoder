@@ -2,8 +2,13 @@ environment:
   matrix:
   - job_name: Windows
     appveyor_build_worker_image: Visual Studio 2017
+    job_group: Build
   - job_name: Linux
     appveyor_build_worker_image: Ubuntu
+    job_group: Build
+  - job_name: Pack
+    appveyor_build_worker_image: Visual Studio 2019
+    job_depends_on: Build
 version: 2017RC4-{build}
 for:
 -
@@ -33,3 +38,41 @@ for:
     - cmake --build build --config Release --parallel
   artifacts:
     - path: 'build/*.so'
+-
+  matrix:
+    only:
+      - job_name: Pack
+  build_script:
+    - ps: >-
+        $baseArtifactsFolder = "addons";
+        $localArtifactsLocation = Join-Path $baseArtifactsFolder -ChildPath $env:appveyor_project_name;
+        
+        New-Item $localArtifactsLocation -ItemType Directory | Out-Null;
+        
+        $buildJobNames = @("Windows", "Linux");
+        
+        $currentBuildInfo = Invoke-RestMethod -Method Get -Uri "$env:appveyor_url/api/projects/$env:appveyor_account_name/$env:appveyor_project_slug/builds/$env:appveyor_build_id";
+        
+        foreach ($job in $currentBuildInfo.build.jobs) {
+            if (-not $job.name -in $buildJobNames) {
+                continue;
+            }
+            if (-not $job.status -eq "success") {
+                throw;
+            }
+            
+            $artifacts = Invoke-RestMethod -Method Get -Uri "$env:appveyor_url/api/buildjobs/$($job.jobId)/artifacts";
+            
+            foreach ($artifact in $artifacts) {
+                $localArtifactPath = Join-Path $localArtifactsLocation -ChildPath $(Split-Path $artifact.fileName -Leaf);
+                
+                Invoke-RestMethod -Method Get -Uri "$env:appveyor_url/api/buildjobs/$($job.jobId)/artifacts/$($artifact.fileName)" -OutFile $localArtifactPath;
+            }
+        }
+        
+        Copy-Item "$env:appveyor_project_name.cfg" -Destination $localArtifactsLocation
+        
+        Compress-Archive $baseArtifactsFolder -DestinationPath "$($env:appveyor_project_name)_$env:appveyor_build_version.zip";
+        Compress-Archive "$($env:appveyor_project_name)_$env:appveyor_build_version.zip" -DestinationPath "$($env:appveyor_project_name).zip";
+  artifacts:
+    - path: '*.zip'

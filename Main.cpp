@@ -137,6 +137,10 @@ public:
 			int16_t decodedSamples;
 			decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
 
+			if (decodedSamples <= 0) {
+				return 0;
+			}
+			
 			decodedRawSamples += decodedSamples;
 			curEncodedBytePos += payloadSize;
 			encodedBytesCount -= payloadSize;

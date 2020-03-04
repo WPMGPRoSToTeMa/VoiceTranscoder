@@ -134,8 +134,7 @@ public:
 			}
 			//LOG_MESSAGE(PLID, "Normal frame");
 
-			int16_t decodedSamples;
-			decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
+			int16_t decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
 
 			if (decodedSamples <= 0) {
 				return 0;
@@ -785,7 +784,13 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 							return;
 						}
 
-						rawSampleCount += pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						int numDecodedSamples = pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						
+						if (numDecodedSamples <= 0) {
+							return;
+						}
+						
+						rawSampleCount += numDecodedSamples;
 						buf.SkipBytes(bytesCount);
 					} else {
 						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);

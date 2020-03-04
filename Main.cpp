@@ -137,6 +137,10 @@ public:
 			int16_t decodedSamples;
 			decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
 
+			if (decodedSamples <= 0) {
+				return -1;
+			}
+
 			decodedRawSamples += decodedSamples;
 			curEncodedBytePos += payloadSize;
 			encodedBytesCount -= payloadSize;
@@ -781,7 +785,14 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 							return;
 						}
 
-						rawSampleCount += pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						auto numDecodedSamples = pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+							
+						if (numDecodedSamples == -1) {
+							return;
+						}
+
+						rawSampleCount += numDecodedSamples;
+
 						buf.SkipBytes(bytesCount);
 					} else {
 						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);

@@ -136,8 +136,10 @@ public:
 
 			int16_t decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
 
-			if (decodedSamples <= 0) {
-				return 0;
+			// An error occured during decode process
+			// TODO: possibly we can use `opus_packet_parse` for preventive packet validation
+			if (decodedSamples < 0) {
+				return std::size_t(-1);
 			}
 			
 			decodedRawSamples += decodedSamples;
@@ -784,13 +786,16 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 							return;
 						}
 
-						int numDecodedSamples = pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						std::size_t decodedSampleCount = pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
 						
-						if (numDecodedSamples <= 0) {
+						if (decodedSampleCount == std::size_t(-1)) {
+							LOG_MESSAGE(PLID, "Invalid voice packet from %s", remainBytes, bytesCount, pClient->m_szPlayerName);
+							EngineUTIL::DropClient(pClient, false, "Invalid voice packet", remainBytes, bytesCount);
+
 							return;
 						}
 						
-						rawSampleCount += numDecodedSamples;
+						rawSampleCount += decodedSampleCount;
 						buf.SkipBytes(bytesCount);
 					} else {
 						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);

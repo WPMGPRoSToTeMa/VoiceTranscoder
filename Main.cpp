@@ -789,8 +789,8 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 						std::size_t decodedSampleCount = pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
 						
 						if (decodedSampleCount == std::size_t(-1)) {
-							LOG_MESSAGE(PLID, "Invalid voice packet from %s", remainBytes, bytesCount, pClient->m_szPlayerName);
-							EngineUTIL::DropClient(pClient, false, "Invalid voice packet", remainBytes, bytesCount);
+							LOG_MESSAGE(PLID, "Invalid voice packet from %s", pClient->m_szPlayerName);
+							EngineUTIL::DropClient(pClient, false, "Invalid voice packet");
 
 							return;
 						}

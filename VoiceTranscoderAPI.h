@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-const char VOICETRANSCODER_VERSION[] = "2017RC4";
+const char VOICETRANSCODER_VERSION[] = "2017RC5";
 
 const size_t VOICETRANSCODER_API_VERSION_MAJOR = 3;
 const size_t VOICETRANSCODER_API_VERSION_MINOR = 1;

@@ -9,7 +9,7 @@ environment:
   - job_name: Pack
     appveyor_build_worker_image: Visual Studio 2019
     job_depends_on: Build
-version: 2017RC4-{build}
+version: 2017RC5-{build}
 for:
 -
   matrix:

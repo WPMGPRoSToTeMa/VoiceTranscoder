@@ -134,9 +134,14 @@ public:
 			}
 			//LOG_MESSAGE(PLID, "Normal frame");
 
-			int16_t decodedSamples;
-			decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
+			int16_t decodedSamples = opus_decode(_opusDecoder, &encodedBytes[curEncodedBytePos], payloadSize, &rawSamples[decodedRawSamples], maxRawSamples - decodedRawSamples, 0);
 
+			// An error occured during decode process
+			// TODO: possibly we can use `opus_packet_parse` for preventive packet validation
+			if (decodedSamples < 0) {
+				return std::size_t(-1);
+			}
+			
 			decodedRawSamples += decodedSamples;
 			curEncodedBytePos += payloadSize;
 			encodedBytesCount -= payloadSize;
@@ -781,7 +786,17 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 							return;
 						}
 
-						rawSampleCount += pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						std::size_t decodedSampleCount = pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
+						
+						// The bug is still not fixed in mainstream steamclient.dll, so we need to block any further propagation of invalid payloads
+						if (decodedSampleCount == std::size_t(-1)) {
+							LOG_MESSAGE(PLID, "Invalid voice packet from %s", pClient->m_szPlayerName);
+							EngineUTIL::DropClient(pClient, false, "Invalid voice packet");
+
+							return;
+						}
+						
+						rawSampleCount += decodedSampleCount;
 						buf.SkipBytes(bytesCount);
 					} else {
 						LOG_MESSAGE(PLID, "Voice packet invalid vdata size (cur = %u, need = %u) from %s", remainBytes, bytesCount, pClient->m_szPlayerName);

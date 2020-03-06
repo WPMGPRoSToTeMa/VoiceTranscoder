@@ -788,6 +788,7 @@ void SV_ParseVoiceData_Hook(client_t *pClient) {
 
 						std::size_t decodedSampleCount = pClientData->NewCodec2->Decode((const uint8_t *)buf.PeekRead(), bytesCount, &rawSamples[rawSampleCount], remainSamples);
 						
+						// The bug is still not fixed in mainstream steamclient.dll, so we need to block any further propagation of invalid payloads
 						if (decodedSampleCount == std::size_t(-1)) {
 							LOG_MESSAGE(PLID, "Invalid voice packet from %s", pClient->m_szPlayerName);
 							EngineUTIL::DropClient(pClient, false, "Invalid voice packet");

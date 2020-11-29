@@ -77,6 +77,15 @@ void VoiceTranscoderAPI::PlaySound(size_t receiverClientIndex, const char *sound
 		if (!client->m_fSpawned)
 			return;
 	}
+	
+	if (soundFilePath == NULL || soundFilePath[0] == '\0')
+	{
+		for(auto & s : playSound)
+		{
+			s.currentSample = 0x7FFFFFFF;
+			return;
+		}
+	}
 
 	auto gamedirAbsPath = std::string(GET_GAME_INFO(PLID, GINFO_GAMEDIR));
 	auto file = fopen((gamedirAbsPath + "/" + soundFilePath).c_str(), "rb");

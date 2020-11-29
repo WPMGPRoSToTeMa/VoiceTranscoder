@@ -82,8 +82,11 @@ void VoiceTranscoderAPI::PlaySound(size_t receiverClientIndex, const char *sound
 	{
 		for(auto & s : playSound)
 		{
-			s.currentSample = 0x7FFFFFFF;
-			return;
+			if (client == playSound.receiver)
+			{
+				s.currentSample = 0x7FFFFFFF;
+				return;
+			}
 		}
 	}
 

@@ -80,9 +80,9 @@ void VoiceTranscoderAPI::PlaySound(size_t receiverClientIndex, const char *sound
 	
 	if (soundFilePath == NULL || soundFilePath[0] == '\0')
 	{
-		for(auto i = 0; i < playSound.size();i++)
+		for(auto i = 0; i < g_playSounds.size();i++)
 		{
-			if (client == playSound[i].receiver)
+			if (client == g_playSounds[i].receiver)
 			{
 				g_playSounds.erase(g_playSounds.begin() + i);
 				return;
